@@ -23,4 +23,8 @@ export class AuthService {
   signUpWithEmailAndPassword(signUpUserData: AuthFormData): Observable<AuthApiResponse> {
     return this.http.post<AuthApiResponse>(environment.backendUrl + ApiEndPoints.signUp, signUpUserData)
   }
+
+  isUserAuthenticated(): boolean {
+    return !!localStorage.getItem('UserInfo')
+  }
 }
