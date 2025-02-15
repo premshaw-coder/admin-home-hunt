@@ -2,7 +2,7 @@ import { Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonToastService } from '../../../../app/shared/toast/common-toast.service';
-import { AuthFormControl, AuthFormData } from '../../interfaces/auth/auth-login.form.interface';
+import { AuthFormControl } from '../../interfaces/auth/auth-login.form.interface';
 import { AuthApiResponse } from '../../interfaces/auth/auth-login.interface';
 import { AuthService } from '../../services/auth.service';
 import { HttpClient } from '@angular/common/http';
@@ -13,18 +13,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { ToastModule } from 'primeng/toast';
-import { matchPassword } from '../../../../app/shared/functions/validators.functions';
 import { ActivatedRoute, Router } from '@angular/router';
-
-interface ResetPasswordFormControl {
-  newPassword?: FormControl<string | null | undefined>;
-  confirmPassword?: FormControl<string | null | undefined>;
-}
-
-interface ResetPasswordFormData {
-  newPassword: string | null | undefined;
-  confirmPassword: string | null | undefined;
-}
 
 @Component({
   selector: 'app-reset-password',
@@ -35,7 +24,7 @@ interface ResetPasswordFormData {
   styleUrl: './reset-password.component.scss'
 })
 export class ResetPasswordComponent {
-  public resetPasswordForm!: FormGroup<ResetPasswordFormControl>
+  public resetPasswordForm!: FormGroup<AuthFormControl>
   private authService = inject(AuthService)
   private commonService = inject(CommonToastService)
   private destroyRef = inject(DestroyRef)
@@ -55,9 +44,8 @@ export class ResetPasswordComponent {
   }
 
   private setForm(): void {
-    this.resetPasswordForm = new FormGroup<ResetPasswordFormControl>({
-      newPassword: new FormControl('', [Validators.email, Validators.required]),
-      confirmPassword: new FormControl('', [matchPassword, Validators.required])
+    this.resetPasswordForm = new FormGroup<AuthFormControl>({
+      password: new FormControl('', [Validators.email, Validators.required]),
     })
   }
 
@@ -66,34 +54,25 @@ export class ResetPasswordComponent {
     if (this.isFormInValid()) {
       return
     }
-    if (this.secret_key)
-      this.authService.resetPassword({ password: this.resetPasswordForm.value.newPassword || '', secret_key: this.secret_key })
-        .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-          next: (res) => {
-            localStorage.setItem('UserInfo', JSON.stringify(res))
-            this.commonService.successToast('Password Reset Successfully')
-            this.router.navigate(['']);
-          },
-          error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
-            this.commonService.errorToast(err.error.errMsg, err.error?.data?.message)
-          },
-          complete: () => {
-            this.resetPasswordForm.reset();
-          },
-        })
+    this.authService.resetPassword({ password: this.resetPasswordForm.value.password || '', secret_key: this.secret_key })
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: (res: AuthApiResponse) => {
+          localStorage.setItem('UserInfo', JSON.stringify(res))
+          this.commonService.successToast('Password Reset Successfully')
+          this.router.navigate(['']);
+        },
+        error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
+          this.commonService.errorToast(err.error.errMsg, err.error?.data?.message)
+        },
+        complete: () => {
+          this.resetPasswordForm.reset();
+        },
+      })
   }
   private isFormInValid(): boolean {
     if (this.resetPasswordForm.invalid) {
-      if (!this.resetPasswordForm.get('confirmPassword')?.value && !this.resetPasswordForm.get('newPassword')?.value) {
-        this.commonService.errorToast('All Fields are required');
-        return true;
-      }
-      if (this.resetPasswordForm.controls.newPassword?.errors) {
+      if (this.resetPasswordForm.controls.password?.errors) {
         this.commonService.errorToast('Password', 'Either Empty or Invalid');
-        return true;
-      }
-      if (this.resetPasswordForm.controls.confirmPassword?.errors) {
-        this.commonService.errorToast('Password', 'Either Empty or Not Matched');
         return true;
       }
     }
