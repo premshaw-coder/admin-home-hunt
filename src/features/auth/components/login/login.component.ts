@@ -13,6 +13,7 @@ import { HttpClient } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
 import { CardModule } from 'primeng/card';
 import { ToastModule } from 'primeng/toast';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -28,6 +29,7 @@ export class LoginComponent implements OnInit {
   private authService = inject(AuthService)
   private commonService = inject(CommonToastService)
   private destroyRef = inject(DestroyRef)
+  private router = inject(Router)
 
   constructor() { }
 
@@ -50,13 +52,14 @@ export class LoginComponent implements OnInit {
     this.authService.loginWithEmailAndPassword(loginFormData)
       .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: async (res: AuthApiResponse) => {
+          this.commonService.successToast('Login Successful')
           localStorage.setItem('UserInfo', JSON.stringify(res))
+          this.router.navigate(['/home'])
         },
         error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
           this.commonService.errorToast(err.error.errMsg, err.error?.data?.message)
         },
         complete: () => {
-          this.commonService.successToast('Login Successful')
           this.loginForm.reset()
         },
       })
