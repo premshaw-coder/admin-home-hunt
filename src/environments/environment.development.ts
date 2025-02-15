@@ -1,1 +1,4 @@
-export const environment = {};
+export const environment = {
+    backendUrl: 'http://localhost:3000',
+    from: 'dev'
+};
