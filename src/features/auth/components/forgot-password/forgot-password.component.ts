@@ -1,29 +1,27 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
-import { InputTextModule } from 'primeng/inputtext';
-import { FloatLabelModule } from 'primeng/floatlabel';
-import { ButtonModule } from 'primeng/button';
-import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
-import { PasswordModule } from 'primeng/password';
-import { AuthFormData, AuthFormControl } from '../../interfaces/auth/auth-login.form.interface';
-import { AuthApiResponse } from '../../interfaces/auth/auth-login.interface';
-import { CommonToastService } from '../../../../app/shared/toast/common-toast.service';
 import { HttpClient } from '@angular/common/http';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { InputTextModule } from 'primeng/inputtext';
+import { PasswordModule } from 'primeng/password';
 import { ToastModule } from 'primeng/toast';
+import { CommonToastService } from '../../../../app/shared/toast/common-toast.service';
+import { AuthService } from '../../services/auth.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AuthFormControl, AuthFormData } from '../../interfaces/auth/auth-login.form.interface';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-forgot-password',
   imports: [InputTextModule, FloatLabelModule, CardModule, ButtonModule, FormsModule,
     ReactiveFormsModule, PasswordModule, ToastModule],
   providers: [AuthService, HttpClient, CommonToastService, MessageService],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  templateUrl: './forgot-password.component.html',
+  styleUrl: './forgot-password.component.scss'
 })
-export class LoginComponent implements OnInit {
-
+export class ForgotPasswordComponent {
   public loginForm!: FormGroup<AuthFormControl>
   private authService = inject(AuthService)
   private commonService = inject(CommonToastService)
@@ -37,23 +35,18 @@ export class LoginComponent implements OnInit {
 
   private setForm(): void {
     this.loginForm = new FormGroup<AuthFormControl>({
-      email: new FormControl('', [Validators.email, Validators.required]),
-      password: new FormControl('', [Validators.minLength(8), Validators.maxLength(20),
-      Validators.required]),
+      email: new FormControl('', [Validators.email, Validators.required])
     })
   }
 
   public onSubmit(): void {
-    let loginFormData: AuthFormData = this.loginForm.value
+    let loginFormData: AuthFormData = this.loginForm.value;
     if (this.isFormInValid()) {
       return
     }
-    this.authService.loginWithEmailAndPassword(loginFormData)
+    this.authService.forgotPassword(loginFormData.email || '')
       .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: async (res: AuthApiResponse) => {
-          localStorage.setItem('UserInfo', JSON.stringify(res))
-          this.commonService.successToast('Login Successful')
-        },
+        next: (res: string) => this.commonService.successToast(res),
         error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
           this.commonService.errorToast(err.error.errMsg, err.error?.data?.message)
         },
@@ -70,10 +63,6 @@ export class LoginComponent implements OnInit {
       }
       if (this.loginForm.controls.email?.errors) {
         this.commonService.errorToast('Email', 'Either Empty or Invalid');
-        return true;
-      }
-      if (this.loginForm.controls.password?.errors) {
-        this.commonService.errorToast('Password', 'Either Empty or Invalid');
         return true;
       }
     }
