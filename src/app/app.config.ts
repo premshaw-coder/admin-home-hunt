@@ -4,7 +4,7 @@ import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
 import { provideHttpClient } from '@angular/common/http';
-import { MyPreset } from '../shared/primeNg-themes/primeng-themes';
+import { MyPreset } from './shared/primeNg-themes/primeng-themes';
 
 export const appConfig: ApplicationConfig = {
   providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideHttpClient(), provideRouter(routes),
