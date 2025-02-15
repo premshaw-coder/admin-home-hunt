@@ -6,7 +6,7 @@
         <div class="container" [formGroup]="signUpForm">
             <div class="floatLabel">
                 <p-floatLabel>
-                    <input type="text" autocomplete="off" pInputText id="email" formControlName="name" />
+                    <input type="text" autocomplete="off" pInputText id="name" formControlName="name" />
                     <label for="email">Name</label>
                 </p-floatLabel>
             </div>
@@ -18,12 +18,12 @@
             </div>
             <div class="floatLabel">
                 <p-floatLabel>
-                    <input type="text" autocomplete="off" pInputText id="email" formControlName="phoneNumber" />
+                    <input type="text" autocomplete="off" pInputText id="phone_number" formControlName="phoneNumber" />
                     <label for="email">Phone Number</label>
                 </p-floatLabel>
             </div>
             <p-floatlabel class="floatLabel">
-                <p-password styleClass="full_width" [inputStyle]="{'height': '50px', 'width': '100%'}"
+                <p-password styleClass="full_width" id="password" [inputStyle]="{'height': '50px', 'width': '100%'}"
                     [style]="{'width': '100%'}" [toggleMask]="true" formControlName="password" />
                 <label for="over_label">Password</label>
             </p-floatlabel>
@@ -38,3 +38,4 @@
         </ng-template>
     </p-card>
 </div>
+<p-toast />

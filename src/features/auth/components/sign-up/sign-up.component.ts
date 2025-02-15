@@ -12,10 +12,11 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { HttpClient } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-sign-up',
-  imports: [InputTextModule, FloatLabelModule, CardModule, ButtonModule, FormsModule, ReactiveFormsModule, PasswordModule],
+  imports: [InputTextModule, FloatLabelModule, CardModule, ButtonModule, FormsModule, ReactiveFormsModule, PasswordModule, ToastModule],
   providers: [AuthService, HttpClient, CommonToastService, MessageService],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.scss'
@@ -44,38 +45,42 @@ export class SignUpComponent {
   }
 
   onSubmit(signUpFormData: AuthFormData): void {
-    if (this.signUpForm.valid) {
-      signUpFormData = { ...signUpFormData, user_type: 'Property-Owner' }
-      this.authService.signUpWithEmailAndPassword(signUpFormData)
-        .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-          next: async (res: AuthApiResponse) => {
-            localStorage.setItem('UserInfo', JSON.stringify(res))
-          },
-          error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
-            this.commonService.errorToast(err.error.errMsg, err.error?.data?.message)
-          },
-          complete: () => {
-            this.signUpForm.reset()
-            console.log('Observable completed');
-          },
-        })
+    if (this.isFormInValid()) {
+      return
     }
-    else {
-      let data = this.signUpForm.controls
-      console.log('invalid', this.signUpForm.value);
-      if (data.email?.errors) this.commonService.showError('Email', 'Either Empty or Invalid')
-      if (data.password?.errors) this.commonService.showError('Password', 'Either Empty or Invalid')
-    }
+    signUpFormData = { ...signUpFormData, user_type: 'Property-Owner' }
+    this.authService.signUpWithEmailAndPassword(signUpFormData)
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: async (res: AuthApiResponse) => {
+          this.commonService.successToast('User Registered Successfully')
+        },
+        error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
+          this.commonService.errorToast(err.error.errMsg, err.error?.data?.message)
+        },
+        complete: () => {
+          this.signUpForm.reset()
+          console.log('Observable completed');
+        },
+      })
   }
 
   private isFormInValid(): boolean {
     if (this.signUpForm.invalid) {
-      if (!this.signUpForm.get('email')?.value && !this.signUpForm.get('password')?.value) {
+      if (!this.signUpForm.get('email')?.value && !this.signUpForm.get('password')?.value
+        && !this.signUpForm.get('name')?.value && !this.signUpForm.get('phoneNumber')?.value) {
         this.commonService.errorToast('All Fields are required');
+        return true;
+      }
+      if (this.signUpForm.controls.name?.errors) {
+        this.commonService.errorToast('Name', 'Either Empty or Invalid');
         return true;
       }
       if (this.signUpForm.controls.email?.errors) {
         this.commonService.errorToast('Email', 'Either Empty or Invalid');
+        return true;
+      }
+      if (this.signUpForm.controls.phoneNumber?.errors) {
+        this.commonService.errorToast('Phone Number', 'Either Empty or Invalid');
         return true;
       }
       if (this.signUpForm.controls.password?.errors) {
