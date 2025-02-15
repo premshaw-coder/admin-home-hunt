@@ -59,7 +59,6 @@ export class SignUpComponent {
         },
         complete: () => {
           this.signUpForm.reset()
-          console.log('Observable completed');
         },
       })
   }
