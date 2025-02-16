@@ -45,7 +45,8 @@ export class LoginComponent implements OnInit {
     })
   }
 
-  public onSubmit(loginFormData: AuthFormData): void {
+  public onSubmit(): void {
+    let loginFormData: AuthFormData = this.loginForm.value
     if (this.isFormInValid()) {
       return
     }

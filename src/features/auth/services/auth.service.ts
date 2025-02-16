@@ -24,6 +24,14 @@ export class AuthService {
     return this.http.post<AuthApiResponse>(environment.backendUrl + ApiEndPoints.signUp, signUpUserData)
   }
 
+  forgotPassword(email?: string): Observable<string> {
+    return this.http.get<string>(environment.backendUrl + ApiEndPoints.requestResetPassword + email)
+  }
+
+  resetPassword(data: { password: string, secret_key: String }): Observable<AuthApiResponse> {
+    return this.http.post<AuthApiResponse>(environment.backendUrl + ApiEndPoints.resetPassword, data)
+  }
+
   isUserAuthenticated(): boolean {
     return !!localStorage.getItem('UserInfo')
   }
