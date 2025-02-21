@@ -1,4 +1,68 @@
+@import "primeicons/primeicons.css";
+
 body {
     margin: 0;
     padding: 0;
+}
+
+/* Base flex containers */
+.flex_row {
+    display: flex;
+    flex-direction: row;
+}
+
+.flex_column {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Justify content */
+.flex_justify_start {
+    justify-content: flex-start;
+}
+
+.flex_justify_center {
+    justify-content: center;
+}
+
+.flex_justify_end {
+    justify-content: flex-end;
+}
+
+.flex_justify_between {
+    justify-content: space-between;
+}
+
+.flex_justify_around {
+    justify-content: space-around;
+}
+
+.flex_justify_evenly {
+    justify-content: space-evenly;
+}
+
+/* Align items */
+.flex_align_start {
+    align-items: flex-start;
+}
+
+.flex_align_center {
+    align-items: center;
+}
+
+.flex_align_end {
+    align-items: flex-end;
+}
+
+.flex_align_stretch {
+    align-items: stretch;
+}
+
+/* Wrap utilities */
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.flex-nowrap {
+    flex-wrap: nowrap;
 }

@@ -14,6 +14,7 @@ import { MessageService } from 'primeng/api';
 import { CardModule } from 'primeng/card';
 import { ToastModule } from 'primeng/toast';
 import { Router } from '@angular/router';
+import { RoutesPaths } from '../../../../app/shared/application-routes/app-routes';
 
 @Component({
   selector: 'app-login',
@@ -54,7 +55,7 @@ export class LoginComponent implements OnInit {
         next: async (res: AuthApiResponse) => {
           this.commonService.successToast('Login Successful')
           localStorage.setItem('UserInfo', JSON.stringify(res))
-          this.router.navigate(['/home'])
+          this.router.navigate([RoutesPaths.basePath + RoutesPaths.createPropertyListing])
         },
         error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
           this.commonService.errorToast(err.error.errMsg, err.error?.data?.message)

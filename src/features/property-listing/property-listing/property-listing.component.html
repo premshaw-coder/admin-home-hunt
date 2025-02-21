@@ -1,0 +1,12 @@
+<div class="card">
+    <p-tabs [value]="tabs[0].route" scrollable>
+        <p-tablist>
+            @for(tab of tabs; track tab.route){
+            <p-tab [value]="tab.route" [routerLink]="tab.route">
+                <span>{{ tab.label }}</span>
+            </p-tab>
+            }
+        </p-tablist>
+        <router-outlet></router-outlet>
+    </p-tabs>
+</div>
