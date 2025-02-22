@@ -66,3 +66,18 @@ body {
 .flex-nowrap {
     flex-wrap: nowrap;
 }
+//primeNg table column border css
+.table-vertical-borders th,
+.table-vertical-borders td {
+    border-right: 1px solid #e9ecef !important;
+}
+/*PrimeNG p-splitbutton overlay/modal position CSS; use !important for custom
+ styles to ensure correct menu button positioning.
+ */
+.p-tieredmenu-overlay {
+    position: absolute !important;
+}
+
+.p-tieredmenu {
+    min-width: 9rem !important;
+}

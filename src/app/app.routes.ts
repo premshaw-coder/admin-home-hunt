@@ -14,7 +14,7 @@ export const routes: Routes = [
         loadComponent: () => import('../features/property-listing/property-listing/property-listing.component')
             .then(c => c.PropertyListingComponent),
         children: [{
-            path: '', loadChildren: () => import('../features/property-listing/routes/property-listing-routes')
+            path: '', loadChildren: () => import('../features/property-listing/property-listing-routes/property-listing-routes')
                 .then(c => c.PropertyListingRoutes)
         }]
 

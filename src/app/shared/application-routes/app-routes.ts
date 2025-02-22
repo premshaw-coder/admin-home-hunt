@@ -1,6 +1,7 @@
 export const RoutesPaths = {
     // Application Base Path
     basePath: '/',
+    
     //Authentication Routes
     auth: 'auth',
     login: 'auth/login',
@@ -10,7 +11,7 @@ export const RoutesPaths = {
     // Application Routes
 
     // Property Listing Routes
-    createPropertyListing: 'create-property-listing',
+    createPropertyListing: 'property-listing',
     rentPropertyListing: 'rent',
     sellPropertyListing: 'sell',
     leasePropertyListing: 'lease',
