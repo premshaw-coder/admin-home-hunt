@@ -24,32 +24,39 @@ export class RentPropertyListingFormComponent {
   public propertyParkingValues = ApiStaticData.propertyParkingValues;
 
   public propertyFullAddressFormData = [
-    { id: 1, name: 'propertyCityName', placeholder: 'Enter city' },
-    { id: 2, name: 'houseNumber', placeholder: 'Enter house number' },
-    { id: 3, name: 'street', placeholder: 'Enter street' },
-    { id: 4, name: 'area', placeholder: 'Enter area' },
-    { id: 5, name: 'city', placeholder: 'Enter city' },
-    { id: 6, name: 'state', placeholder: 'Enter state' },
-    { id: 7, name: 'country', placeholder: 'Enter country' },
-    { id: 8, name: 'pincode', placeholder: 'Enter pincode' },
-    { id: 9, name: 'landmark', placeholder: 'Enter landmark' },
-    { id: 10, name: 'latitude', placeholder: 'Enter latitude' },
-    { id: 11, name: 'longitude', placeholder: 'Enter longitude' },
+    { id: 1, control: 'propertyCityName', placeholder: 'Enter city' },
+    { id: 2, control: 'houseNumber', placeholder: 'Enter house number' },
+    { id: 3, control: 'street', placeholder: 'Enter street' },
+    { id: 4, control: 'area', placeholder: 'Enter area' },
+    { id: 5, control: 'city', placeholder: 'Enter city' },
+    { id: 6, control: 'state', placeholder: 'Enter state' },
+    { id: 7, control: 'country', placeholder: 'Enter country' },
+    { id: 8, control: 'pincode', placeholder: 'Enter pincode' },
+    { id: 9, control: 'landmark', placeholder: 'Enter landmark' },
+    { id: 10, control: 'latitude', placeholder: 'Enter latitude' },
+    { id: 11, control: 'longitude', placeholder: 'Enter longitude' },
   ];
 
   public propertyDetailsFormInputData = [
-    { id: 11, name: 'propertyName', placeholder: 'Enter property' },
-    { id: 12, name: 'propertyDescription', placeholder: 'Enter description' },
-    { id: 13, name: 'street', placeholder: 'Enter street' },
-    { id: 14, name: 'area', placeholder: 'Enter area' },
-    { id: 15, name: 'city', placeholder: 'Enter city' },
-    { id: 16, name: 'state', placeholder: 'Enter state' },
-    { id: 17, name: 'country', placeholder: 'Enter country' },
-    { id: 18, name: 'pincode', placeholder: 'Enter pincode' },
-    { id: 19, name: 'landmark', placeholder: 'Enter landmark' },
-    { id: 20, name: 'latitude', placeholder: 'Enter latitude' },
-    { id: 21, name: 'longitude', placeholder: 'Enter longitude' },
+    { id: 12, control: 'propertyName', placeholder: 'Enter property' },
+    { id: 13, control: 'propertyDescription', placeholder: 'Enter description' },
+    { id: 14, control: 'propertyOwner', placeholder: 'Enter Owner' },
+    { id: 15, control: 'propertyCost', placeholder: 'Enter Cost' },
+    { id: 16, control: 'availability', placeholder: 'Enter availability' },
+    { id: 17, control: 'propertySecurityDeposit', placeholder: 'Enter security eposit' },
+    { id: 18, control: 'propertyCoveredArea', placeholder: 'covered area' },
+    { id: 19, control: 'propertTotalBathroom', placeholder: 'Enter total bathroom' },
+    { id: 20, control: 'propertyFloors', placeholder: 'Enter floors' },
   ];
+
+  public propertyDetailsFormSelectData = [
+    { id: 12, control: 'bhkType', placeholder: 'Enter bhk', values: this.bhktypeValues },
+    { id: 13, control: 'furnishingStatus', placeholder: 'Enter furnishing', values: this.furnishingStatusValues },
+    { id: 14, control: 'propertyFacing', placeholder: 'Enter Facing', values: this.propertyFacingValues },
+    { id: 15, control: 'propertyParking', placeholder: 'Enter Parking', values: this.propertyParkingValues },
+    { id: 16, control: 'propertyType', placeholder: 'Enter Type', values: this.propertypeValues },
+    { id: 17, control: 'propertyPreferredTenants', placeholder: 'Enter preferred tenants', values: this.propertyPreferredTenantsValues },
+  ]
 
 
   ngOnInit() {
