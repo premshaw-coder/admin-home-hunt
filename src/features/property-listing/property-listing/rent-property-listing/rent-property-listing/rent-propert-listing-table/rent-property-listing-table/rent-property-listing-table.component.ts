@@ -1,15 +1,13 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { Component, inject, OnInit } from '@angular/core';
+import { MessageService } from 'primeng/api';
 import { RentPropertyListingService } from '../../../services/rent-property-listing.service'
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { ToastModule } from 'primeng/toast';
-import { ToolbarModule } from 'primeng/toolbar';
-import { IconFieldModule } from 'primeng/iconfield';
-import { Table } from 'primeng/table';
 import { SplitButton, SplitButtonModule } from 'primeng/splitbutton';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { FormsModule } from '@angular/forms';
+import { DialogService, DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
+import { RentPropertyListingFormComponent } from '../rent-property-listing-form/rent-property-listing-form.component';
 interface Column {
   field: string;
   header: string;
@@ -22,30 +20,24 @@ interface ExportColumn {
 }
 @Component({
   selector: 'app-rent-property-listing-table',
-  imports: [TableModule, ToastModule, IconFieldModule, ButtonModule,
-    SplitButtonModule, MultiSelectModule, FormsModule],
+  imports: [TableModule, ButtonModule, SplitButtonModule,
+    MultiSelectModule, FormsModule],
+  providers: [DialogService],
   templateUrl: './rent-property-listing-table.component.html',
   styleUrl: './rent-property-listing-table.component.scss'
 })
 export class RentPropertyListingTableComponent implements OnInit {
+  public cols!: Column[];
+  public selectedColumns!: Column[];
+  public items: ({ label: string; icon: string; command: () => void; separator?: undefined; } | { separator: boolean; label?: undefined; icon?: undefined; command?: undefined; })[];
+  public products!: any[];
+  private ref: DynamicDialogRef | undefined;
 
+  private dialogService = inject(DialogService)
+  private RentPropertyListingService = inject(RentPropertyListingService)
+  private messageService = inject(MessageService)
 
-
-  @ViewChild('dt') dt!: Table;
-
-  cols!: Column[];
-  selectedColumns!: Column[];
-
-  exportColumns!: ExportColumn[];
-  items: ({ label: string; icon: string; command: () => void; separator?: undefined; } | { separator: boolean; label?: undefined; icon?: undefined; command?: undefined; })[];
-  products!: any[];
-
-  constructor(
-    private RentPropertyListingService: RentPropertyListingService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService,
-    private cd: ChangeDetectorRef
-  ) {
+  constructor() {
     this.items = [
       {
         label: 'Update',
@@ -70,7 +62,7 @@ export class RentPropertyListingTableComponent implements OnInit {
   ngOnInit(): void {
     this.RentPropertyListingService.getProducts().then((data) => {
       this.products = data;
-      this.cd.markForCheck();
+      // this.cd.markForCheck();
     });
     this.cols = [
       { field: 'name', header: 'Name' },
@@ -79,9 +71,9 @@ export class RentPropertyListingTableComponent implements OnInit {
     ];
 
     this.selectedColumns = this.cols;
-    this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
   }
 
+  //this function is to be removed
   showMenu(event: Event, splitBtn: SplitButton) {
     // Prevent default click action
     event.preventDefault();
@@ -90,5 +82,17 @@ export class RentPropertyListingTableComponent implements OnInit {
     if (splitBtn.menu && !splitBtn.menu.visible) {
       splitBtn.menu.toggle(event);
     }
+  }
+
+  createRentListing() {
+    let dialogConfig = new DynamicDialogConfig()
+    dialogConfig.header = 'Add New Rent Property Listing';
+    dialogConfig.width = '90%';
+    dialogConfig.height = '80%';
+    dialogConfig.showHeader = true;
+    dialogConfig.closeOnEscape = true;
+    dialogConfig.dismissableMask = true;
+    dialogConfig.closable = true;
+    this.ref = this.dialogService.open(RentPropertyListingFormComponent, dialogConfig)
   }
 }

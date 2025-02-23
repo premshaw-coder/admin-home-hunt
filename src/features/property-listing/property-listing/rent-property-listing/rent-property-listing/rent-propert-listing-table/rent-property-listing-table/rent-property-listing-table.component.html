@@ -1,5 +1,5 @@
 <div class="card">
-    <p-table #dt [resizableColumns]="true" [reorderableColumns]="true" styleClass="table-vertical-borders"
+    <p-table #dt [resizableColumns]="true" styleClass="table-vertical-borders"
         [columns]="selectedColumns" [value]="products" [exportHeader]="'customExportHeader'" [paginator]="true"
         [rows]="5" [tableStyle]="{ 'min-width': '50rem' }" [rowsPerPageOptions]="[5, 10, 20]">
         <ng-template #caption>
@@ -10,7 +10,7 @@
                         placeholder="Choose Columns" />
                 </div>
                 <div>
-                    <p-button label="Create rent Listing" icon="pi pi-plus-circle" />
+                    <p-button label="Create rent Listing" icon="pi pi-plus-circle"  (onClick)="createRentListing()"/>
                     <p-button icon="pi pi-external-link" label="Export" (click)="dt.exportCSV()"
                         [style]="{'margin-left': '12px'}" />
                 </div>
@@ -18,24 +18,20 @@
         </ng-template>
         <ng-template #header let-columns>
             <tr>
-                <th style="width:3rem"></th>
-                <th pReorderableColumn pResizableColumn pSortableColumn="code" style="width:20%">
+                <th pResizableColumn pSortableColumn="code" style="width:20%">
                     Code <p-sortIcon field="code" />
                 </th>
 
                 @for (col of columns; track $index) {
-                <th pReorderableColumn [pSortableColumn]="col.field" pResizableColumn>
+                <th [pSortableColumn]="col.field" pResizableColumn>
                     {{ col.header }} <p-sortIcon [field]="col.field" />
                 </th>
                 }
-                <th pReorderableColumn pResizableColumn>Action</th>
+                <th pResizableColumn>Action</th>
             </tr>
         </ng-template>
-        <ng-template #body let-product let-columns="columns" let-index="rowIndex">
-            <tr [pReorderableRow]="index">
-                <td>
-                    <span class="pi pi-bars" pReorderableRowHandle></span>
-                </td>
+        <ng-template #body let-product let-columns="columns">
+            <tr>
                 <td>{{ product.code }}</td>
                 @for (col of columns; track $index) {
                 <td>
