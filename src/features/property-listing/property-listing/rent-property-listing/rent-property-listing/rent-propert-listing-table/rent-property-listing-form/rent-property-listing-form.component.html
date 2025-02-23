@@ -5,50 +5,13 @@
                 <p-step>Header I</p-step>
                 <p-step-panel>
                     <ng-template #content let-activateCallback="activateCallback">
-                        <div>
-                            <input type="text" pInputText formControlName="propertyCityName" />
-                        </div>
                         <div formGroupName="propertyFullAddress" class="flex_row flex-wrap flex_gap">
+                            @for (formData of propertyFullAddressFormData; track formData?.id) {
                             <div>
-                                <input placeholder="Enter house number" type="text" pInputText
-                                    formControlName="houseNumber">
+                                <input [placeholder]="formData.placeholder" type="text" pInputText
+                                    [formControlName]="formData.name" />
                             </div>
-
-                            <div>
-                                <input placeholder="Enter street" type="text" pInputText formControlName="street">
-                            </div>
-
-                            <div>
-                                <input placeholder="Enter area" type="text" pInputText formControlName="area">
-                            </div>
-
-                            <div>
-                                <input placeholder="Enter city" type="text" pInputText formControlName="city">
-                            </div>
-
-                            <div>
-                                <input placeholder="Enter state" type="text" pInputText formControlName="state">
-                            </div>
-
-                            <div>
-                                <input placeholder="Enter country" type="text" pInputText formControlName="country">
-                            </div>
-
-                            <div>
-                                <input placeholder="Enter pincode" type="text" pInputText formControlName="pincode">
-                            </div>
-
-                            <div>
-                                <input placeholder="Enter landmark" type="text" pInputText formControlName="landmark">
-                            </div>
-
-                            <div>
-                                <input placeholder="Enter latitude" type="text" pInputText formControlName="latitude">
-                            </div>
-
-                            <div>
-                                <input placeholder="Enter longitude" type="text" pInputText formControlName="longitude">
-                            </div>
+                            }
                         </div>
                         <div class="py-6">
                             <p-button [style]="{'margin-top': '16px'}" label="Next" (onClick)="activateCallback(2)" />
@@ -66,7 +29,6 @@
                                 <input placeholder="Enter property name" type="text" pInputText
                                     formControlName="propertyName">
                             </div>
-
                             <div>
                                 <input placeholder="Enter property description" type="text" pInputText
                                     formControlName="propertyDescription">
@@ -92,17 +54,6 @@
                                     formControlName="availability">
                             </div>
                             <div>
-                                <p-select [panelStyle]="{ 'height': '120px','overflow-y': 'auto'}"
-                                    formControlName="bhkType" [options]="bhktypeValues" optionLabel="name"
-                                    placeholder="Select a Bhk" class="w-full md:w-56" />
-                            </div>
-                            <div>
-                                <p-select [panelStyle]="{ 'height': '120px','overflow-y': 'auto'}"
-                                    formControlName="propertyType" [options]="propertypeValues" optionLabel="name"
-                                    placeholder="Select a property type" class="w-full md:w-56" />
-                            </div>
-
-                            <div>
                                 <input placeholder="Enter security deposit" type="text" pInputText
                                     formControlName="propertySecurityDeposit">
                             </div>
@@ -111,46 +62,56 @@
                                 <input placeholder="Enter Covered Area" type="text" pInputText
                                     formControlName="propertyCoveredArea">
                             </div>
+                            <div>
+                                <input placeholder="Enter total bathroom" type="text" pInputText
+                                    formControlName="propertTotalBathroom">
+                            </div>
+                            <div>
+                                <input placeholder="Enter Floors" type="text" pInputText
+                                    formControlName="propertyFloors">
+                            </div>
 
                             <div>
-                                <p-select [panelStyle]="{ 'height': '120px','overflow-y': 'auto'}"
+                                <p-select appendTo="body"
                                     formControlName="propertyPreferredTenants"
                                     [options]="propertyPreferredTenantsValues" optionLabel="name"
                                     placeholder="Select a tenants" class="w-full md:w-56" />
                             </div>
 
                             <div>
-                                <p-select [panelStyle]="{ 'height': '120px','overflow-y': 'auto'}" formControlName="furnishingStatus"
-                                    [options]="furnishingStatusValues" optionLabel="name" placeholder="Select a furnishing status"
+                                <p-select appendTo="body"
+                                    formControlName="furnishingStatus" [options]="furnishingStatusValues"
+                                    optionLabel="name" placeholder="Select a furnishing status"
                                     class="w-full md:w-56" />
                             </div>
 
                             <div>
 
-                                <p-select formControlName="propertyFacing"
-                                    [options]="propertyFacingValues" optionLabel="name" placeholder="Select a property facing"
-                                    class="w-full md:w-56" />
+                                <p-select appendTo="body"
+                                    formControlName="propertyFacing" [options]="propertyFacingValues" optionLabel="name"
+                                    placeholder="Select a property facing" class="w-full md:w-56" />
                             </div>
 
                             <div>
-                                <input placeholder="Enter total bathroom" type="text" pInputText
-                                    formControlName="propertTotalBathroom">
+                                <p-select appendTo="body"
+                                    formControlName="bhkType" [options]="bhktypeValues" optionLabel="name"
+                                    placeholder="Select a Bhk" class="w-full md:w-56" />
                             </div>
-
                             <div>
-                                <p-select formControlName="propertyParking" [options]="propertyParkingValues" optionLabel="name"
-                                    placeholder="Select a property parking" class="w-full md:w-56" />
+                                <p-select appendTo="body"
+                                    formControlName="propertyType" [options]="propertypeValues" optionLabel="name"
+                                    placeholder="Select a property type" class="w-full md:w-56" />
                             </div>
-
                             <div>
-                                <input placeholder="Enter Floors" type="text" pInputText
-                                    formControlName="propertyFloors">
+                                <p-select appendTo="body"
+                                    formControlName="propertyParking" [options]="propertyParkingValues"
+                                    optionLabel="name" placeholder="Select a property parking" class="w-full md:w-56" />
                             </div>
                         </div>
                         <div class="flex py-6 gap-2">
-                            <p-button [style]="{'margin-top': '16px','margin-right':'12px'}" label="Back"
-                                severity="secondary" (onClick)="activateCallback(1)" />
-                            <p-button [style]="{'margin-top': '16px'}" label="Next" (onClick)="activateCallback(3)" />
+                            <p-button [style]="{'margin-right': '12px',}" label="Back" severity="secondary"
+                                (onClick)="activateCallback(1)" />
+                            <p-button label="Next" (onClick)="activateCallback(3)" />
                         </div>
                     </ng-template>
                 </p-step-panel>

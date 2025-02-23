@@ -22,10 +22,44 @@ export class RentPropertyListingFormComponent {
   public furnishingStatusValues = ApiStaticData.furnishingStatusValues;
   public propertyFacingValues = ApiStaticData.propertyFacingValues;
   public propertyParkingValues = ApiStaticData.propertyParkingValues;
+
+  public propertyFullAddressFormData = [
+    { id: 1, name: 'propertyCityName', placeholder: 'Enter city' },
+    { id: 2, name: 'houseNumber', placeholder: 'Enter house number' },
+    { id: 3, name: 'street', placeholder: 'Enter street' },
+    { id: 4, name: 'area', placeholder: 'Enter area' },
+    { id: 5, name: 'city', placeholder: 'Enter city' },
+    { id: 6, name: 'state', placeholder: 'Enter state' },
+    { id: 7, name: 'country', placeholder: 'Enter country' },
+    { id: 8, name: 'pincode', placeholder: 'Enter pincode' },
+    { id: 9, name: 'landmark', placeholder: 'Enter landmark' },
+    { id: 10, name: 'latitude', placeholder: 'Enter latitude' },
+    { id: 11, name: 'longitude', placeholder: 'Enter longitude' },
+  ];
+
+  public propertyDetailsFormInputData = [
+    { id: 11, name: 'propertyName', placeholder: 'Enter property' },
+    { id: 12, name: 'propertyDescription', placeholder: 'Enter description' },
+    { id: 13, name: 'street', placeholder: 'Enter street' },
+    { id: 14, name: 'area', placeholder: 'Enter area' },
+    { id: 15, name: 'city', placeholder: 'Enter city' },
+    { id: 16, name: 'state', placeholder: 'Enter state' },
+    { id: 17, name: 'country', placeholder: 'Enter country' },
+    { id: 18, name: 'pincode', placeholder: 'Enter pincode' },
+    { id: 19, name: 'landmark', placeholder: 'Enter landmark' },
+    { id: 20, name: 'latitude', placeholder: 'Enter latitude' },
+    { id: 21, name: 'longitude', placeholder: 'Enter longitude' },
+  ];
+
+
   ngOnInit() {
+    this.initiliseForm()
+  }
+
+  initiliseForm() {
     this.RentPropertyListingForm = new FormGroup({
-      propertyCityName: new FormControl('', Validators.required),
       propertyFullAddress: new FormGroup({
+        propertyCityName: new FormControl('', Validators.required),
         houseNumber: new FormControl('', Validators.required),
         street: new FormControl('', Validators.required),
         area: new FormControl('', Validators.required),
@@ -63,6 +97,8 @@ export class RentPropertyListingFormComponent {
         lift: new FormControl('', Validators.required)
       }),
     });
+
+    console.log(this.RentPropertyListingForm.get('propertyFullAddress'));
   }
 
   onSubmit() {
