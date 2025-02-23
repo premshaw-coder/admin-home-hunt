@@ -85,7 +85,8 @@ export class RentPropertyListingTableComponent implements OnInit {
   }
 
   createRentListing() {
-    let dialogConfig = new DynamicDialogConfig()
+    let dialogConfig = new DynamicDialogConfig();
+    dialogConfig.appendTo = "body";
     dialogConfig.header = 'Add New Rent Property Listing';
     dialogConfig.width = '90%';
     dialogConfig.height = '80%';

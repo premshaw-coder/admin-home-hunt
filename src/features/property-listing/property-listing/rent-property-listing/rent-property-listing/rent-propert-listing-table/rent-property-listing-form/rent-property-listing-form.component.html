@@ -8,8 +8,11 @@
                         <div formGroupName="propertyFullAddress" class="flex_row flex-wrap flex_gap">
                             @for (formData of propertyFullAddressFormData; track formData?.id) {
                             <div>
+                                @let formControl =
+                                RentPropertyListingForm.get('propertyFullAddress')?.get(formData.control);
                                 <input [placeholder]="formData.placeholder" type="text" pInputText
-                                    [formControlName]="formData.control" />
+                                    [formControlName]="formData.control"
+                                    [ngClass]="{'ng-invalid ng-dirty': formControl?.touched && formControl?.invalid}" />
                             </div>
                             }
                         </div>
@@ -33,7 +36,7 @@
                             }
                             @for (propertyDetailsFormSelect of propertyDetailsFormSelectData; track $index) {
                             <div>
-                                <p-select appendTo="body" [formControlName]="propertyDetailsFormSelect.control"
+                                <p-select [formControlName]="propertyDetailsFormSelect.control"
                                     [options]="propertyDetailsFormSelect.values" optionLabel="name"
                                     [placeholder]="propertyDetailsFormSelect.placeholder" class="w-full md:w-56" />
                             </div>
