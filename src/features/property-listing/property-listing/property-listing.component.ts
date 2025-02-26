@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { TabsModule } from 'primeng/tabs';
 import { RoutesPaths } from '../../../app/shared/application-routes/app-routes';
+import { filter, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-property-listing',
@@ -11,6 +12,8 @@ import { RoutesPaths } from '../../../app/shared/application-routes/app-routes';
 })
 export class PropertyListingComponent {
   tabs: any[] = [];
+  private router = inject(Router)
+  currentUrl!: string;
 
   constructor() {
     this.tabs = [
@@ -18,5 +21,12 @@ export class PropertyListingComponent {
       { label: 'Sell property', value: 1, route: RoutesPaths.sellPropertyListing },
       { label: 'Lease property', value: 2, route: RoutesPaths.leasePropertyListing },
     ];
+
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      map(() => this.router.url)
+    ).subscribe(url => {
+      this.currentUrl = url.split('/').pop() || '';
+    });
   }
 }

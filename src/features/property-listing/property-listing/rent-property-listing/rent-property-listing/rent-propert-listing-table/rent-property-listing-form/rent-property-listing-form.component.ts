@@ -16,13 +16,14 @@ import { SelectModule } from 'primeng/select';
 })
 export class RentPropertyListingFormComponent {
   RentPropertyListingForm!: FormGroup;
-  public bhktypeValues = ApiStaticData.bhktypeValues;
-  public propertypeValues = ApiStaticData.propertyTypeValues;
-  public propertyPreferredTenantsValues = ApiStaticData.propertyPreferredTenantsValues;
-  public furnishingStatusValues = ApiStaticData.furnishingStatusValues;
-  public propertyFacingValues = ApiStaticData.propertyFacingValues;
-  public propertyParkingValues = ApiStaticData.propertyParkingValues;
-
+  private bhktypeValues = ApiStaticData.bhktypeValues;
+  private propertypeValues = ApiStaticData.propertyTypeValues;
+  private propertyPreferredTenantsValues = ApiStaticData.propertyPreferredTenantsValues;
+  private furnishingStatusValues = ApiStaticData.furnishingStatusValues;
+  private propertyFacingValues = ApiStaticData.propertyFacingValues;
+  private propertyParkingValues = ApiStaticData.propertyParkingValues;
+  
+  
   public propertyFullAddressFormData = [
     { id: 1, control: 'propertyCityName', placeholder: 'Enter city' },
     { id: 2, control: 'houseNumber', placeholder: 'Enter house number' },
@@ -36,7 +37,7 @@ export class RentPropertyListingFormComponent {
     { id: 10, control: 'latitude', placeholder: 'Enter latitude' },
     { id: 11, control: 'longitude', placeholder: 'Enter longitude' },
   ];
-
+  
   public propertyDetailsFormInputData = [
     { id: 12, control: 'propertyName', placeholder: 'Enter property' },
     { id: 13, control: 'propertyDescription', placeholder: 'Enter description' },
@@ -48,17 +49,16 @@ export class RentPropertyListingFormComponent {
     { id: 19, control: 'propertTotalBathroom', placeholder: 'Enter total bathroom' },
     { id: 20, control: 'propertyFloors', placeholder: 'Enter floors' },
   ];
-
+  
   public propertyDetailsFormSelectData = [
-    { id: 12, control: 'bhkType', placeholder: 'Enter bhk', values: this.bhktypeValues },
-    { id: 13, control: 'furnishingStatus', placeholder: 'Enter furnishing', values: this.furnishingStatusValues },
-    { id: 14, control: 'propertyFacing', placeholder: 'Enter Facing', values: this.propertyFacingValues },
-    { id: 15, control: 'propertyParking', placeholder: 'Enter Parking', values: this.propertyParkingValues },
-    { id: 16, control: 'propertyType', placeholder: 'Enter Type', values: this.propertypeValues },
-    { id: 17, control: 'propertyPreferredTenants', placeholder: 'Enter preferred tenants', values: this.propertyPreferredTenantsValues },
+    { id: 21, control: 'bhkType', placeholder: 'Enter bhk', values: this.bhktypeValues },
+    { id: 22, control: 'furnishingStatus', placeholder: 'Enter furnishing', values: this.furnishingStatusValues },
+    { id: 23, control: 'propertyFacing', placeholder: 'Enter Facing', values: this.propertyFacingValues },
+    { id: 24, control: 'propertyParking', placeholder: 'Enter Parking', values: this.propertyParkingValues },
+    { id: 25, control: 'propertyType', placeholder: 'Enter Type', values: this.propertypeValues },
+    { id: 26, control: 'propertyPreferredTenants', placeholder: 'Enter preferred tenants', values: this.propertyPreferredTenantsValues },
   ]
-
-
+  
   ngOnInit() {
     this.initiliseForm()
   }
