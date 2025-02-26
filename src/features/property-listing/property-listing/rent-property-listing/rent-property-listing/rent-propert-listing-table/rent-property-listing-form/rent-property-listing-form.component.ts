@@ -1,20 +1,24 @@
-import { Component } from '@angular/core';
-import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
+import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule, NgModel } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { StepperModule } from 'primeng/stepper';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ApiStaticData } from '../../../../../../../app/shared/api-static-data/api-static-data';
 import { SelectModule } from 'primeng/select';
+import { NgClass } from '@angular/common';
+
 @Component({
   selector: 'app-rent-property-listing-form',
   imports: [StepperModule, ButtonModule, FormsModule, ReactiveFormsModule, InputTextModule,
-    ToggleSwitchModule, SelectModule
+    ToggleSwitchModule, SelectModule, NgClass
   ],
   templateUrl: './rent-property-listing-form.component.html',
-  styleUrl: './rent-property-listing-form.component.scss'
+  styleUrl: './rent-property-listing-form.component.scss',
+  schemas: [NO_ERRORS_SCHEMA]
 })
 export class RentPropertyListingFormComponent {
+  index: number = 0;
   RentPropertyListingForm!: FormGroup;
   private bhktypeValues = ApiStaticData.bhktypeValues;
   private propertypeValues = ApiStaticData.propertyTypeValues;

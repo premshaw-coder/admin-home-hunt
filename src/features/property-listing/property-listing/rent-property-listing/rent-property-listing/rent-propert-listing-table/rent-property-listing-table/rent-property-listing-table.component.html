@@ -1,16 +1,17 @@
 <div class="card">
-    <p-table #dt [resizableColumns]="true" styleClass="table-vertical-borders"
-        [columns]="selectedColumns" [value]="products" [exportHeader]="'customExportHeader'" [paginator]="true"
-        [rows]="5" [tableStyle]="{ 'min-width': '50rem' }" [rowsPerPageOptions]="[5, 10, 20]">
+    <p-table #dt [resizableColumns]="true" styleClass="table-vertical-borders" [columns]="selectedColumns"
+        [value]="products" [exportHeader]="'customExportHeader'" [paginator]="true" [rows]="5"
+        [tableStyle]="{ 'min-width': '50rem' }" [rowsPerPageOptions]="[5, 10, 20]">
         <ng-template #caption>
             <div class="flex_row flex_justify_between flex_align_center">
                 <div>
-                    <p-multiselect optionLabel="name" [maxSelectedLabels]="4" [display]="selectedColumns.length> 2 ? 'comma':'chip'" [options]="cols" [(ngModel)]="selectedColumns" optionLabel="header"
-                        selectedItemsLabel="{0} columns selected" [style]="{ 'min-width': '200px' }"
-                        placeholder="Choose Columns" />
+                    <p-multiselect optionLabel="name" [maxSelectedLabels]="4"
+                        [display]="selectedColumns.length> 2 ? 'comma':'chip'" [options]="cols"
+                        [(ngModel)]="selectedColumns" optionLabel="header" selectedItemsLabel="{0} columns selected"
+                        [style]="{ 'min-width': '200px' }" placeholder="Choose Columns" />
                 </div>
                 <div>
-                    <p-button label="Create rent Listing" icon="pi pi-plus-circle"  (onClick)="createRentListing()"/>
+                    <p-button label="Create rent Listing" icon="pi pi-plus-circle" (onClick)="createRentListing()" />
                     <p-button icon="pi pi-external-link" label="Export" (click)="dt.exportCSV()"
                         [style]="{'margin-left': '12px'}" />
                 </div>
