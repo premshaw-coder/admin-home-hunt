@@ -1,4 +1,5 @@
 export type DialogConfig = {
+    data:any;
     header: string;
     width: string;
     height: string;

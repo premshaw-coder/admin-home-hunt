@@ -10,7 +10,6 @@ import { DialogService, DynamicDialogRef, DynamicDialogConfig } from 'primeng/dy
 import { RentPropertyListingFormComponent } from '../rent-property-listing-form/rent-property-listing-form.component';
 import { DialogConfig } from '../../../../../property-listing-types/dialog-config';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { JsonPipe } from '@angular/common';
 interface Column {
   field: string;
   header: string;
@@ -20,7 +19,7 @@ interface Column {
 @Component({
   selector: 'app-rent-property-listing-table',
   imports: [TableModule, ButtonModule, SplitButtonModule,
-    MultiSelectModule, FormsModule, JsonPipe],
+    MultiSelectModule, FormsModule],
   providers: [DialogService],
   templateUrl: './rent-property-listing-table.component.html',
   styleUrl: './rent-property-listing-table.component.scss'
@@ -30,8 +29,8 @@ export class RentPropertyListingTableComponent implements OnInit {
   public selectedColumns!: Column[];
   public items: ({ label: string; icon: string; command: () => void; separator?: undefined; } | { separator: boolean; label?: undefined; icon?: undefined; command?: undefined; })[];
   public products!: any[];
-  userInfo: any = JSON.parse(localStorage.getItem('UserInfo') || '')
-
+  private userInfo: any = JSON.parse(localStorage.getItem('UserInfo') || '')
+  public rowPropertyRentIndex!: number
 
   private dialogService = inject(DialogService)
   private RentPropertyListingService = inject(RentPropertyListingService)
@@ -45,7 +44,7 @@ export class RentPropertyListingTableComponent implements OnInit {
         label: 'Update',
         icon: 'pi pi-refresh',
         command: () => {
-          this.messageService.add({ severity: 'success', summary: 'Updated', detail: 'Data Updated', life: 3000 });
+          this.editRentListing(this.products[this.rowPropertyRentIndex])
         },
       },
       {
@@ -73,6 +72,7 @@ export class RentPropertyListingTableComponent implements OnInit {
       },
     });;
     this.cols = [
+      { field: 'propertyCityName', header: 'Property Full Address' },
       { field: 'propertyName', header: 'Property Name' },
       { field: 'availability', header: 'Availability' },
       { field: 'propertyCost', header: 'Property Cost' },
@@ -85,7 +85,7 @@ export class RentPropertyListingTableComponent implements OnInit {
   }
 
   //this function is to be removed
-  showMenu(event: Event, splitBtn: SplitButton) {
+  showMenu(event: Event, splitBtn: SplitButton, rowIndex: number) {
     // Prevent default click action
     event.preventDefault();
 
@@ -97,7 +97,22 @@ export class RentPropertyListingTableComponent implements OnInit {
 
   createRentListing() {
     let dialogConfigObj: DialogConfig = {
+      data: { create: true },
       header: 'Add New Rent Property Listing',
+      width: '90%',
+      height: '80%',
+      showHeader: true,
+      closeOnEscape: true,
+      dismissableMask: true,
+      closable: true
+    }
+    this.dialogConfig(RentPropertyListingFormComponent, dialogConfigObj)
+  }
+
+  editRentListing(propertyRentListData: any) {
+    let dialogConfigObj: DialogConfig = {
+      data: { edit: true, propertyRentListData: propertyRentListData },
+      header: 'Edit Rent Property Listing',
       width: '90%',
       height: '80%',
       showHeader: true,
@@ -110,8 +125,9 @@ export class RentPropertyListingTableComponent implements OnInit {
 
   dialogConfig(component: Type<any>, dialogConfigObj: DialogConfig) {
     let dialogConfig = new DynamicDialogConfig();
-    let ref: DynamicDialogRef | undefined;
+    let ref: DynamicDialogRef;
     dialogConfig.appendTo = "body";
+    dialogConfig.data = dialogConfigObj?.data
     dialogConfig.header = dialogConfigObj?.header;
     dialogConfig.width = dialogConfigObj?.width;
     dialogConfig.height = dialogConfigObj?.height;
@@ -121,5 +137,10 @@ export class RentPropertyListingTableComponent implements OnInit {
     dialogConfig.closable = dialogConfigObj?.closable;
     ref = this.dialogService.open(component, dialogConfig)
     return ref
+  }
+
+  getTableRowIndex(event: any, rowIndex: any) {
+    this.rowPropertyRentIndex = rowIndex
+    console.log(this.rowPropertyRentIndex)
   }
 }

@@ -22,9 +22,6 @@
                 <th pResizableColumn pSortableColumn="code" style="width:5%">
                     Code <p-sortIcon field="code" />
                 </th>
-                <th pResizableColumn pSortableColumn="code" style="width:15%">
-                    Property Full Address <p-sortIcon field="code" />
-                </th>
                 @for (col of columns; track $index) {
                 <th [pSortableColumn]="col.field" pResizableColumn>
                     {{ col.header }} <p-sortIcon [field]="col.field" />
@@ -36,15 +33,15 @@
         <ng-template #body let-product let-columns="columns" let-index="rowIndex">
             <tr>
                 <td>{{ index+1 }}</td>
-                <td>{{ product?.propertyFullAddress?.propertyCityName }}</td>
                 @for (col of columns; track $index) {
                 <td>
-                    {{ product.propertyDetails[col.field] }}
+                    {{ product?.propertyFullAddress[col.field] || product.propertyDetails[col.field] }}
                 </td>
                 }
                 <td>
                     <p-splitbutton #splitBtn [raised]="true" [appendTo]="'body'" label="View" icon="pi pi-eye"
-                        dropdownIcon="pi pi-cog" [model]="items" (onClick)="showMenu($event, splitBtn)" />
+                        dropdownIcon="pi pi-cog" [model]="items" (onClick)="showMenu($event, splitBtn, index)"
+                        (onDropdownClick)="getTableRowIndex($event, index)" />
                 </td>
 
             </tr>
