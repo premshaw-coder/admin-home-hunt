@@ -10,6 +10,7 @@ import { DialogService, DynamicDialogRef, DynamicDialogConfig } from 'primeng/dy
 import { RentPropertyListingFormComponent } from '../rent-property-listing-form/rent-property-listing-form.component';
 import { DialogConfig } from '../../../../../property-listing-types/dialog-config';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { dialogConfig } from '../../../../../../../app/shared/reusable-function/common-function';
 interface Column {
   field: string;
   header: string;
@@ -85,7 +86,7 @@ export class RentPropertyListingTableComponent implements OnInit {
   }
 
   //this function is to be removed
-  showMenu(event: Event, splitBtn: SplitButton, rowIndex: number) {
+  public showMenu(event: Event, splitBtn: SplitButton, rowIndex: number) {
     // Prevent default click action
     event.preventDefault();
 
@@ -95,7 +96,7 @@ export class RentPropertyListingTableComponent implements OnInit {
     }
   }
 
-  createRentListing() {
+  public createRentListing() {
     let dialogConfigObj: DialogConfig = {
       data: { create: true },
       header: 'Add New Rent Property Listing',
@@ -106,10 +107,10 @@ export class RentPropertyListingTableComponent implements OnInit {
       dismissableMask: true,
       closable: true
     }
-    this.dialogConfig(RentPropertyListingFormComponent, dialogConfigObj)
+    dialogConfig(RentPropertyListingFormComponent, dialogConfigObj, this.dialogService)
   }
 
-  editRentListing(propertyRentListData: any) {
+  private editRentListing(propertyRentListData: any) {
     let dialogConfigObj: DialogConfig = {
       data: { edit: true, propertyRentListData: propertyRentListData },
       header: 'Edit Rent Property Listing',
@@ -120,26 +121,12 @@ export class RentPropertyListingTableComponent implements OnInit {
       dismissableMask: true,
       closable: true
     }
-    this.dialogConfig(RentPropertyListingFormComponent, dialogConfigObj)
+    dialogConfig(RentPropertyListingFormComponent, dialogConfigObj, this.dialogService)
   }
 
-  dialogConfig(component: Type<any>, dialogConfigObj: DialogConfig) {
-    let dialogConfig = new DynamicDialogConfig();
-    let ref: DynamicDialogRef;
-    dialogConfig.appendTo = "body";
-    dialogConfig.data = dialogConfigObj?.data
-    dialogConfig.header = dialogConfigObj?.header;
-    dialogConfig.width = dialogConfigObj?.width;
-    dialogConfig.height = dialogConfigObj?.height;
-    dialogConfig.showHeader = dialogConfigObj?.showHeader;
-    dialogConfig.closeOnEscape = dialogConfigObj?.closeOnEscape;
-    dialogConfig.dismissableMask = dialogConfigObj?.dismissableMask;
-    dialogConfig.closable = dialogConfigObj?.closable;
-    ref = this.dialogService.open(component, dialogConfig)
-    return ref
-  }
 
-  getTableRowIndex(event: any, rowIndex: any) {
+
+  public getTableRowIndex(event: any, rowIndex: any) {
     this.rowPropertyRentIndex = rowIndex
     console.log(this.rowPropertyRentIndex)
   }

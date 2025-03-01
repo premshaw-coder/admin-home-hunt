@@ -189,7 +189,7 @@ export class RentPropertyListingFormComponent {
     return selectedValue?.['name'] || "";
   }
 
-  createRentPropertyListing(formData: any) {
+  private createRentPropertyListing(formData: any) {
     // console.log('submit clicked', formData)
     this.rentPropertyListingService.createRentPropertyListing(formData).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: async (res: any) => {
