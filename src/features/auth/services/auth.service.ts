@@ -17,11 +17,11 @@ export class AuthService {
   }
 
   loginWithEmailAndPassword(loginUserData: AuthFormData): Observable<AuthApiResponse> {
-    return this.http.post<AuthApiResponse>(environment.backendUrl + ApiEndPoints.login, loginUserData)
+    return this.http.post<AuthApiResponse>(environment.baseUrl + ApiEndPoints.login, loginUserData)
   }
 
   signUpWithEmailAndPassword(signUpUserData: AuthFormData): Observable<AuthApiResponse> {
-    return this.http.post<AuthApiResponse>(environment.backendUrl + ApiEndPoints.signUp, signUpUserData)
+    return this.http.post<AuthApiResponse>(environment.baseUrl + ApiEndPoints.signUp, signUpUserData)
   }
 
   isUserAuthenticated(): boolean {

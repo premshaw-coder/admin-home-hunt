@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, Type } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { RentPropertyListingService } from '../../../services/rent-property-listing.service'
 import { TableModule } from 'primeng/table';
@@ -8,20 +8,19 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { FormsModule } from '@angular/forms';
 import { DialogService, DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { RentPropertyListingFormComponent } from '../rent-property-listing-form/rent-property-listing-form.component';
+import { DialogConfig } from '../../../../../property-listing-types/dialog-config';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { JsonPipe } from '@angular/common';
 interface Column {
   field: string;
   header: string;
   customExportHeader?: string;
 }
 
-interface ExportColumn {
-  title: string;
-  dataKey: string;
-}
 @Component({
   selector: 'app-rent-property-listing-table',
   imports: [TableModule, ButtonModule, SplitButtonModule,
-    MultiSelectModule, FormsModule],
+    MultiSelectModule, FormsModule, JsonPipe],
   providers: [DialogService],
   templateUrl: './rent-property-listing-table.component.html',
   styleUrl: './rent-property-listing-table.component.scss'
@@ -31,11 +30,14 @@ export class RentPropertyListingTableComponent implements OnInit {
   public selectedColumns!: Column[];
   public items: ({ label: string; icon: string; command: () => void; separator?: undefined; } | { separator: boolean; label?: undefined; icon?: undefined; command?: undefined; })[];
   public products!: any[];
-  private ref: DynamicDialogRef | undefined;
+  userInfo: any = JSON.parse(localStorage.getItem('UserInfo') || '')
+
 
   private dialogService = inject(DialogService)
   private RentPropertyListingService = inject(RentPropertyListingService)
   private messageService = inject(MessageService)
+  private destroyRef = inject(DestroyRef)
+
 
   constructor() {
     this.items = [
@@ -60,14 +62,23 @@ export class RentPropertyListingTableComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.RentPropertyListingService.getProducts().then((data) => {
-      this.products = data;
-      // this.cd.markForCheck();
-    });
+    this.RentPropertyListingService.getAllRentPropertyListingByProperOwner(this.userInfo?.uuid).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (res: any) => {
+        this.products = res
+      },
+      error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
+      },
+      complete: () => {
+
+      },
+    });;
     this.cols = [
-      { field: 'name', header: 'Name' },
-      { field: 'category', header: 'Category' },
-      { field: 'quantity', header: 'Quantity' }
+      { field: 'propertyName', header: 'Property Name' },
+      { field: 'availability', header: 'Availability' },
+      { field: 'propertyCost', header: 'Property Cost' },
+      { field: 'bhkType', header: 'Bhk Type' },
+      { field: 'propertyType', header: 'Property Type' },
+      { field: 'propertySecurityDeposit', header: 'Security Deposit' },
     ];
 
     this.selectedColumns = this.cols;
@@ -85,15 +96,30 @@ export class RentPropertyListingTableComponent implements OnInit {
   }
 
   createRentListing() {
+    let dialogConfigObj: DialogConfig = {
+      header: 'Add New Rent Property Listing',
+      width: '90%',
+      height: '80%',
+      showHeader: true,
+      closeOnEscape: true,
+      dismissableMask: true,
+      closable: true
+    }
+    this.dialogConfig(RentPropertyListingFormComponent, dialogConfigObj)
+  }
+
+  dialogConfig(component: Type<any>, dialogConfigObj: DialogConfig) {
     let dialogConfig = new DynamicDialogConfig();
+    let ref: DynamicDialogRef | undefined;
     dialogConfig.appendTo = "body";
-    dialogConfig.header = 'Add New Rent Property Listing';
-    dialogConfig.width = '90%';
-    dialogConfig.height = '80%';
-    dialogConfig.showHeader = true;
-    dialogConfig.closeOnEscape = true;
-    dialogConfig.dismissableMask = true;
-    dialogConfig.closable = true;
-    this.ref = this.dialogService.open(RentPropertyListingFormComponent, dialogConfig)
+    dialogConfig.header = dialogConfigObj?.header;
+    dialogConfig.width = dialogConfigObj?.width;
+    dialogConfig.height = dialogConfigObj?.height;
+    dialogConfig.showHeader = dialogConfigObj?.showHeader;
+    dialogConfig.closeOnEscape = dialogConfigObj?.closeOnEscape;
+    dialogConfig.dismissableMask = dialogConfigObj?.dismissableMask;
+    dialogConfig.closable = dialogConfigObj?.closable;
+    ref = this.dialogService.open(component, dialogConfig)
+    return ref
   }
 }

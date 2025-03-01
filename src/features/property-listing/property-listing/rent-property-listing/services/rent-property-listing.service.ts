@@ -1,9 +1,15 @@
-import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { environment } from '../../../../../environments/environment.development';
+import { ApiEndPoints } from '../../../../../app/shared/api-ends-points/admin-home-hunt-api-endpoints';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RentPropertyListingService {
+
+  private httpService = inject(HttpClient)
 
   getProductsData() {
     return [
@@ -1222,5 +1228,13 @@ export class RentPropertyListingService {
 
   getProductsWithOrders() {
     return Promise.resolve(this.getProductsWithOrdersData());
+  }
+
+  createRentPropertyListing(rentListinginfo: any): Observable<any> {
+    return this.httpService.post<any>(environment.baseUrl + environment.apiVersion + ApiEndPoints.addRentListing, { ...rentListinginfo });
+  }
+
+  getAllRentPropertyListingByProperOwner(paramsId:string): Observable<any> {
+    return this.httpService.get<any>(environment.baseUrl + environment.apiVersion + ApiEndPoints.getAllRentPropertyListingByProperOwner+ paramsId);
   }
 }

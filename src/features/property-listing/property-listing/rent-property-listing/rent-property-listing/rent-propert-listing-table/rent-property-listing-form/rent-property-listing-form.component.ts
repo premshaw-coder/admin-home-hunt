@@ -1,4 +1,4 @@
-import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
+import { Component, DestroyRef, inject, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule, NgModel } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { StepperModule } from 'primeng/stepper';
@@ -7,18 +7,20 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ApiStaticData } from '../../../../../../../app/shared/api-static-data/api-static-data';
 import { SelectModule } from 'primeng/select';
 import { NgClass } from '@angular/common';
+import { RentPropertyListingService } from '../../../services/rent-property-listing.service';
+import { HttpClient } from '@angular/common/http';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-rent-property-listing-form',
   imports: [StepperModule, ButtonModule, FormsModule, ReactiveFormsModule, InputTextModule,
     ToggleSwitchModule, SelectModule, NgClass
   ],
+  providers: [RentPropertyListingService, HttpClient],
   templateUrl: './rent-property-listing-form.component.html',
   styleUrl: './rent-property-listing-form.component.scss',
-  schemas: [NO_ERRORS_SCHEMA]
 })
 export class RentPropertyListingFormComponent {
-  index: number = 0;
   RentPropertyListingForm!: FormGroup;
   private bhktypeValues = ApiStaticData.bhktypeValues;
   private propertypeValues = ApiStaticData.propertyTypeValues;
@@ -26,8 +28,13 @@ export class RentPropertyListingFormComponent {
   private furnishingStatusValues = ApiStaticData.furnishingStatusValues;
   private propertyFacingValues = ApiStaticData.propertyFacingValues;
   private propertyParkingValues = ApiStaticData.propertyParkingValues;
-  
-  
+
+  userInfo: any = JSON.parse(localStorage.getItem('UserInfo') || '')
+
+  private rentPropertyListingService = inject(RentPropertyListingService)
+  private destroyRef = inject(DestroyRef)
+
+
   public propertyFullAddressFormData = [
     { id: 1, control: 'propertyCityName', placeholder: 'Enter city' },
     { id: 2, control: 'houseNumber', placeholder: 'Enter house number' },
@@ -41,11 +48,11 @@ export class RentPropertyListingFormComponent {
     { id: 10, control: 'latitude', placeholder: 'Enter latitude' },
     { id: 11, control: 'longitude', placeholder: 'Enter longitude' },
   ];
-  
+
   public propertyDetailsFormInputData = [
     { id: 12, control: 'propertyName', placeholder: 'Enter property' },
     { id: 13, control: 'propertyDescription', placeholder: 'Enter description' },
-    { id: 14, control: 'propertyOwner', placeholder: 'Enter Owner' },
+    { id: 14, control: 'propertyPostedBy', placeholder: 'Enter Owner name' },
     { id: 15, control: 'propertyCost', placeholder: 'Enter Cost' },
     { id: 16, control: 'availability', placeholder: 'Enter availability' },
     { id: 17, control: 'propertySecurityDeposit', placeholder: 'Enter security eposit' },
@@ -53,7 +60,7 @@ export class RentPropertyListingFormComponent {
     { id: 19, control: 'propertTotalBathroom', placeholder: 'Enter total bathroom' },
     { id: 20, control: 'propertyFloors', placeholder: 'Enter floors' },
   ];
-  
+
   public propertyDetailsFormSelectData = [
     { id: 21, control: 'bhkType', placeholder: 'Enter bhk', values: this.bhktypeValues },
     { id: 22, control: 'furnishingStatus', placeholder: 'Enter furnishing', values: this.furnishingStatusValues },
@@ -62,9 +69,11 @@ export class RentPropertyListingFormComponent {
     { id: 25, control: 'propertyType', placeholder: 'Enter Type', values: this.propertypeValues },
     { id: 26, control: 'propertyPreferredTenants', placeholder: 'Enter preferred tenants', values: this.propertyPreferredTenantsValues },
   ]
-  
+
   ngOnInit() {
     this.initiliseForm()
+    this.testFormData()
+    console.log(this.userInfo)
   }
 
   initiliseForm() {
@@ -112,7 +121,86 @@ export class RentPropertyListingFormComponent {
     console.log(this.RentPropertyListingForm.get('propertyFullAddress'));
   }
 
-  onSubmit() {
-    console.log(this.RentPropertyListingForm.value);
+  public onSubmit(): any {
+    if (this.RentPropertyListingForm.invalid) return '';
+    let propertyDetailFormData = this.RentPropertyListingForm.get('propertyDetails')
+    let formData = {
+      ...this.RentPropertyListingForm.value, 'propertyDetails': {
+        ...propertyDetailFormData?.value,
+        'bhkType': this.getSelectedValueAsString('propertyDetails', 'bhkType'),
+        'propertyPreferredTenants': this.getSelectedValueAsString('propertyDetails', 'propertyPreferredTenants'),
+        'furnishingStatus': this.getSelectedValueAsString('propertyDetails', 'furnishingStatus'),
+        'propertyFacing': this.getSelectedValueAsString('propertyDetails', 'propertyFacing'),
+        'propertyParking': this.getSelectedValueAsString('propertyDetails', 'propertyParking'),
+        'propertyType': this.getSelectedValueAsString('propertyDetails', 'propertyType'),
+        'propertyCoveredArea': +propertyDetailFormData?.get('propertyCoveredArea')?.value,
+        'propertyOwner': this.userInfo?.uuid,
+        'propertyPostedBy': this.userInfo?.name
+      }
+    }
+    // console.log('submit clicked', formData)
+    this.rentPropertyListingService.createRentPropertyListing(formData).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: async (res: any) => {
+        
+      },
+      error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
+      },
+      complete: () => {
+        this.RentPropertyListingForm.reset()
+      },
+    });
+  }
+
+  private testFormData() {
+    // Assuming these are the values to be patched
+    const propertyData = {
+      propertyFullAddress: {
+        propertyCityName: 'Bengaluru',
+        houseNumber: '123',
+        street: 'Main Street',
+        area: 'Koramangala',
+        city: 'Bengaluru',
+        state: 'Karnataka',
+        country: 'India',
+        pincode: '560034',
+        landmark: 'Near Forum Mall',
+        latitude: '12.9352',
+        longitude: '77.6245'
+      },
+      propertyDetails: {
+        propertyName: 'Cozy Apartment',
+        propertyDescription: 'A cozy 2BHK apartment in the heart of the city',
+        propertyOwner: 'John Doe',
+        propertyPostedBy: 'John Doe',
+        propertyCost: '35000',
+        availability: 'Immediate',
+        bhkType: this.bhktypeValues[0],
+        propertyType: this.propertypeValues[0],
+        propertySecurityDeposit: '100000',
+        propertyPostedOnDate: '2025-02-26',
+        propertyCoveredArea: '1200',
+        propertyPreferredTenants: this.propertyPreferredTenantsValues[0],
+        furnishingStatus: this.furnishingStatusValues[0],
+        propertyFacing: this.propertyFacingValues[0],
+        propertTotalBathroom: '2',
+        propertyParking: this.propertyParkingValues[0],
+        propertyFloors: '3'
+      },
+      propertyAmnities: {
+        waterSupply: true,
+        attachedBathroom: true,
+        security: true,
+        lift: true
+      }
+    };
+
+    // Patching the form with the provided data
+    this.RentPropertyListingForm.patchValue(propertyData);
+
+  }
+
+  private getSelectedValueAsString(formGroupName: string, FormControlName: string) {
+    let selectedValue = this.RentPropertyListingForm.get(formGroupName)?.get(FormControlName)?.value ?? {}
+    return selectedValue?.['name'] || "";
   }
 }

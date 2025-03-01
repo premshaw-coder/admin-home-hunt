@@ -14,11 +14,11 @@ export const ApiStaticData = {
         { name: 'Commercial', code: 'Commercial' }
     ],
     propertyPreferredTenantsValues: [
-        { name: 'Family', code: 'Family' }, { name: 'Bachelors', code: 'Bachelors' }
+        { name: 'family', code: 'family' }, { name: 'bachelors', code: 'bachelors' }
     ],
     furnishingStatusValues: [
-        { name: 'Furnished', code: 'Furnished' }, { name: 'Semi-Furnished', code: 'Semi-Furnished' },
-        { name: 'Unfurnished', code: 'Unfurnished' }
+        { name: 'furnished', code: 'furnished' }, { name: 'semi-furnished', code: 'semi-furnished' },
+        { name: 'unfurnished', code: 'unfurnished' }
     ],
     propertyFacingValues: [
         { name: 'east', code: 'east' },
@@ -31,6 +31,6 @@ export const ApiStaticData = {
         { name: 'south - west', code: 'south - west' }
     ],
     propertyParkingValues: [
-        { name: 'Bike', code: 'Bike' }, { name: 'Car', code: 'Car' }, { name: 'Both', code: 'Both' }
+        { name: '2wheeler', code: '2wheeler' }, { name: '4wheeler', code: '4wheeler' }, { name: 'both', code: 'both' }
     ],
 }
