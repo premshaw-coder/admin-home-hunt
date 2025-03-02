@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, Type } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { RentPropertyListingService } from '../../../services/rent-property-listing.service'
 import { TableModule } from 'primeng/table';
@@ -6,11 +6,11 @@ import { ButtonModule } from 'primeng/button';
 import { SplitButton, SplitButtonModule } from 'primeng/splitbutton';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { FormsModule } from '@angular/forms';
-import { DialogService, DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
+import { DialogService } from 'primeng/dynamicdialog';
 import { RentPropertyListingFormComponent } from '../rent-property-listing-form/rent-property-listing-form.component';
 import { DialogConfig } from '../../../../../property-listing-types/dialog-config';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { dialogConfig } from '../../../../../../../app/shared/reusable-function/common-function';
+import { openDialog, dialogConfigObj } from '../../../../../../../app/shared/reusable-function/common-function';
 interface Column {
   field: string;
   header: string;
@@ -19,8 +19,7 @@ interface Column {
 
 @Component({
   selector: 'app-rent-property-listing-table',
-  imports: [TableModule, ButtonModule, SplitButtonModule,
-    MultiSelectModule, FormsModule],
+  imports: [TableModule, ButtonModule, SplitButtonModule, MultiSelectModule, FormsModule],
   providers: [DialogService],
   templateUrl: './rent-property-listing-table.component.html',
   styleUrl: './rent-property-listing-table.component.scss'
@@ -97,36 +96,16 @@ export class RentPropertyListingTableComponent implements OnInit {
   }
 
   public createRentListing() {
-    let dialogConfigObj: DialogConfig = {
-      data: { create: true },
-      header: 'Add New Rent Property Listing',
-      width: '90%',
-      height: '80%',
-      showHeader: true,
-      closeOnEscape: true,
-      dismissableMask: true,
-      closable: true
-    }
-    dialogConfig(RentPropertyListingFormComponent, dialogConfigObj, this.dialogService)
+    let dialogConfig: DialogConfig = dialogConfigObj(false)
+    openDialog(RentPropertyListingFormComponent, dialogConfig, this.dialogService)
   }
 
   private editRentListing(propertyRentListData: any) {
-    let dialogConfigObj: DialogConfig = {
-      data: { edit: true, propertyRentListData: propertyRentListData },
-      header: 'Edit Rent Property Listing',
-      width: '90%',
-      height: '80%',
-      showHeader: true,
-      closeOnEscape: true,
-      dismissableMask: true,
-      closable: true
-    }
-    dialogConfig(RentPropertyListingFormComponent, dialogConfigObj, this.dialogService)
+    let dialogConfig: DialogConfig = dialogConfigObj(true, propertyRentListData)
+    openDialog(RentPropertyListingFormComponent, dialogConfig, this.dialogService)
   }
 
-
-
-  public getTableRowIndex(event: any, rowIndex: any) {
+  public getTableRowIndex(rowIndex: any) {
     this.rowPropertyRentIndex = rowIndex
     console.log(this.rowPropertyRentIndex)
   }

@@ -240,15 +240,15 @@ export class RentPropertyListingFormComponent {
     // Patching the form with the provided data
     let rentPropertyDetailsData = this.rentPropertyData?.propertyDetails
     this.RentPropertyListingForm.patchValue(this.rentPropertyData);
-    this.patchFormSelectDropdownData('bhkType', this.bhktypeValues, rentPropertyDetailsData?.bhkType)
-    this.patchFormSelectDropdownData('furnishingStatus', this.furnishingStatusValues, rentPropertyDetailsData?.furnishingStatus)
-    this.patchFormSelectDropdownData('propertyFacing', this.propertyFacingValues, rentPropertyDetailsData?.propertyFacing)
-    this.patchFormSelectDropdownData('propertyParking', this.propertyParkingValues, rentPropertyDetailsData?.propertyParking)
-    this.patchFormSelectDropdownData('propertyType', this.propertypeValues, rentPropertyDetailsData?.propertyType)
-    this.patchFormSelectDropdownData('propertyPreferredTenants', this.propertyPreferredTenantsValues, rentPropertyDetailsData?.propertyPreferredTenants)
+    this.patchValueForSelectDropdownData('bhkType', this.bhktypeValues, rentPropertyDetailsData?.bhkType)
+    this.patchValueForSelectDropdownData('furnishingStatus', this.furnishingStatusValues, rentPropertyDetailsData?.furnishingStatus)
+    this.patchValueForSelectDropdownData('propertyFacing', this.propertyFacingValues, rentPropertyDetailsData?.propertyFacing)
+    this.patchValueForSelectDropdownData('propertyParking', this.propertyParkingValues, rentPropertyDetailsData?.propertyParking)
+    this.patchValueForSelectDropdownData('propertyType', this.propertypeValues, rentPropertyDetailsData?.propertyType)
+    this.patchValueForSelectDropdownData('propertyPreferredTenants', this.propertyPreferredTenantsValues, rentPropertyDetailsData?.propertyPreferredTenants)
   }
 
-  patchFormSelectDropdownData(FormControlName: string, selectOptionData: any[], selectedData: string) {
+  patchValueForSelectDropdownData(FormControlName: string, selectOptionData: any[], selectedData: string) {
     let selectedDropdownFormData = selectOptionData.find((data: any) => data.name === selectedData)
     this.RentPropertyListingForm.get('propertyDetails')?.get(FormControlName)?.patchValue(selectedDropdownFormData);
   }

@@ -41,7 +41,7 @@
                 <td>
                     <p-splitbutton #splitBtn [raised]="true" [appendTo]="'body'" label="View" icon="pi pi-eye"
                         dropdownIcon="pi pi-cog" [model]="items" (onClick)="showMenu($event, splitBtn, index)"
-                        (onDropdownClick)="getTableRowIndex($event, index)" />
+                        (onDropdownClick)="getTableRowIndex(index)" />
                 </td>
 
             </tr>
