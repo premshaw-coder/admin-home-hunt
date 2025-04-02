@@ -74,7 +74,7 @@ export class RentPropertyListingFormComponent {
 
   ngOnInit() {
     this.initiliseForm()
-    // this.testFormData()
+    this.testFormData()
     this.isEditMode = this.dialogConfig.data.edit || false;
     this.rentPropertyData = this.dialogConfig.data.propertyRentListData;
     this.patchFormData()

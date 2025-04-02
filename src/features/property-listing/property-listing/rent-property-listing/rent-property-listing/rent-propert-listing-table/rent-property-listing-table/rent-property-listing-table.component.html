@@ -1,5 +1,5 @@
-<div class="card">
-    <p-table #dt [resizableColumns]="true" styleClass="table-vertical-borders" [columns]="selectedColumns"
+<div class="container">
+    <p-table #dt [resizableColumns]="true" showGridlines styleClass="table-vertical-borders" [columns]="selectedColumns"
         [value]="products" [exportHeader]="'customExportHeader'" [paginator]="true" [rows]="5"
         [tableStyle]="{ 'min-width': '50rem' }" [rowsPerPageOptions]="[5, 10, 20]">
         <ng-template #caption>
@@ -35,13 +35,12 @@
                 <td>{{ index+1 }}</td>
                 @for (col of columns; track $index) {
                 <td>
-                    {{ product?.propertyFullAddress[col.field] || product.propertyDetails[col.field] }}
+                    {{ product?.propertyFullAddress[col?.propertyName] || product?.propertyDetails[col?.propertyName] }}
                 </td>
                 }
                 <td>
                     <p-splitbutton #splitBtn [raised]="true" [appendTo]="'body'" label="View" icon="pi pi-eye"
-                        dropdownIcon="pi pi-cog" [model]="items" (onClick)="showMenu($event, splitBtn, index)"
-                        (onDropdownClick)="getTableRowIndex(index)" />
+                        dropdownIcon="pi pi-cog" [model]="items" (onDropdownClick)="getTableRowIndex(index)" />
                 </td>
 
             </tr>

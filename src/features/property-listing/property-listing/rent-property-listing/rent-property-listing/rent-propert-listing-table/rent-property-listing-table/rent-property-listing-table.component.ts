@@ -11,10 +11,12 @@ import { RentPropertyListingFormComponent } from '../rent-property-listing-form/
 import { DialogConfig } from '../../../../../property-listing-types/dialog-config';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { openDialog, dialogConfigObj } from '../../../../../../../app/shared/reusable-function/common-function';
+import { RentPropertyUploadMediaFilesComponent } from '../rent-property-upload-media-files/rent-property-upload-media-files.component';
 interface Column {
   field: string;
   header: string;
   customExportHeader?: string;
+  propertyName?: string;
 }
 
 @Component({
@@ -57,42 +59,39 @@ export class RentPropertyListingTableComponent implements OnInit {
           this.messageService.add({ severity: 'warn', summary: 'Delete', detail: 'Data Deleted', life: 3000 });
         },
       },
+      {
+        label: 'Upload files',
+        icon: 'pi pi-times',
+        command: () => {
+          this.uploadFiles(this.products[this.rowPropertyRentIndex])
+        },
+      },
     ];
   }
 
   ngOnInit(): void {
-    this.RentPropertyListingService.getAllRentPropertyListingByProperOwner(this.userInfo?.uuid).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (res: any) => {
-        this.products = res
-      },
-      error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
-      },
-      complete: () => {
+    this.RentPropertyListingService.getAllRentPropertyListingByProperOwner(this.userInfo?.uuid)
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: (res: any) => {
+          this.products = res
+        },
+        error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
+        },
+        complete: () => {
 
-      },
-    });;
+        },
+      });
     this.cols = [
-      { field: 'propertyCityName', header: 'Property Full Address' },
-      { field: 'propertyName', header: 'Property Name' },
-      { field: 'availability', header: 'Availability' },
-      { field: 'propertyCost', header: 'Property Cost' },
-      { field: 'bhkType', header: 'Bhk Type' },
-      { field: 'propertyType', header: 'Property Type' },
-      { field: 'propertySecurityDeposit', header: 'Security Deposit' },
+      { field: 'propertyFullAddress.propertyCityName', header: 'Property Full Address', propertyName: 'propertyCityName' },
+      { field: 'propertyDetails.propertyName', header: 'Property Name', propertyName: 'propertyName' },
+      { field: 'propertyDetails.availability', header: 'Availability', propertyName: 'availability' },
+      { field: 'propertyDetails.propertyCost', header: 'Property Cost', propertyName: 'propertyCost' },
+      { field: 'propertyDetails.bhkType', header: 'Bhk Type', propertyName: 'bhkType' },
+      { field: 'propertyDetails.propertyType', header: 'Property Type', propertyName: 'propertyType' },
+      { field: 'propertyDetails.propertySecurityDeposit', header: 'Security Deposit', propertyName: 'propertySecurityDeposit' },
     ];
 
     this.selectedColumns = this.cols;
-  }
-
-  //this function is to be removed
-  public showMenu(event: Event, splitBtn: SplitButton, rowIndex: number) {
-    // Prevent default click action
-    event.preventDefault();
-
-    // Show the menu
-    if (splitBtn.menu && !splitBtn.menu.visible) {
-      splitBtn.menu.toggle(event);
-    }
   }
 
   public createRentListing() {
@@ -108,5 +107,11 @@ export class RentPropertyListingTableComponent implements OnInit {
   public getTableRowIndex(rowIndex: any) {
     this.rowPropertyRentIndex = rowIndex
     console.log(this.rowPropertyRentIndex)
+  }
+
+  uploadFiles(propertyRentListData: any) {
+    console.log('propertyRentListData',propertyRentListData)
+    let dialogConfig: DialogConfig = dialogConfigObj(true, propertyRentListData)
+    openDialog(RentPropertyUploadMediaFilesComponent, dialogConfig, this.dialogService)
   }
 }
