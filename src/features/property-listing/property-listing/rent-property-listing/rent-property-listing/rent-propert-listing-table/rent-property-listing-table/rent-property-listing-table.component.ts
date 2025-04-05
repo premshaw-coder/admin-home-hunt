@@ -1,5 +1,5 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
-import { MessageService } from 'primeng/api';
+import { Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { RentPropertyListingService } from '../../../services/rent-property-listing.service'
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -12,6 +12,7 @@ import { DialogConfig } from '../../../../../property-listing-types/dialog-confi
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { openDialog, dialogConfigObj } from '../../../../../../../app/shared/reusable-function/common-function';
 import { RentPropertyUploadMediaFilesComponent } from '../rent-property-upload-media-files/rent-property-upload-media-files.component';
+import { DeleteRentListingComponent } from "../delete-rent-listing/delete-rent-listing.component";
 interface Column {
   field: string;
   header: string;
@@ -21,7 +22,7 @@ interface Column {
 
 @Component({
   selector: 'app-rent-property-listing-table',
-  imports: [TableModule, ButtonModule, SplitButtonModule, MultiSelectModule, FormsModule],
+  imports: [TableModule, ButtonModule, SplitButtonModule, MultiSelectModule, FormsModule, DeleteRentListingComponent],
   providers: [DialogService],
   templateUrl: './rent-property-listing-table.component.html',
   styleUrl: './rent-property-listing-table.component.scss'
@@ -33,6 +34,8 @@ export class RentPropertyListingTableComponent implements OnInit {
   public products!: any[];
   private userInfo: any = JSON.parse(localStorage.getItem('UserInfo') || '')
   public rowPropertyRentIndex!: number
+
+  @ViewChild('deleteRentListingComponentRef') deleteRentListingComponentRef!: DeleteRentListingComponent;
 
   private dialogService = inject(DialogService)
   private RentPropertyListingService = inject(RentPropertyListingService)
@@ -56,7 +59,7 @@ export class RentPropertyListingTableComponent implements OnInit {
         label: 'Delete',
         icon: 'pi pi-times',
         command: () => {
-          this.messageService.add({ severity: 'warn', summary: 'Delete', detail: 'Data Deleted', life: 3000 });
+          this.confirmDeleteRentListing(this.products[this.rowPropertyRentIndex])
         },
       },
       {
@@ -70,17 +73,7 @@ export class RentPropertyListingTableComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.RentPropertyListingService.getAllRentPropertyListingByProperOwner(this.userInfo?.uuid)
-      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: (res: any) => {
-          this.products = res
-        },
-        error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
-        },
-        complete: () => {
-
-        },
-      });
+    this.getAllRentPropertyListingByProperOwner()
     this.cols = [
       { field: 'propertyFullAddress.propertyCityName', header: 'Property Full Address', propertyName: 'propertyCityName' },
       { field: 'propertyDetails.propertyName', header: 'Property Name', propertyName: 'propertyName' },
@@ -94,14 +87,37 @@ export class RentPropertyListingTableComponent implements OnInit {
     this.selectedColumns = this.cols;
   }
 
+  getAllRentPropertyListingByProperOwner() {
+    this.RentPropertyListingService.getAllRentPropertyListingByProperOwner(this.userInfo?.uuid)
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: (res: any) => {
+          this.products = res
+        },
+        error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
+        },
+        complete: () => {
+
+        },
+      });
+  }
+
+
   public createRentListing() {
     let dialogConfig: DialogConfig = dialogConfigObj(false)
-    openDialog(RentPropertyListingFormComponent, dialogConfig, this.dialogService)
+    const createRentListingDialogRef = openDialog(RentPropertyListingFormComponent, dialogConfig, this.dialogService)
+    createRentListingDialogRef.onClose.subscribe((res: any) => {
+      console.log('Dialog closed with result create:', res);
+      if (res.data = 'Create rent listing') this.getAllRentPropertyListingByProperOwner()
+    })
   }
 
   private editRentListing(propertyRentListData: any) {
     let dialogConfig: DialogConfig = dialogConfigObj(true, propertyRentListData)
-    openDialog(RentPropertyListingFormComponent, dialogConfig, this.dialogService)
+    const editRentListingDialogRef = openDialog(RentPropertyListingFormComponent, dialogConfig, this.dialogService);
+    editRentListingDialogRef.onClose.subscribe((res: any) => {
+      console.log('Dialog closed with result edit:', res);
+      if (res.data = 'Edit rent listing') this.getAllRentPropertyListingByProperOwner()
+    })
   }
 
   public getTableRowIndex(rowIndex: any) {
@@ -110,8 +126,12 @@ export class RentPropertyListingTableComponent implements OnInit {
   }
 
   uploadFiles(propertyRentListData: any) {
-    console.log('propertyRentListData',propertyRentListData)
+    console.log('propertyRentListData', propertyRentListData)
     let dialogConfig: DialogConfig = dialogConfigObj(true, propertyRentListData)
     openDialog(RentPropertyUploadMediaFilesComponent, dialogConfig, this.dialogService)
+  }
+
+  confirmDeleteRentListing(rentPropertyListData: any) {
+    this.deleteRentListingComponentRef.deleteRentListing(rentPropertyListData)
   }
 }

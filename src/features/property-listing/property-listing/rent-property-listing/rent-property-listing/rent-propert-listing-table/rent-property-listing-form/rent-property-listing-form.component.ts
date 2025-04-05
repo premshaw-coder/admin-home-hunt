@@ -10,7 +10,7 @@ import { NgClass } from '@angular/common';
 import { RentPropertyListingService } from '../../../services/rent-property-listing.service';
 import { HttpClient } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DynamicDialogConfig } from 'primeng/dynamicdialog';
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 @Component({
   selector: 'app-rent-property-listing-form',
@@ -36,6 +36,7 @@ export class RentPropertyListingFormComponent {
   private rentPropertyListingService = inject(RentPropertyListingService)
   private destroyRef = inject(DestroyRef)
   public dialogConfig = inject(DynamicDialogConfig)
+  public dialogRef = inject(DynamicDialogRef)
 
   public propertyFullAddressFormData = [
     { id: 1, control: 'propertyCityName', placeholder: 'Enter city' },
@@ -199,6 +200,7 @@ export class RentPropertyListingFormComponent {
       },
       complete: () => {
         this.RentPropertyListingForm.reset()
+        this.dialogRef.close({ action: 'submit', data: 'Create rent listing' });
       },
     });
   }
@@ -213,6 +215,7 @@ export class RentPropertyListingFormComponent {
       },
       complete: () => {
         this.RentPropertyListingForm.reset()
+        this.dialogRef.close({ action: 'submit', data: 'Edit rent listing' });
       },
     });
   }

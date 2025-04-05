@@ -22,4 +22,8 @@ export class RentPropertyListingService {
   getAllRentPropertyListingByProperOwner(propertyOwnerUUID: string): Observable<any> {
     return this.httpService.get<any>(environment.baseUrl + environment.apiVersion + ApiEndPoints.getAllRentPropertyListingByProperOwner + propertyOwnerUUID);
   }
+
+  deleteRentPropertyListing(propertyOwnerId: any): Observable<any> {
+    return this.httpService.delete<any>(environment.baseUrl + environment.apiVersion + ApiEndPoints.deleteRentProperty + propertyOwnerId);
+  }
 }
