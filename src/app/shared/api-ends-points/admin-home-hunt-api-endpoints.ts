@@ -9,6 +9,6 @@ export const ApiEndPoints = {
     getAllRentPropertyListingByProperOwner: '/property-rent/get-all-house-by-propertyOwner/',
     deleteRentPropertyFiles: '/property-rent/delete-files',
     deleteRentProperty: '/property-rent/delete-house/',
-    regenerateFilesSignedUrl: '/re-generate-signed-url/',
+    regenerateFilesSignedUrl: '/property-rent/re-generate-signed-url/',
     uploadRentPropertyFiles: '/property-rent/files-upload/',
 }

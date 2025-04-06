@@ -1,7 +1,7 @@
 <div class="card">
     <p-toast />
     <p-fileupload fileLimit="5" name="files" [url]="uploadFilesUrl" [multiple]="true" accept="image/*"
-        maxFileSize="1000000" (onUpload)="onTemplatedUpload($event)" (onSelect)="onSelectedFiles($event)">
+        maxFileSize="5000000" (onUpload)="onTemplatedUpload($event)" (onSelect)="onSelectedFiles($event)">
         <ng-template #header let-files let-chooseCallback="chooseCallback" let-clearCallback="clearCallback"
             let-uploadCallback="uploadCallback">
             <div class="flex flex-wrap justify-between items-center flex-1 gap-4">

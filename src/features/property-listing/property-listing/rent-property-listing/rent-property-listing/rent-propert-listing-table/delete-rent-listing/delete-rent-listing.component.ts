@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, inject } from '@angular/core';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialog } from 'primeng/confirmdialog';
@@ -12,7 +12,7 @@ import { RentPropertyListingService } from '../../../services/rent-property-list
   styleUrl: './delete-rent-listing.component.scss'
 })
 export class DeleteRentListingComponent {
-
+  @Output() isRentListingPropertyDeleted = new EventEmitter<boolean>();
   private confirmationService = inject(ConfirmationService)
   private messageService = inject(MessageService)
   private RentPropertyListingService = inject(RentPropertyListingService)
@@ -40,6 +40,9 @@ export class DeleteRentListingComponent {
       error: (err) => {
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to Delete Property Listing' });
       },  
+      complete: () => {
+        this.isRentListingPropertyDeleted.emit(true);
+      }
     });
   }
 }

@@ -13,6 +13,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { openDialog, dialogConfigObj } from '../../../../../../../app/shared/reusable-function/common-function';
 import { RentPropertyUploadMediaFilesComponent } from '../rent-property-upload-media-files/rent-property-upload-media-files.component';
 import { DeleteRentListingComponent } from "../delete-rent-listing/delete-rent-listing.component";
+import { RentPropertyFilesUploadService } from '../../../services/files-upload/rent-property-files-upload.service';
 interface Column {
   field: string;
   header: string;
@@ -28,6 +29,9 @@ interface Column {
   styleUrl: './rent-property-listing-table.component.scss'
 })
 export class RentPropertyListingTableComponent implements OnInit {
+  @ViewChild('deleteRentListingComponentRef') deleteRentListingComponentRef!: DeleteRentListingComponent;
+  @ViewChild(RentPropertyUploadMediaFilesComponent) rentPropertyUploadMediaFilesComponent!: RentPropertyUploadMediaFilesComponent;
+
   public cols!: Column[];
   public selectedColumns!: Column[];
   public items: ({ label: string; icon: string; command: () => void; separator?: undefined; } | { separator: boolean; label?: undefined; icon?: undefined; command?: undefined; })[];
@@ -35,12 +39,12 @@ export class RentPropertyListingTableComponent implements OnInit {
   private userInfo: any = JSON.parse(localStorage.getItem('UserInfo') || '')
   public rowPropertyRentIndex!: number
 
-  @ViewChild('deleteRentListingComponentRef') deleteRentListingComponentRef!: DeleteRentListingComponent;
-
   private dialogService = inject(DialogService)
   private RentPropertyListingService = inject(RentPropertyListingService)
   private messageService = inject(MessageService)
   private destroyRef = inject(DestroyRef)
+  private S3FilesService = inject(RentPropertyFilesUploadService);
+
 
 
   constructor() {
@@ -85,6 +89,7 @@ export class RentPropertyListingTableComponent implements OnInit {
     ];
 
     this.selectedColumns = this.cols;
+    this.onRegeneratedSignedUrlFilesUploadedToS3bucket()
   }
 
   getAllRentPropertyListingByProperOwner() {
@@ -128,10 +133,26 @@ export class RentPropertyListingTableComponent implements OnInit {
   uploadFiles(propertyRentListData: any) {
     console.log('propertyRentListData', propertyRentListData)
     let dialogConfig: DialogConfig = dialogConfigObj(true, propertyRentListData)
-    openDialog(RentPropertyUploadMediaFilesComponent, dialogConfig, this.dialogService)
+    const RentPropertyUploadFilesDialogRef = openDialog(RentPropertyUploadMediaFilesComponent, dialogConfig, this.dialogService)
+    RentPropertyUploadFilesDialogRef.onClose.subscribe((res: any) => {
+      console.log('Dialog closed with result upload:', res);
+      if (res?.data?.isFilesUploadedToS3bucket) this.getAllRentPropertyListingByProperOwner()
+    })
   }
 
   confirmDeleteRentListing(rentPropertyListData: any) {
     this.deleteRentListingComponentRef.deleteRentListing(rentPropertyListData)
+  }
+
+  updateRentListingTableDataOnRentPropertyDelete(event: any) {
+    console.log('Delete Rent Property Listing:', event);
+    this.getAllRentPropertyListingByProperOwner()
+  }
+
+  onRegeneratedSignedUrlFilesUploadedToS3bucket() {
+    this.S3FilesService.refetchRentPropertTableData.asObservable().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res: any) => {
+      console.log('Regenerated Signed URL Files Uploaded:', res);
+      if (res) this.getAllRentPropertyListingByProperOwner()
+    })
   }
 }

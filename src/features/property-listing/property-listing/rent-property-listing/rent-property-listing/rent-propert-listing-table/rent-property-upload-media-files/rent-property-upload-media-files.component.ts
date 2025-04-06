@@ -8,7 +8,7 @@ import { BadgeModule } from 'primeng/badge';
 import { HttpClientModule } from '@angular/common/http';
 import { ProgressBar } from 'primeng/progressbar';
 import { ToastModule } from 'primeng/toast';
-import { DynamicDialogConfig } from 'primeng/dynamicdialog';
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { RentPropertyFilesUploadService } from '../../../services/files-upload/rent-property-files-upload.service';
 import { environment } from '../../../../../../../environments/environment.development';
 import { ApiEndPoints } from '../../../../../../../app/shared/api-ends-points/admin-home-hunt-api-endpoints';
@@ -26,19 +26,25 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
   uploadedFilesToS3: any;
   propertyOwnerId: string = '';
   uploadFilesUrl: string = '';
+  isFilesUploadedToS3bucket: boolean = false;
+  isRegeneratedSignedUrlFilesUploadedToS3bucket: boolean = false;
+
 
   private dialogConfig = inject(DynamicDialogConfig)
   private S3FilesService = inject(RentPropertyFilesUploadService);
   private config = inject(PrimeNG);
   private messageService = inject(MessageService);
-
-  constructor() { }
+  public dialogRef = inject(DynamicDialogRef)
+  constructor() {
+  }
 
   ngOnInit(): void {
     console.log('Dialog Config:', this.dialogConfig.data.propertyRentListData._id);
     this.propertyOwnerId = this.dialogConfig.data.propertyRentListData._id;
     this.uploadFilesUrl = `${environment.baseUrl}${environment.apiVersion}${ApiEndPoints.uploadRentPropertyFiles}${this.propertyOwnerId}`;
     this.uploadedFilesToS3 = this.dialogConfig?.data?.propertyRentListData?.propertyDetails?.propertyImages
+    console.log('Uploaded Files:', this.uploadedFilesToS3);
+    this.regenerateFilesSignedUrl(this.uploadedFilesToS3);
   }
 
   choose(event: any, callback: () => void) {
@@ -61,6 +67,8 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
     if (event && event.originalEvent && event.originalEvent.body) {
       this.uploadedFilesToS3 = event?.originalEvent?.body?.propertyDetails?.propertyImages;
       console.log('API Response:', this.uploadedFilesToS3);
+      this.isFilesUploadedToS3bucket = true;
+      this.dialogRef.close({ action: 'file uploaded sucessfully', data: { isFilesUploadedToS3bucket: this.isFilesUploadedToS3bucket } })
     }
     this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Uploaded', life: 3000 });
   }
@@ -100,8 +108,39 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error Deleting File:', err);
+      },
+      complete: () => {
+        this.S3FilesService.refetchRentPropertTableData.next(true);
       }
     });
 
   }
+  regenerateFilesSignedUrl(uploadedFilesToS3: any) {
+    const payload = uploadedFilesToS3.filter((file: any) => {
+      console.log('Regenerate Files Signed URL:', uploadedFilesToS3);
+      let signedUrlExpirationDate = Date.parse(file.fileExpirationTime)
+      let currentDate = Date.now();
+      if (currentDate > signedUrlExpirationDate) return file
+    })
+
+    if (payload.length > 0) {
+      this.S3FilesService.regenerateFilesSignedUrl(this.propertyOwnerId, payload).subscribe({
+        next: (res) => {
+          console.log('Regenerate Files Signed URL Response:', res);
+          this.uploadedFilesToS3 = res?.propertyDetails?.propertyImages;
+          this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Regenerated Sucessfully', life: 3000 });
+        },
+        error: (err) => {
+          console.error('Error Regenerating File:', err);
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error Regenerating File', life: 3000 });
+        },
+        complete: () => {
+          this.S3FilesService.refetchRentPropertTableData.next(true);
+        }
+      })
+    }
+    console.log('Payload:', payload);
+  }
 }
+
+

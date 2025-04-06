@@ -3,12 +3,14 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
 import { environment } from '../../../../../../environments/environment.development';
 import { ApiEndPoints } from '../../../../../../app/shared/api-ends-points/admin-home-hunt-api-endpoints';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RentPropertyFilesUploadService {
 
+  refetchRentPropertTableData: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   private httpService = inject(HttpClient)
 
@@ -28,7 +30,7 @@ export class RentPropertyFilesUploadService {
   regenerateFilesSignedUrl(propertyOwnerId: string, fileData: any): Observable<any> {
     return this.httpService.post<any>(
       `${environment.baseUrl}${environment.apiVersion}${ApiEndPoints.regenerateFilesSignedUrl}${propertyOwnerId}`,
-      { body: fileData }
+      { fileData: fileData }
     );
   }
 }
