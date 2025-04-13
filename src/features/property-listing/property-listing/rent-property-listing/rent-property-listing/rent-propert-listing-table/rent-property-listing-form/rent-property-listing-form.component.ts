@@ -29,7 +29,7 @@ export class RentPropertyListingFormComponent {
   private furnishingStatusValues = ApiStaticData.furnishingStatusValues;
   private propertyFacingValues = ApiStaticData.propertyFacingValues;
   private propertyParkingValues = ApiStaticData.propertyParkingValues;
-  private userInfo: any = JSON.parse(localStorage.getItem('UserInfo') || '')
+  private userInfo: any = JSON.parse(localStorage.getItem('UserInfo') || '{}')
   private isEditMode!: boolean;
   private rentPropertyData: any
 
@@ -76,11 +76,9 @@ export class RentPropertyListingFormComponent {
   ngOnInit() {
     this.initiliseForm()
     this.testFormData()
-    this.isEditMode = this.dialogConfig.data.edit || false;
-    this.rentPropertyData = this.dialogConfig.data.propertyRentListData;
+    this.isEditMode = this.dialogConfig?.data?.edit || false;
+    this.rentPropertyData = this.dialogConfig?.data?.propertyRentListData;
     this.patchFormData()
-
-    console.log(this.rentPropertyData)
   }
 
   initiliseForm() {
@@ -124,8 +122,6 @@ export class RentPropertyListingFormComponent {
         lift: new FormControl('', Validators.required)
       }),
     });
-
-    console.log(this.RentPropertyListingForm.get('propertyFullAddress'));
   }
 
   public onSubmit(): any {
@@ -191,7 +187,6 @@ export class RentPropertyListingFormComponent {
   }
 
   private createRentPropertyListing(formData: any) {
-    // console.log('submit clicked', formData)
     this.rentPropertyListingService.createRentPropertyListing(formData).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: async (res: any) => {
 
@@ -206,7 +201,6 @@ export class RentPropertyListingFormComponent {
   }
 
   editRentPropertyListing(formData: any) {
-    console.log('submit clicked edit', formData)
     this.rentPropertyListingService.editRentPropertyListing(formData, this.rentPropertyData._id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: async (res: any) => {
 

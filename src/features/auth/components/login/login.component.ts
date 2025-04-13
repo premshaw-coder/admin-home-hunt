@@ -65,6 +65,7 @@ export class LoginComponent implements OnInit {
         },
       })
   }
+  
   private isFormInValid(): boolean {
     if (this.loginForm.invalid) {
       if (!this.loginForm.get('email')?.value && !this.loginForm.get('password')?.value) {

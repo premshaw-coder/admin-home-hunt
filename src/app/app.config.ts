@@ -7,8 +7,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { MyPreset } from './shared/primeNg-themes/primeng-themes';
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideHttpClient(), provideRouter(routes),
-  provideAnimationsAsync(),
+  providers: [provideAnimationsAsync(), provideZoneChangeDetection({ eventCoalescing: true }), provideHttpClient(), provideRouter(routes),
   providePrimeNG({
     theme: {
       preset: MyPreset,

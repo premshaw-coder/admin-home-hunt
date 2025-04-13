@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { LeasePropertyListingComponent } from './lease-property-listing.component';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 describe('LeasePropertyListingComponent', () => {
   let component: LeasePropertyListingComponent;
@@ -8,7 +9,8 @@ describe('LeasePropertyListingComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LeasePropertyListingComponent]
+      imports: [LeasePropertyListingComponent],
+      providers: [provideAnimationsAsync()]
     })
     .compileComponents();
 

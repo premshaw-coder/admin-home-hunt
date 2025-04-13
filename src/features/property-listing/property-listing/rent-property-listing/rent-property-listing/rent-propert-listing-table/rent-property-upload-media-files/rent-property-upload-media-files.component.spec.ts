@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RentPropertyUploadMediaFilesComponent } from './rent-property-upload-media-files.component';
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 describe('RentPropertyUploadMediaFilesComponent', () => {
   let component: RentPropertyUploadMediaFilesComponent;
@@ -8,9 +10,14 @@ describe('RentPropertyUploadMediaFilesComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RentPropertyUploadMediaFilesComponent]
+      imports: [RentPropertyUploadMediaFilesComponent],
+      providers: [
+        provideAnimationsAsync(),
+        DynamicDialogConfig,
+        DynamicDialogRef // Add any necessary providers here
+      ]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(RentPropertyUploadMediaFilesComponent);
     component = fixture.componentInstance;

@@ -18,7 +18,6 @@ export class DeleteRentListingComponent {
   private RentPropertyListingService = inject(RentPropertyListingService)
 
   deleteRentListing(rentPropertyListData?: any) {
-    console.log('Delete Rent Property Listing:', rentPropertyListData);
     this.confirmationService.confirm({
       header: 'Are you sure?',
       message: 'Please confirm to proceed.',
@@ -32,7 +31,6 @@ export class DeleteRentListingComponent {
   }
 
   onDeleteRentPropertyListing(propertyOwnerId: any) {
-    console.log('Delete Rent Property Listing:', propertyOwnerId);
     this.RentPropertyListingService.deleteRentPropertyListing(propertyOwnerId).subscribe({
       next: (res) => {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Property Listing Deleted Successfully' });

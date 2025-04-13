@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HeaderComponent } from './header.component';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
@@ -8,7 +9,8 @@ describe('HeaderComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HeaderComponent]
+      imports: [HeaderComponent],
+      providers: [provideAnimationsAsync()]
     })
     .compileComponents();
 

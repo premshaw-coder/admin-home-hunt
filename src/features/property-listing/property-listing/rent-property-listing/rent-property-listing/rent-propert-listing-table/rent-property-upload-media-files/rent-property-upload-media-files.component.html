@@ -1,5 +1,6 @@
 <div class="card">
     <p-toast />
+    @let showDragDropIcon = this.uploadedFilesToS3?.length > 0 ? false: true;
     <p-fileupload fileLimit="5" name="files" [url]="uploadFilesUrl" [multiple]="true" accept="image/*"
         maxFileSize="5000000" (onUpload)="onTemplatedUpload($event)" (onSelect)="onSelectedFiles($event)">
         <ng-template #header let-files let-chooseCallback="chooseCallback" let-clearCallback="clearCallback"
@@ -35,8 +36,8 @@
                             <div>{{ formatSize(file.size) }}</div>
                             <p-badge value="Pending" severity="warn" />
                             <p-button icon="pi pi-times"
-                                (click)="onRemoveTemplatingFile($event, file, removeFileCallback, i)"
-                                [outlined]="true" [rounded]="true" severity="danger" />
+                                (click)="onRemoveTemplatingFile($event, file, removeFileCallback, i)" [outlined]="true"
+                                [rounded]="true" severity="danger" />
                         </div>
                     </div>
                 </div>
@@ -62,10 +63,12 @@
         </ng-template>
         <ng-template #file></ng-template>
         <ng-template #empty>
+            @if (showDragDropIcon) {
             <div class="flex items-center justify-center flex-col">
                 <i class="pi pi-cloud-upload !border-2 !rounded-full !p-8 !text-4xl !text-muted-color"></i>
                 <p class="mt-6 mb-0">Drag and drop files to here to upload.</p>
             </div>
+            }
         </ng-template>
     </p-fileupload>
 </div>

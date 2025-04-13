@@ -39,11 +39,9 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('Dialog Config:', this.dialogConfig.data.propertyRentListData._id);
-    this.propertyOwnerId = this.dialogConfig.data.propertyRentListData._id;
+    this.propertyOwnerId = this.dialogConfig?.data?.propertyRentListData?._id;
     this.uploadFilesUrl = `${environment.baseUrl}${environment.apiVersion}${ApiEndPoints.uploadRentPropertyFiles}${this.propertyOwnerId}`;
     this.uploadedFilesToS3 = this.dialogConfig?.data?.propertyRentListData?.propertyDetails?.propertyImages
-    console.log('Uploaded Files:', this.uploadedFilesToS3);
     this.regenerateFilesSignedUrl(this.uploadedFilesToS3);
   }
 
@@ -66,7 +64,6 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
   onTemplatedUpload(event: any) {
     if (event && event.originalEvent && event.originalEvent.body) {
       this.uploadedFilesToS3 = event?.originalEvent?.body?.propertyDetails?.propertyImages;
-      console.log('API Response:', this.uploadedFilesToS3);
       this.isFilesUploadedToS3bucket = true;
       this.dialogRef.close({ action: 'file uploaded sucessfully', data: { isFilesUploadedToS3bucket: this.isFilesUploadedToS3bucket } })
     }
@@ -98,11 +95,8 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
   removeUploadedFile(filesInfo: any) {
     let payload = {}
     payload = { "data": [{ "Key": "test/property-owner-rent/" + filesInfo.fileName, "_id": filesInfo._id }] }
-    console.log('Payload:', payload);
-
     this.S3FilesService.deleteUploadedFilesFromS3Bucket(payload, this.propertyOwnerId).subscribe({
       next: (res) => {
-        console.log('File Deleted:', res);
         this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Deleted Sucessfully', life: 3000 });
         this.uploadedFilesToS3 = res?.data?.propertyDetails?.propertyImages;
       },
@@ -116,17 +110,15 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
 
   }
   regenerateFilesSignedUrl(uploadedFilesToS3: any) {
-    const payload = uploadedFilesToS3.filter((file: any) => {
-      console.log('Regenerate Files Signed URL:', uploadedFilesToS3);
+    const payload = uploadedFilesToS3?.filter((file: any) => {
       let signedUrlExpirationDate = Date.parse(file.fileExpirationTime)
       let currentDate = Date.now();
       if (currentDate > signedUrlExpirationDate) return file
     })
 
-    if (payload.length > 0) {
+    if (payload?.length > 0) {
       this.S3FilesService.regenerateFilesSignedUrl(this.propertyOwnerId, payload).subscribe({
         next: (res) => {
-          console.log('Regenerate Files Signed URL Response:', res);
           this.uploadedFilesToS3 = res?.propertyDetails?.propertyImages;
           this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Regenerated Sucessfully', life: 3000 });
         },
@@ -139,7 +131,6 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
         }
       })
     }
-    console.log('Payload:', payload);
   }
 }
 

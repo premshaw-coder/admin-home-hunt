@@ -36,7 +36,7 @@ export class RentPropertyListingTableComponent implements OnInit {
   public selectedColumns!: Column[];
   public items: ({ label: string; icon: string; command: () => void; separator?: undefined; } | { separator: boolean; label?: undefined; icon?: undefined; command?: undefined; })[];
   public products!: any[];
-  private userInfo: any = JSON.parse(localStorage.getItem('UserInfo') || '')
+  private userInfo: any = JSON.parse(localStorage.getItem('UserInfo') || '{}')
   public rowPropertyRentIndex!: number
 
   private dialogService = inject(DialogService)
@@ -111,7 +111,6 @@ export class RentPropertyListingTableComponent implements OnInit {
     let dialogConfig: DialogConfig = dialogConfigObj(false)
     const createRentListingDialogRef = openDialog(RentPropertyListingFormComponent, dialogConfig, this.dialogService)
     createRentListingDialogRef.onClose.subscribe((res: any) => {
-      console.log('Dialog closed with result create:', res);
       if (res.data = 'Create rent listing') this.getAllRentPropertyListingByProperOwner()
     })
   }
@@ -120,22 +119,18 @@ export class RentPropertyListingTableComponent implements OnInit {
     let dialogConfig: DialogConfig = dialogConfigObj(true, propertyRentListData)
     const editRentListingDialogRef = openDialog(RentPropertyListingFormComponent, dialogConfig, this.dialogService);
     editRentListingDialogRef.onClose.subscribe((res: any) => {
-      console.log('Dialog closed with result edit:', res);
       if (res.data = 'Edit rent listing') this.getAllRentPropertyListingByProperOwner()
     })
   }
 
   public getTableRowIndex(rowIndex: any) {
     this.rowPropertyRentIndex = rowIndex
-    console.log(this.rowPropertyRentIndex)
   }
 
   uploadFiles(propertyRentListData: any) {
-    console.log('propertyRentListData', propertyRentListData)
     let dialogConfig: DialogConfig = dialogConfigObj(true, propertyRentListData)
     const RentPropertyUploadFilesDialogRef = openDialog(RentPropertyUploadMediaFilesComponent, dialogConfig, this.dialogService)
     RentPropertyUploadFilesDialogRef.onClose.subscribe((res: any) => {
-      console.log('Dialog closed with result upload:', res);
       if (res?.data?.isFilesUploadedToS3bucket) this.getAllRentPropertyListingByProperOwner()
     })
   }
@@ -145,13 +140,11 @@ export class RentPropertyListingTableComponent implements OnInit {
   }
 
   updateRentListingTableDataOnRentPropertyDelete(event: any) {
-    console.log('Delete Rent Property Listing:', event);
     this.getAllRentPropertyListingByProperOwner()
   }
 
   onRegeneratedSignedUrlFilesUploadedToS3bucket() {
     this.S3FilesService.refetchRentPropertTableData.asObservable().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res: any) => {
-      console.log('Regenerated Signed URL Files Uploaded:', res);
       if (res) this.getAllRentPropertyListingByProperOwner()
     })
   }
