@@ -52,7 +52,7 @@ export class LoginComponent implements OnInit {
     }
     this.authService.loginWithEmailAndPassword(loginFormData)
       .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: async (res: AuthApiResponse) => {
+        next: (res: AuthApiResponse) => {
           this.commonService.successToast('Login Successful')
           localStorage.setItem('UserInfo', JSON.stringify(res))
           this.router.navigate([RoutesPaths.basePath + RoutesPaths.createPropertyListing])
@@ -65,7 +65,7 @@ export class LoginComponent implements OnInit {
         },
       })
   }
-  
+
   private isFormInValid(): boolean {
     if (this.loginForm.invalid) {
       if (!this.loginForm.get('email')?.value && !this.loginForm.get('password')?.value) {

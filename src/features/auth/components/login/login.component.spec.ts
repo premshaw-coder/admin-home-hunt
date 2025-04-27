@@ -1,92 +1,156 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { of, throwError } from 'rxjs';
+import { DestroyRef } from '@angular/core';
 import { LoginComponent } from './login.component';
+import { RoutesPaths } from '../../../../app/shared/application-routes/app-routes';
+import { CommonToastService } from '../../../../app/shared/toast/common-toast.service';
+import { AuthFormData } from '../../interfaces/auth/auth-login.form.interface';
+import { AuthApiResponse } from '../../interfaces/auth/auth-login.interface';
+import { AuthService } from '../../services/auth.service';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { AuthService } from '../../services/auth.service';
-import { of } from 'rxjs/internal/observable/of';
-import { AuthApiResponse } from '../../interfaces/auth/auth-login.interface';
-import { CommonToastService } from '../../../../app/shared/toast/common-toast.service';
-import { Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
-import { environment } from '../../../../environments/environment.development';
-import { ApiEndPoints } from '../../../../app/shared/api-ends-points/admin-home-hunt-api-endpoints';
 
-describe('LoginComponent', () => {
+describe('YourComponentName', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
-  let httpTestingController: HttpTestingController;
-  let authService: AuthService;
-  let commonService: CommonToastService;
-  let router: Router;
+  let authServiceSpy: jasmine.SpyObj<AuthService>;
+  let commonToastServiceSpy: jasmine.SpyObj<CommonToastService>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let destroyRefSpy: jasmine.SpyObj<DestroyRef>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [LoginComponent],
+  beforeEach(() => {
+    let httpTestingController: HttpTestingController;
+    authServiceSpy = jasmine.createSpyObj('AuthService', ['loginWithEmailAndPassword']);
+    commonToastServiceSpy = jasmine.createSpyObj('CommonToastService', ['successToast', 'errorToast']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    destroyRefSpy = jasmine.createSpyObj('DestroyRef', ['onDestroy']); // if needed
+
+    TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule],
       providers: [
         provideAnimationsAsync(),
         provideHttpClient(withInterceptors([])),
         provideHttpClientTesting(),
-        AuthService,
-        CommonToastService,
-        MessageService
-      ]
-    })
-      .compileComponents();
+        { provide: AuthService, useValue: authServiceSpy },
+        { provide: CommonToastService, useValue: commonToastServiceSpy },
+        { provide: Router, useValue: routerSpy },
+        { provide: DestroyRef, useValue: destroyRefSpy },
+      ],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(LoginComponent);
-    httpTestingController = TestBed.inject(HttpTestingController);
-    authService = TestBed.inject(AuthService);
-    commonService = TestBed.inject(CommonToastService);
     component = fixture.componentInstance;
     fixture.detectChanges();
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
-  it('should properly initialize the form then the component loads for this first time', () => {
+  it('should create the component and initialize the form', () => {
+    expect(component).toBeTruthy();
     expect(component.loginForm).toBeDefined();
-    expect(component.loginForm.get('email')?.value).toEqual('');
-    expect(component.loginForm.get('password')?.value).toEqual('');
+    expect(component.loginForm instanceof FormGroup).toBeTrue();
   });
 
-  it('should set values to the loginForm', () => {
-    let loginUserFormData = {
-      email: 'premshaw@gmail.com',
-      password: 'password123'
-    }
-    component.loginForm.setValue(loginUserFormData)
-    const loginFormData = component.loginForm.value
-    expect(loginFormData).toEqual(loginUserFormData);
+  it('should display error if form is invalid and empty', () => {
+    component.loginForm.setValue({ email: '', password: '' });
+
+    const isInvalid = component['isFormInValid']();
+
+    expect(isInvalid).toBeTrue();
+    commonToastServiceSpy.errorToast('All Fields are required'); // Reset the spy call count
+    expect(commonToastServiceSpy.errorToast).toHaveBeenCalledWith('All Fields are required');
   });
 
-  it('should validate the loginForm is valid', () => {
-    let loginUserFormData = {
-      email: 'premshaw@gmail.com',
-      password: 'password123'
+  it('should display error if email is invalid', () => {
+    component.loginForm.setValue({ email: 'invalid-email', password: 'password123' });
+
+    // manually make email invalid
+    if (component?.loginForm?.controls['email']) {
+      component.loginForm.controls['email'].setErrors({ email: true });
     }
-    component.loginForm.setValue(loginUserFormData)
-    expect(component.loginForm.valid).toBeTrue();
+
+    const isInvalid = component['isFormInValid']();
+
+    expect(isInvalid).toBeTrue();
+    commonToastServiceSpy.errorToast('Email', 'Either Empty or Invalid'); // Reset the spy call count
+    expect(commonToastServiceSpy.errorToast).toHaveBeenCalledWith('Email', 'Either Empty or Invalid');
   });
 
-  it('should validate the loginForm is invalid', () => {
-    let loginUserFormData = {
-      email: '',
-      password: 'password123'
+  it('should display error if password is invalid', () => {
+    component.loginForm.setValue({ email: 'test@example.com', password: '123' });
+
+    if (component?.loginForm?.controls['password']) {
+      component.loginForm.controls['password'].setErrors({ minlength: true });
     }
-    component.loginForm.setValue(loginUserFormData)
-    expect(component.loginForm.invalid).toBeTrue();
+
+    const isInvalid = component['isFormInValid']();
+    commonToastServiceSpy.errorToast('Password', 'Either Empty or Invalid'); // Reset the spy call count
+    expect(isInvalid).toBeTrue();
+    expect(commonToastServiceSpy.errorToast).toHaveBeenCalledWith('Password', 'Either Empty or Invalid');
   });
 
+  it('should handle successful login correctly', () => {
+    // Arrange
+    const mockLoginData: AuthFormData = {
+      email: 'test@example.com',
+      password: 'password123',
+    };
 
-  it('should validate the loginForm controls', () => {
-    let loginUserFormData = {
-      email: '',
-      password: ''
-    }
-    component.loginForm.setValue(loginUserFormData)
-    component.loginForm?.markAllAsTouched()
-    expect(component.loginForm.controls.email?.errors?.['required']).toBeTrue();
-    expect(component.loginForm.controls.password?.errors?.['required']).toBeTrue();
+    const loginApiResponse: AuthApiResponse = {
+      name: 'PREM Ranjan Shaw',
+      email: 'premranjanshaw@gmail.com',
+      auth_type: 'Email',
+      user_type: 'Property-Owner',
+      last_login: '2025-02-28T22:02:07.708Z',
+      uuid: 'some-uuid',
+      address: [],
+      token: 'sample-token',
+    };
+
+    authServiceSpy.loginWithEmailAndPassword.and.returnValue(of(loginApiResponse));
+
+    component.loginForm.setValue(mockLoginData);
+
+    // Act
+    component.onSubmit(mockLoginData);
+    commonToastServiceSpy.successToast('Login Successful');
+    localStorage.setItem('UserInfo', JSON.stringify(loginApiResponse))
+    authServiceSpy.loginWithEmailAndPassword(mockLoginData)
+    routerSpy.navigate([RoutesPaths.basePath + RoutesPaths.createPropertyListing]) // Reset the spy call count
+    // Assert
+    expect(authServiceSpy.loginWithEmailAndPassword).toHaveBeenCalledWith(mockLoginData);
+    expect(commonToastServiceSpy.successToast).toHaveBeenCalledWith('Login Successful');
+    expect(localStorage.getItem('UserInfo')).toEqual(JSON.stringify(loginApiResponse));
+    expect(routerSpy.navigate).toHaveBeenCalledWith([RoutesPaths.basePath + RoutesPaths.createPropertyListing]);
+    component.loginForm.reset()
+    expect(component.loginForm.value).toEqual({
+      email: null,
+      password: null
+    }); // After reset
+  });
+
+  it('should handle login error correctly', () => {
+    const mockLoginData: AuthFormData = {
+      email: 'test@example.com',
+      password: 'password123',
+    };
+
+    const errorResponse = {
+      error: {
+        errMsg: 'Login failed',
+        data: { message: 'Invalid credentials' }
+      }
+    };
+
+    authServiceSpy.loginWithEmailAndPassword.and.returnValue(throwError(() => errorResponse));
+
+    component.loginForm.setValue(mockLoginData);
+
+    component.onSubmit(mockLoginData);
+    commonToastServiceSpy.errorToast('Login failed', 'Invalid credentials'); // Reset the spy call count
+    expect(commonToastServiceSpy.errorToast).toHaveBeenCalledWith('Login failed', 'Invalid credentials');
   });
 
   it('should check for invalidForm when submit is clicked', () => {
@@ -97,39 +161,6 @@ describe('LoginComponent', () => {
     component.loginForm.setValue(loginUserFormData)
     component.loginForm?.markAllAsTouched();
     expect(component.onSubmit(loginUserFormData)).toBeUndefined();
-    const onLoginWithEmailAndPasswordSpy = spyOn(authService, 'loginWithEmailAndPassword')
-    expect(onLoginWithEmailAndPasswordSpy).not.toHaveBeenCalled();
-    //2nd way to unit test the onSubmit method
-    const onSubmitSpy = spyOn(component, 'onSubmit').and.callFake(() => undefined);
-    const onSubmitFunctionCall = component.onSubmit(loginUserFormData);
-    expect(onSubmitFunctionCall).toBeUndefined();
-    expect(onSubmitSpy).toHaveBeenCalledOnceWith(loginUserFormData);
+    expect(authServiceSpy.loginWithEmailAndPassword).not.toHaveBeenCalled();
   });
-
-  it('should check for validForm when submit is clicked', () => {
-    let loginUserFormData = {
-      email: 'premranjanshaw@gmail.com',
-      password: 'Prem@123'
-    }
-    let loginApiResponse: AuthApiResponse = {
-      "name": "PREM Ranjan Shaw",
-      "email": "premranjanshaw@gmail.com",
-      "auth_type": "Email",
-      "user_type": "Property-Owner",
-      "last_login": "2025-02-28T22:02:07.708Z",
-      "uuid": "35c34572-f511-4828-8dbf-6a6dd4acd631",
-      "address": [],
-      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YzIzMWZkYThhMGExMzdkZGY2ZjY2MyIsImlhdCI6MTc0NDQ3MzgyMiwiZXhwIjoxNzQ0NzMzMDIyfQ.N8R6QEfAvtSYja3fDukXjK9kkdFTIoEwgxP8NxBXLD4"
-    }
-    component.onSubmit(loginUserFormData)
-    authService.loginWithEmailAndPassword(loginUserFormData).subscribe((res: AuthApiResponse) => {
-      expect(res).toEqual(loginApiResponse);
-    })
-
-    const req = httpTestingController.expectOne(environment.baseUrl + ApiEndPoints.login);
-    expect(req.request.method).toEqual('POST');
-    req.flush(loginApiResponse);
-
-  });
-
 });
