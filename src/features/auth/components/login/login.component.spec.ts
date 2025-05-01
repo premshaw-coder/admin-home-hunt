@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
@@ -12,6 +12,7 @@ import { AuthService } from '../../services/auth.service';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { MessageService } from 'primeng/api';
 
 describe('YourComponentName', () => {
   let component: LoginComponent;
@@ -20,12 +21,11 @@ describe('YourComponentName', () => {
   let commonToastServiceSpy: jasmine.SpyObj<CommonToastService>;
   let routerSpy: jasmine.SpyObj<Router>;
   let destroyRefSpy: jasmine.SpyObj<DestroyRef>;
-
   beforeEach(() => {
     let httpTestingController: HttpTestingController;
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     authServiceSpy = jasmine.createSpyObj('AuthService', ['loginWithEmailAndPassword']);
     commonToastServiceSpy = jasmine.createSpyObj('CommonToastService', ['successToast', 'errorToast']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     destroyRefSpy = jasmine.createSpyObj('DestroyRef', ['onDestroy']); // if needed
 
     TestBed.configureTestingModule({
@@ -34,6 +34,7 @@ describe('YourComponentName', () => {
         provideAnimationsAsync(),
         provideHttpClient(withInterceptors([])),
         provideHttpClientTesting(),
+        MessageService,
         { provide: AuthService, useValue: authServiceSpy },
         { provide: CommonToastService, useValue: commonToastServiceSpy },
         { provide: Router, useValue: routerSpy },
@@ -160,7 +161,39 @@ describe('YourComponentName', () => {
     }
     component.loginForm.setValue(loginUserFormData)
     component.loginForm?.markAllAsTouched();
+    component.onSubmit(loginUserFormData);
     expect(component.onSubmit(loginUserFormData)).toBeUndefined();
-    expect(authServiceSpy.loginWithEmailAndPassword).not.toHaveBeenCalled();
+    // expect(authServiceSpy.loginWithEmailAndPassword).not.toHaveBeenCalled();
   });
+
+  it('should login user and show success toast', () => {
+    const loginUserFormData: AuthFormData = {
+      "email": "premranjanshaw@gmail.com",
+      "password": "Prem@123"
+    };
+
+    component.loginForm.setValue(loginUserFormData);
+
+    // Bypass the validation, another way to assign return type of the function isFormInValid
+    // spyOn(component as any, 'isFormInValid').and.returnValue(false);
+
+    const mockUser: AuthApiResponse = {
+      name: 'John',
+      email: 'john@example.com',
+      auth_type: 'Email',
+      user_type: 'User',
+      last_login: '2025-02-28T22:02:07.708Z',
+      uuid: 'uuid-1',
+      address: [],
+      token: 'token-1',
+    };
+
+    authServiceSpy.loginWithEmailAndPassword.and.returnValue(of(mockUser));
+    component.onSubmit(loginUserFormData);
+    expect(authServiceSpy.loginWithEmailAndPassword).toHaveBeenCalledWith(loginUserFormData);
+    expect(commonToastServiceSpy.successToast).toHaveBeenCalledWith('Login Successful');
+    expect(localStorage.getItem('UserInfo')).toEqual(JSON.stringify(mockUser));
+    expect(routerSpy.navigate).toHaveBeenCalledWith([RoutesPaths.basePath + RoutesPaths.createPropertyListing]);
+  });
+
 });

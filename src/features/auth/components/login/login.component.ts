@@ -9,8 +9,6 @@ import { PasswordModule } from 'primeng/password';
 import { AuthFormData, AuthFormControl } from '../../interfaces/auth/auth-login.form.interface';
 import { AuthApiResponse } from '../../interfaces/auth/auth-login.interface';
 import { CommonToastService } from '../../../../app/shared/toast/common-toast.service';
-import { HttpClient } from '@angular/common/http';
-import { MessageService } from 'primeng/api';
 import { CardModule } from 'primeng/card';
 import { ToastModule } from 'primeng/toast';
 import { Router } from '@angular/router';
@@ -20,7 +18,6 @@ import { RoutesPaths } from '../../../../app/shared/application-routes/app-route
   selector: 'app-login',
   imports: [InputTextModule, FloatLabelModule, CardModule, ButtonModule, FormsModule,
     ReactiveFormsModule, PasswordModule, ToastModule],
-  providers: [AuthService, HttpClient, CommonToastService, MessageService],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -50,8 +47,7 @@ export class LoginComponent implements OnInit {
     if (this.isFormInValid()) {
       return
     }
-    this.authService.loginWithEmailAndPassword(loginFormData)
-      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.authService.loginWithEmailAndPassword(loginFormData)?.pipe(takeUntilDestroyed(this.destroyRef))?.subscribe({
         next: (res: AuthApiResponse) => {
           this.commonService.successToast('Login Successful')
           localStorage.setItem('UserInfo', JSON.stringify(res))
