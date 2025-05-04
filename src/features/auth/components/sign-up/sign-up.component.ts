@@ -17,7 +17,6 @@ import { ToastModule } from 'primeng/toast';
 @Component({
   selector: 'app-sign-up',
   imports: [InputTextModule, FloatLabelModule, CardModule, ButtonModule, FormsModule, ReactiveFormsModule, PasswordModule, ToastModule],
-  providers: [AuthService, HttpClient, CommonToastService, MessageService],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.scss'
 })

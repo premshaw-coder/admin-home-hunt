@@ -60,7 +60,6 @@ describe('YourComponentName', () => {
     const isInvalid = component['isFormInValid']();
 
     expect(isInvalid).toBeTrue();
-    commonToastServiceSpy.errorToast('All Fields are required'); // Reset the spy call count
     expect(commonToastServiceSpy.errorToast).toHaveBeenCalledWith('All Fields are required');
   });
 
@@ -75,7 +74,6 @@ describe('YourComponentName', () => {
     const isInvalid = component['isFormInValid']();
 
     expect(isInvalid).toBeTrue();
-    commonToastServiceSpy.errorToast('Email', 'Either Empty or Invalid'); // Reset the spy call count
     expect(commonToastServiceSpy.errorToast).toHaveBeenCalledWith('Email', 'Either Empty or Invalid');
   });
 
@@ -87,7 +85,6 @@ describe('YourComponentName', () => {
     }
 
     const isInvalid = component['isFormInValid']();
-    commonToastServiceSpy.errorToast('Password', 'Either Empty or Invalid'); // Reset the spy call count
     expect(isInvalid).toBeTrue();
     expect(commonToastServiceSpy.errorToast).toHaveBeenCalledWith('Password', 'Either Empty or Invalid');
   });
@@ -116,7 +113,6 @@ describe('YourComponentName', () => {
 
     // Act
     component.onSubmit(mockLoginData);
-    commonToastServiceSpy.successToast('Login Successful');
     localStorage.setItem('UserInfo', JSON.stringify(loginApiResponse))
     authServiceSpy.loginWithEmailAndPassword(mockLoginData)
     routerSpy.navigate([RoutesPaths.basePath + RoutesPaths.createPropertyListing]) // Reset the spy call count
@@ -150,7 +146,6 @@ describe('YourComponentName', () => {
     component.loginForm.setValue(mockLoginData);
 
     component.onSubmit(mockLoginData);
-    commonToastServiceSpy.errorToast('Login failed', 'Invalid credentials'); // Reset the spy call count
     expect(commonToastServiceSpy.errorToast).toHaveBeenCalledWith('Login failed', 'Invalid credentials');
   });
 
