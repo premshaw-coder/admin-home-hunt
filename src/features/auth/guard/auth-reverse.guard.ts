@@ -4,8 +4,8 @@ import { AuthService } from '../services/auth.service';
 import { RoutesPaths } from '../../../app/shared/application-routes/app-routes';
 
 export const authReverseGuard: CanActivateFn = (route, state) => {
-  let authService = inject(AuthService);
-  let router = inject(Router);
+  const authService = inject(AuthService);
+  const router = inject(Router);
   if (authService.isUserAuthenticated()) {
     router.navigate([RoutesPaths.basePath + RoutesPaths.createPropertyListing]);
     return false

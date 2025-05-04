@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { CommonToastService } from '../../../../app/shared/toast/common-toast.service';
@@ -20,7 +20,7 @@ import { ToastModule } from 'primeng/toast';
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.scss'
 })
-export class SignUpComponent {
+export class SignUpComponent implements OnInit {
   signUpForm!: FormGroup<AuthFormControl>
 
   private authService = inject(AuthService)

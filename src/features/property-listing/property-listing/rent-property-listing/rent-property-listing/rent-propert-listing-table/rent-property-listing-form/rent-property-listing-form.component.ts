@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, NO_ERRORS_SCHEMA } from '@angular/core';
+import { Component, DestroyRef, inject, NO_ERRORS_SCHEMA, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule, NgModel } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { StepperModule } from 'primeng/stepper';
@@ -21,7 +21,7 @@ import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
   templateUrl: './rent-property-listing-form.component.html',
   styleUrl: './rent-property-listing-form.component.scss',
 })
-export class RentPropertyListingFormComponent {
+export class RentPropertyListingFormComponent implements OnInit {
   RentPropertyListingForm!: FormGroup;
   private bhktypeValues = ApiStaticData.bhktypeValues;
   private propertypeValues = ApiStaticData.propertyTypeValues;
@@ -182,7 +182,7 @@ export class RentPropertyListingFormComponent {
   }
 
   private getSelectedValueAsString(formGroupName: string, FormControlName: string) {
-    let selectedValue = this.RentPropertyListingForm.get(formGroupName)?.get(FormControlName)?.value ?? {}
+    const selectedValue = this.RentPropertyListingForm.get(formGroupName)?.get(FormControlName)?.value ?? {}
     return selectedValue?.['name'] || "";
   }
 
@@ -215,8 +215,8 @@ export class RentPropertyListingFormComponent {
   }
 
   createPaylaod() {
-    let propertyDetailFormData = this.RentPropertyListingForm.get('propertyDetails')
-    let formData = {
+    const propertyDetailFormData = this.RentPropertyListingForm.get('propertyDetails')
+    const formData = {
       ...this.RentPropertyListingForm.value, propertyDetails: {
         ...propertyDetailFormData?.value,
         bhkType: this.getSelectedValueAsString('propertyDetails', 'bhkType'),
@@ -235,7 +235,7 @@ export class RentPropertyListingFormComponent {
 
   patchFormData() {
     // Patching the form with the provided data
-    let rentPropertyDetailsData = this.rentPropertyData?.propertyDetails
+    const rentPropertyDetailsData = this.rentPropertyData?.propertyDetails
     this.RentPropertyListingForm.patchValue(this.rentPropertyData);
     this.patchValueForSelectDropdownData('bhkType', this.bhktypeValues, rentPropertyDetailsData?.bhkType)
     this.patchValueForSelectDropdownData('furnishingStatus', this.furnishingStatusValues, rentPropertyDetailsData?.furnishingStatus)
@@ -246,7 +246,7 @@ export class RentPropertyListingFormComponent {
   }
 
   patchValueForSelectDropdownData(FormControlName: string, selectOptionData: any[], selectedData: string) {
-    let selectedDropdownFormData = selectOptionData.find((data: any) => data.name === selectedData)
+    const selectedDropdownFormData = selectOptionData.find((data: any) => data.name === selectedData)
     this.RentPropertyListingForm.get('propertyDetails')?.get(FormControlName)?.patchValue(selectedDropdownFormData);
   }
 

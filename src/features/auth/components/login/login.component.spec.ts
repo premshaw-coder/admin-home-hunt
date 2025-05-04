@@ -150,7 +150,7 @@ describe('YourComponentName', () => {
   });
 
   it('should check for invalidForm when submit is clicked', () => {
-    let loginUserFormData = {
+    const loginUserFormData = {
       email: '',
       password: ''
     }

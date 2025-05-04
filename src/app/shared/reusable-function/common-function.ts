@@ -28,7 +28,7 @@ export function openDialog(component: Type<any>, dialogConfigObj: DialogConfig, 
 }
 
 
-export function dialogConfigObj(isEdit: boolean = false, rentPropertyData?: any) {
+export function dialogConfigObj(isEdit = false, rentPropertyData?: any) {
     const dialogConfig: DialogConfig = {
         data: {
             edit: isEdit,

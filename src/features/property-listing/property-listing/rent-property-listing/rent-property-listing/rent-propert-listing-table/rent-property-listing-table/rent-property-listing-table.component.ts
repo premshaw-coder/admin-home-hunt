@@ -108,7 +108,7 @@ export class RentPropertyListingTableComponent implements OnInit {
 
 
   public createRentListing() {
-    let dialogConfig: DialogConfig = dialogConfigObj(false)
+    const dialogConfig: DialogConfig = dialogConfigObj(false)
     const createRentListingDialogRef = openDialog(RentPropertyListingFormComponent, dialogConfig, this.dialogService)
     createRentListingDialogRef.onClose.subscribe((res: any) => {
       if (res.data = 'Create rent listing') this.getAllRentPropertyListingByProperOwner()
@@ -116,7 +116,7 @@ export class RentPropertyListingTableComponent implements OnInit {
   }
 
   private editRentListing(propertyRentListData: any) {
-    let dialogConfig: DialogConfig = dialogConfigObj(true, propertyRentListData)
+    const dialogConfig: DialogConfig = dialogConfigObj(true, propertyRentListData)
     const editRentListingDialogRef = openDialog(RentPropertyListingFormComponent, dialogConfig, this.dialogService);
     editRentListingDialogRef.onClose.subscribe((res: any) => {
       if (res.data = 'Edit rent listing') this.getAllRentPropertyListingByProperOwner()
@@ -128,7 +128,7 @@ export class RentPropertyListingTableComponent implements OnInit {
   }
 
   uploadFiles(propertyRentListData: any) {
-    let dialogConfig: DialogConfig = dialogConfigObj(true, propertyRentListData)
+    const dialogConfig: DialogConfig = dialogConfigObj(true, propertyRentListData)
     const RentPropertyUploadFilesDialogRef = openDialog(RentPropertyUploadMediaFilesComponent, dialogConfig, this.dialogService)
     RentPropertyUploadFilesDialogRef.onClose.subscribe((res: any) => {
       if (res?.data?.isFilesUploadedToS3bucket) this.getAllRentPropertyListingByProperOwner()

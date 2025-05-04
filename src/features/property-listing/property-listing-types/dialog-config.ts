@@ -1,4 +1,4 @@
-export type DialogConfig = {
+export interface DialogConfig {
     data:any;
     header: string;
     width: string;

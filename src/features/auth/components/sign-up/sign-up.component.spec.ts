@@ -97,7 +97,7 @@ describe('SignUpComponent', () => {
   })
 
   it('should call signUpWithEmailAndPassword and show success toast on successful sign up', () => {
-    let mockSignUpPayload: { name: string; email: string; password: string; phoneNumber: number; user_type?: string } = {
+    const mockSignUpPayload: { name: string; email: string; password: string; phoneNumber: number; user_type?: string } = {
       name: 'John Doe', email: 'prem@gmail.com', password: 'password123', phoneNumber: 1234567890,
     };
     const mockAuthApiResponse: AuthApiResponse = {
@@ -120,7 +120,7 @@ describe('SignUpComponent', () => {
       uuid: "123e4567-e89b-12d3-a456-426614174000",
     };
     component.signUpForm.setValue(mockSignUpPayload);
-    let signUpPayload = { ...mockSignUpPayload, 'user_type': 'Property-Owner' }
+    const signUpPayload = { ...mockSignUpPayload, 'user_type': 'Property-Owner' }
     authServiceSpy.signUpWithEmailAndPassword.and.returnValue(of(mockAuthApiResponse));
     component.onSubmit(signUpPayload);
     expect(authServiceSpy.signUpWithEmailAndPassword).toHaveBeenCalledWith(signUpPayload);
@@ -128,7 +128,7 @@ describe('SignUpComponent', () => {
   })
 
   it('should not call signUpWithEmailAndPassword on invalid form and show error toast during sign up', () => {
-    let mockSignUpPayload: { name: string; email: string; password: string; phoneNumber: number; user_type?: string } = {
+    const mockSignUpPayload: { name: string; email: string; password: string; phoneNumber: number; user_type?: string } = {
       name: 'John Doe', email: 'prem@gmail.com', password: 'password123', phoneNumber: 1234567890,
     };
     const errorResponse = {
@@ -138,7 +138,7 @@ describe('SignUpComponent', () => {
       }
     };
     component.signUpForm.setValue(mockSignUpPayload);
-    let signUpPayload = { ...mockSignUpPayload, 'user_type': 'Property-Owner' }
+    const signUpPayload = { ...mockSignUpPayload, 'user_type': 'Property-Owner' }
     authServiceSpy.signUpWithEmailAndPassword.and.returnValue(throwError(() => errorResponse));
     component.onSubmit(signUpPayload);
     expect(authServiceSpy.signUpWithEmailAndPassword).toHaveBeenCalledWith(signUpPayload);

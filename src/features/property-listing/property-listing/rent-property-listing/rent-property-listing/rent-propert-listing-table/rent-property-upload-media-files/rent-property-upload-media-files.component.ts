@@ -21,13 +21,13 @@ import { ApiEndPoints } from '../../../../../../../app/shared/api-ends-points/ad
 })
 export class RentPropertyUploadMediaFilesComponent implements OnInit {
   files = [];
-  totalSize: number = 0;
-  totalSizePercent: number = 0;
+  totalSize = 0;
+  totalSizePercent = 0;
   uploadedFilesToS3: any;
-  propertyOwnerId: string = '';
-  uploadFilesUrl: string = '';
-  isFilesUploadedToS3bucket: boolean = false;
-  isRegeneratedSignedUrlFilesUploadedToS3bucket: boolean = false;
+  propertyOwnerId = '';
+  uploadFilesUrl = '';
+  isFilesUploadedToS3bucket = false;
+  isRegeneratedSignedUrlFilesUploadedToS3bucket = false;
 
 
   private dialogConfig = inject(DynamicDialogConfig)
@@ -111,8 +111,8 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
   }
   regenerateFilesSignedUrl(uploadedFilesToS3: any) {
     const payload = uploadedFilesToS3?.filter((file: any) => {
-      let signedUrlExpirationDate = Date.parse(file.fileExpirationTime)
-      let currentDate = Date.now();
+      const signedUrlExpirationDate = Date.parse(file.fileExpirationTime)
+      const currentDate = Date.now();
       if (currentDate > signedUrlExpirationDate) return file
     })
 
