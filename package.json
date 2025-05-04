@@ -10,6 +10,9 @@
     "lint": "ng lint",
     "prepare": "husky install"
   },
+  "lint-staged": {
+    "*.{ts,html}": "eslint . --cache --ext .ts,.html --fix"
+  },
   "private": true,
   "dependencies": {
     "@angular/animations": "^19.1.0",
@@ -37,6 +40,7 @@
     "angular-eslint": "19.3.0",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.23.0",
+    "husky": "^8.0.0",
     "jasmine-core": "~5.5.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
@@ -45,7 +49,6 @@
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.7.2",
-    "typescript-eslint": "8.27.0",
-    "husky": "^8.0.0"
+    "typescript-eslint": "8.27.0"
   }
 }

@@ -2,4 +2,4 @@
 ng generate environments
 
 2) lint rules ->
-i)npx eslint . --ext .ts,.html --fix
+i)npx eslint . --cache --ext .ts,.html --fix
