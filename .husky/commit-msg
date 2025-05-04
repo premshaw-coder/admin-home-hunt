@@ -1,0 +1,15 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Basic check: prevent empty commit messages
+if test -z "$(cat "$1")"; then
+  echo "❌ Commit message cannot be empty."
+  exit 1
+fi
+
+# OPTIONAL: Enforce Conventional Commit style
+# You can install commitlint for advanced checking
+# npm install --save-dev @commitlint/{config-conventional,cli}
+# echo "module.exports = {extends: ['@commitlint/config-conventional']}" > commitlint.config.js
+# And use:
+# npx commitlint --edit "$1"
