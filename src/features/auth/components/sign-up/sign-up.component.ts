@@ -21,6 +21,7 @@ import { ToastModule } from 'primeng/toast';
   styleUrl: './sign-up.component.scss'
 })
 export class SignUpComponent implements OnInit {
+
   signUpForm!: FormGroup<AuthFormControl>
 
   private authService = inject(AuthService)
