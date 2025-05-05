@@ -42,7 +42,7 @@ describe('SignUpComponent', () => {
     httpTestingController = TestBed.inject(HttpTestingController);
   });
   it('should create the component', () => {
-    expect(component).toBeFalsy();
+    expect(component).toBeTruthy();
   });
 
   it('should display error if form is invalid and all the fields are empty', () => {
