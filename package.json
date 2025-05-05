@@ -7,12 +7,9 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test --code-coverage",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
     "lint": "ng lint",
-    "prepare": "husky install",
-    "test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage"
-  },
-  "lint-staged": {
-    "*.{ts,html}": "eslint . --cache --ext .ts,.html --fix"
+    "prepare": "husky install"
   },
   "private": true,
   "dependencies": {
