@@ -27,7 +27,8 @@ module.exports = function (config) {
       'src/**/*.js',
       'test/**/*.js'
     ],
-
+    singleRun: process.env.CI === 'true',
+    autoWatch: process.env.CI !== 'true',
     // coverage reporter generates the coverage
     reporters: ['progress', 'kjhtml', 'coverage'],
 
