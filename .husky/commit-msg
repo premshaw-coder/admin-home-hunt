@@ -1,7 +1,7 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-# npx eslint . --cache --ext .ts,.html --fix
+# npx eslint . --cache --ext .ts,.html --fix have to fix the lint error
 
 # Basic check: prevent empty commit messages
 if test -z "$(cat "$1")"; then
