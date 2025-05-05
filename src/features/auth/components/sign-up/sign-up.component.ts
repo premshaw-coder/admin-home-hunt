@@ -3,15 +3,12 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { AuthService } from '../../services/auth.service';
 import { CommonToastService } from '../../../../app/shared/toast/common-toast.service';
 import { AuthFormControl, AuthFormData } from '../../interfaces/auth/auth-login.form.interface';
-import { AuthApiResponse } from '../../interfaces/auth/auth-login.interface';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
-import { HttpClient } from '@angular/common/http';
-import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 
 @Component({
@@ -26,8 +23,6 @@ export class SignUpComponent implements OnInit {
   private authService = inject(AuthService)
   private commonService = inject(CommonToastService)
   private destroyRef = inject(DestroyRef)
-
-  constructor() { }
 
   ngOnInit(): void {
     this.setForm()
@@ -50,7 +45,7 @@ export class SignUpComponent implements OnInit {
     signUpFormData = { ...signUpFormData, user_type: 'Property-Owner' }
     this.authService.signUpWithEmailAndPassword(signUpFormData)
       .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: async (res: AuthApiResponse) => {
+        next: async () => {
           this.commonService.successToast('User Registered Successfully')
         },
         error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
