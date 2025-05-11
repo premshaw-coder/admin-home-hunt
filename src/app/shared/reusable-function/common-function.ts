@@ -1,6 +1,7 @@
 import { Type } from "@angular/core";
 import { DialogConfig } from "../../../features/property-listing/property-listing-types/dialog-config";
 import { DialogService, DynamicDialogConfig, DynamicDialogRef } from "primeng/dynamicdialog";
+import { PropertyListing } from "../../../features/property-listing/property-listing/rent-property-listing/rent-property-listing-interfaces/property-listing-interface";
 
 /**
  * Opens a dialog with the specified component and configuration
@@ -8,7 +9,7 @@ import { DialogService, DynamicDialogConfig, DynamicDialogRef } from "primeng/dy
  * @param dialogConfigObj The configuration options for the dialog
  * @returns A reference to the opened dialog
  */
-export function openDialog(component: Type<any>, dialogConfigObj: DialogConfig, dialogService: DialogService): DynamicDialogRef {
+export function openDialog<T>(component: Type<T>, dialogConfigObj: DialogConfig, dialogService: DialogService): DynamicDialogRef {
     // Use inject function to get the DialogService
     // Create dialog configuration
     const dialogConfig = new DynamicDialogConfig();
@@ -28,7 +29,7 @@ export function openDialog(component: Type<any>, dialogConfigObj: DialogConfig, 
 }
 
 
-export function dialogConfigObj(isEdit = false, rentPropertyData?: any) {
+export function dialogConfigObj(isEdit = false, rentPropertyData?: PropertyListing): DialogConfig {
     const dialogConfig: DialogConfig = {
         data: {
             edit: isEdit,

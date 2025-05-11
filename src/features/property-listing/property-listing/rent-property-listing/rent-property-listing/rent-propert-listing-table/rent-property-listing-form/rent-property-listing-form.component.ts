@@ -1,5 +1,5 @@
-import { Component, DestroyRef, inject, NO_ERRORS_SCHEMA, OnInit } from '@angular/core';
-import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule, NgModel } from '@angular/forms';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { StepperModule } from 'primeng/stepper';
 import { InputTextModule } from 'primeng/inputtext';
@@ -11,6 +11,9 @@ import { RentPropertyListingService } from '../../../services/rent-property-list
 import { HttpClient } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { AuthApiResponse } from '../../../../../../auth/interfaces/auth/auth-login.interface';
+import { PropertyDetails, PropertyListing } from '../../../rent-property-listing-interfaces/property-listing-interface';
+import { PropertyListingForm } from '../../../rent-property-listing-interfaces/property-listing-form-interface';
 
 @Component({
   selector: 'app-rent-property-listing-form',
@@ -23,15 +26,15 @@ import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 })
 export class RentPropertyListingFormComponent implements OnInit {
   RentPropertyListingForm!: FormGroup;
-  private bhktypeValues = ApiStaticData.bhktypeValues;
-  private propertypeValues = ApiStaticData.propertyTypeValues;
-  private propertyPreferredTenantsValues = ApiStaticData.propertyPreferredTenantsValues;
-  private furnishingStatusValues = ApiStaticData.furnishingStatusValues;
-  private propertyFacingValues = ApiStaticData.propertyFacingValues;
-  private propertyParkingValues = ApiStaticData.propertyParkingValues;
-  private userInfo: any = JSON.parse(localStorage.getItem('UserInfo') || '{}')
+  private bhktypeValues:PropertyListingForm[] = ApiStaticData.bhktypeValues;
+  private propertypeValues:PropertyListingForm[] = ApiStaticData.propertyTypeValues;
+  private propertyPreferredTenantsValues:PropertyListingForm[] = ApiStaticData.propertyPreferredTenantsValues;
+  private furnishingStatusValues:PropertyListingForm[] = ApiStaticData.furnishingStatusValues;
+  private propertyFacingValues:PropertyListingForm[] = ApiStaticData.propertyFacingValues;
+  private propertyParkingValues:PropertyListingForm[] = ApiStaticData.propertyParkingValues;
+  private userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') || '{}')
   private isEditMode!: boolean;
-  private rentPropertyData: any
+  private rentPropertyData!: PropertyListing
 
   private rentPropertyListingService = inject(RentPropertyListingService)
   private destroyRef = inject(DestroyRef)
@@ -124,11 +127,11 @@ export class RentPropertyListingFormComponent implements OnInit {
     });
   }
 
-  public onSubmit(): any {
-    if (this.RentPropertyListingForm.invalid) return '';
+  public onSubmit(): void {
+    if (this.RentPropertyListingForm.invalid) return;
     else if (!this.isEditMode) {
       this.createRentPropertyListing(this.createPaylaod())
-      return
+      return;
     }
     else this.editRentPropertyListing(this.createPaylaod())
   }
@@ -186,12 +189,13 @@ export class RentPropertyListingFormComponent implements OnInit {
     return selectedValue?.['name'] || "";
   }
 
-  private createRentPropertyListing(formData: any) {
+  private createRentPropertyListing(formData: PropertyListing) {
     this.rentPropertyListingService.createRentPropertyListing(formData).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: async (res: any) => {
-
+      next: (response: PropertyListing) => {
+        console.log('Rent property listing created successfully:', response);
       },
-      error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
+      error: (err:Error) => {
+        console.error('Error occurred while editing rent property listing:', err);
       },
       complete: () => {
         this.RentPropertyListingForm.reset()
@@ -200,12 +204,13 @@ export class RentPropertyListingFormComponent implements OnInit {
     });
   }
 
-  editRentPropertyListing(formData: any) {
-    this.rentPropertyListingService.editRentPropertyListing(formData, this.rentPropertyData._id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: async (res: any) => {
-
+  editRentPropertyListing(formData: PropertyListing) {
+    this.rentPropertyListingService.editRentPropertyListing(formData, this.rentPropertyData?._id || '').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (res:PropertyListing) => {
+        console.log('Rent property listing edited successfully', res);
       },
-      error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
+      error: (err:Error) => {
+        console.error('Error occurred while editing rent property listing:', err);
       },
       complete: () => {
         this.RentPropertyListingForm.reset()
@@ -214,9 +219,9 @@ export class RentPropertyListingFormComponent implements OnInit {
     });
   }
 
-  createPaylaod() {
+  createPaylaod(): PropertyListing {
     const propertyDetailFormData = this.RentPropertyListingForm.get('propertyDetails')
-    const formData = {
+    const formData: PropertyListing = {
       ...this.RentPropertyListingForm.value, propertyDetails: {
         ...propertyDetailFormData?.value,
         bhkType: this.getSelectedValueAsString('propertyDetails', 'bhkType'),
@@ -235,7 +240,7 @@ export class RentPropertyListingFormComponent implements OnInit {
 
   patchFormData() {
     // Patching the form with the provided data
-    const rentPropertyDetailsData = this.rentPropertyData?.propertyDetails
+    const rentPropertyDetailsData:PropertyDetails = this.rentPropertyData?.propertyDetails
     this.RentPropertyListingForm.patchValue(this.rentPropertyData);
     this.patchValueForSelectDropdownData('bhkType', this.bhktypeValues, rentPropertyDetailsData?.bhkType)
     this.patchValueForSelectDropdownData('furnishingStatus', this.furnishingStatusValues, rentPropertyDetailsData?.furnishingStatus)
@@ -245,8 +250,8 @@ export class RentPropertyListingFormComponent implements OnInit {
     this.patchValueForSelectDropdownData('propertyPreferredTenants', this.propertyPreferredTenantsValues, rentPropertyDetailsData?.propertyPreferredTenants)
   }
 
-  patchValueForSelectDropdownData(FormControlName: string, selectOptionData: any[], selectedData: string) {
-    const selectedDropdownFormData = selectOptionData.find((data: any) => data.name === selectedData)
+  patchValueForSelectDropdownData(FormControlName: string, selectOptionData: PropertyListingForm[], selectedData: string) {
+    const selectedDropdownFormData = selectOptionData.find((data: PropertyListingForm) => data.name === selectedData)
     this.RentPropertyListingForm.get('propertyDetails')?.get(FormControlName)?.patchValue(selectedDropdownFormData);
   }
 

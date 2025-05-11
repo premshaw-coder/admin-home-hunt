@@ -3,6 +3,7 @@ import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router
 import { TabsModule } from 'primeng/tabs';
 import { RoutesPaths } from '../../../app/shared/application-routes/app-routes';
 import { filter, map } from 'rxjs/operators';
+import { PropertyListingTabsInterface } from '../property-listing-interfaces/property-listing-tabs-interface';
 
 @Component({
   selector: 'app-property-listing',
@@ -11,7 +12,7 @@ import { filter, map } from 'rxjs/operators';
   styleUrl: './property-listing.component.scss'
 })
 export class PropertyListingComponent {
-  tabs: any[] = [];
+  tabs: PropertyListingTabsInterface[] = [];
   private router = inject(Router)
   currentUrl!: string;
 

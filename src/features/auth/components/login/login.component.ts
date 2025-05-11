@@ -29,8 +29,6 @@ export class LoginComponent implements OnInit {
   private destroyRef = inject(DestroyRef)
   private router = inject(Router)
 
-  constructor() { }
-
   ngOnInit(): void {
     this.setForm()
   }

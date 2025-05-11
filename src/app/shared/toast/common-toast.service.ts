@@ -7,9 +7,6 @@ import { MessageService } from 'primeng/api';
 export class CommonToastService {
   private messageService = inject(MessageService)
 
-  constructor() {
-  }
-
   successToast(summary: string, detail?: string, timer = 5, clearToast = true):void {
     if (clearToast) this.messageService.clear()
     this.messageService.add({ severity: 'success', summary, detail, life: timer * 1000 });

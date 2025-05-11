@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { PrimeNG } from 'primeng/config';
-import { FileUpload } from 'primeng/fileupload';
+import { FileUpload, FileUploadEvent } from 'primeng/fileupload';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { BadgeModule } from 'primeng/badge';
@@ -12,6 +12,7 @@ import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { RentPropertyFilesUploadService } from '../../../services/files-upload/rent-property-files-upload.service';
 import { environment } from '../../../../../../../environments/environment.development';
 import { ApiEndPoints } from '../../../../../../../app/shared/api-ends-points/admin-home-hunt-api-endpoints';
+import { PropertyImage, PropertyListing } from '../../../rent-property-listing-interfaces/property-listing-interface';
 @Component({
   selector: 'app-rent-property-upload-media-files',
   imports: [FileUpload, ButtonModule, BadgeModule, ProgressBar, ToastModule, HttpClientModule, CommonModule],
@@ -20,10 +21,10 @@ import { ApiEndPoints } from '../../../../../../../app/shared/api-ends-points/ad
   styleUrl: './rent-property-upload-media-files.component.scss'
 })
 export class RentPropertyUploadMediaFilesComponent implements OnInit {
-  files = [];
+  files: File[] = [];
   totalSize = 0;
   totalSizePercent = 0;
-  uploadedFilesToS3: any;
+  uploadedFilesToS3: PropertyImage[] = [];
   propertyOwnerId = '';
   uploadFilesUrl = '';
   isFilesUploadedToS3bucket = false;
@@ -35,8 +36,6 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
   private config = inject(PrimeNG);
   private messageService = inject(MessageService);
   public dialogRef = inject(DynamicDialogRef)
-  constructor() {
-  }
 
   ngOnInit(): void {
     this.propertyOwnerId = this.dialogConfig?.data?.propertyRentListData?._id;
@@ -45,11 +44,11 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
     this.regenerateFilesSignedUrl(this.uploadedFilesToS3);
   }
 
-  choose(event: any, callback: () => void) {
+  choose(event: MouseEvent, callback: () => void): void {
     callback();
   }
 
-  onRemoveTemplatingFile(event: any, file: any, removeFileCallback: any, index: any) {
+  onRemoveTemplatingFile(event: Event, file: File, removeFileCallback: (event: Event, index: number) => void, index: number) {
     removeFileCallback(event, index);
     this.totalSize -= parseInt(this.formatSize(file.size));
     this.totalSizePercent = this.totalSize / 10;
@@ -61,20 +60,33 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
     this.totalSizePercent = 0;
   }
 
-  onTemplatedUpload(event: any) {
-    if (event && event.originalEvent && event.originalEvent.body) {
-      this.uploadedFilesToS3 = event?.originalEvent?.body?.propertyDetails?.propertyImages;
+  onTemplatedUpload(event: FileUploadEvent): void {
+    const responseBody = (event.originalEvent && 'body' in event.originalEvent) ? event.originalEvent.body as PropertyListing : null;
+    if (responseBody) {
+      this.uploadedFilesToS3 = responseBody?.propertyDetails?.propertyImages || [];
       this.isFilesUploadedToS3bucket = true;
-      this.dialogRef.close({ action: 'file uploaded sucessfully', data: { isFilesUploadedToS3bucket: this.isFilesUploadedToS3bucket } })
+      this.dialogRef.close({
+        action: 'file uploaded successfully',
+        data: { isFilesUploadedToS3bucket: this.isFilesUploadedToS3bucket }
+      });
     }
-    this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Uploaded', life: 3000 });
+
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Success',
+      detail: 'File Uploaded',
+      life: 3000
+    });
   }
 
-  onSelectedFiles(event: any) {
-    this.files = event.currentFiles;
-    this.files.forEach((file: any) => {
+
+  onSelectedFiles(event: { originalEvent: Event; files: File[] }): void {
+    this.files = Array.isArray(event.files) ? event.files : [];
+
+    this.files?.forEach((file: File) => {
       this.totalSize += parseInt(this.formatSize(file.size));
     });
+
     this.totalSizePercent = this.totalSize / 10;
   }
 
@@ -92,15 +104,16 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
     return `${formattedSize} ${sizes[i]}`;
   }
 
-  removeUploadedFile(filesInfo: any) {
-    let payload = {}
-    payload = { "data": [{ "Key": "test/property-owner-rent/" + filesInfo.fileName, "_id": filesInfo._id }] }
+  removeUploadedFile(filesInfo: PropertyImage) {
+    let payload: { data: { Key: string; _id: string }[] } = { data: [] };
+    payload = { "data": [{ "Key": "test/property-owner-rent/" + filesInfo.fileName, "_id": filesInfo._id || "" }] }
     this.S3FilesService.deleteUploadedFilesFromS3Bucket(payload, this.propertyOwnerId).subscribe({
-      next: (res) => {
+      next: (res: PropertyListing) => {
         this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Deleted Sucessfully', life: 3000 });
-        this.uploadedFilesToS3 = res?.data?.propertyDetails?.propertyImages;
+        console.log('File Delted', res)
+        this.uploadedFilesToS3 = res?.propertyDetails?.propertyImages || [];
       },
-      error: (err) => {
+      error: (err: Error) => {
         console.error('Error Deleting File:', err);
       },
       complete: () => {
@@ -109,20 +122,20 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
     });
 
   }
-  regenerateFilesSignedUrl(uploadedFilesToS3: any) {
-    const payload = uploadedFilesToS3?.filter((file: any) => {
-      const signedUrlExpirationDate = Date.parse(file.fileExpirationTime)
-      const currentDate = Date.now();
-      if (currentDate > signedUrlExpirationDate) return file
-    })
+  regenerateFilesSignedUrl(uploadedFilesToS3: PropertyImage[]): void {
+    const payload: PropertyImage[] = uploadedFilesToS3?.filter((file: PropertyImage) => {
+      const signedUrlExpirationDate: number = Date.parse(file.fileExpirationTime);
+      const currentDate: number = Date.now();
+      return currentDate > signedUrlExpirationDate;
+    });
 
     if (payload?.length > 0) {
       this.S3FilesService.regenerateFilesSignedUrl(this.propertyOwnerId, payload).subscribe({
-        next: (res) => {
-          this.uploadedFilesToS3 = res?.propertyDetails?.propertyImages;
+        next: (res: PropertyListing) => {
+          this.uploadedFilesToS3 = res?.propertyDetails?.propertyImages || [];
           this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Regenerated Sucessfully', life: 3000 });
         },
-        error: (err) => {
+        error: (err: Error) => {
           console.error('Error Regenerating File:', err);
           this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error Regenerating File', life: 3000 });
         },
