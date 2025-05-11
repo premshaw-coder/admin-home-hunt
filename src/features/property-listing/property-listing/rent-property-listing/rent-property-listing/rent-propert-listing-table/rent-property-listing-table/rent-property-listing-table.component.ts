@@ -1,9 +1,8 @@
 import { Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
-import { ConfirmationService, MessageService } from 'primeng/api';
 import { RentPropertyListingService } from '../../../services/rent-property-listing.service'
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { SplitButton, SplitButtonModule } from 'primeng/splitbutton';
+import { SplitButtonModule } from 'primeng/splitbutton';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { FormsModule } from '@angular/forms';
 import { DialogService } from 'primeng/dynamicdialog';
@@ -14,6 +13,8 @@ import { openDialog, dialogConfigObj } from '../../../../../../../app/shared/reu
 import { RentPropertyUploadMediaFilesComponent } from '../rent-property-upload-media-files/rent-property-upload-media-files.component';
 import { DeleteRentListingComponent } from "../delete-rent-listing/delete-rent-listing.component";
 import { RentPropertyFilesUploadService } from '../../../services/files-upload/rent-property-files-upload.service';
+import { AuthApiResponse } from '../../../../../../auth/interfaces/auth/auth-login.interface';
+import { PropertyListing } from '../../../rent-property-listing-interfaces/property-listing-interface';
 interface Column {
   field: string;
   header: string;
@@ -35,13 +36,12 @@ export class RentPropertyListingTableComponent implements OnInit {
   public cols!: Column[];
   public selectedColumns!: Column[];
   public items: ({ label: string; icon: string; command: () => void; separator?: undefined; } | { separator: boolean; label?: undefined; icon?: undefined; command?: undefined; })[];
-  public products!: any[];
-  private userInfo: any = JSON.parse(localStorage.getItem('UserInfo') || '{}')
+  public products!: PropertyListing[];
+  private userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') || '{}')
   public rowPropertyRentIndex!: number
 
   private dialogService = inject(DialogService)
   private RentPropertyListingService = inject(RentPropertyListingService)
-  private messageService = inject(MessageService)
   private destroyRef = inject(DestroyRef)
   private S3FilesService = inject(RentPropertyFilesUploadService);
 
@@ -93,15 +93,10 @@ export class RentPropertyListingTableComponent implements OnInit {
   }
 
   getAllRentPropertyListingByProperOwner() {
-    this.RentPropertyListingService.getAllRentPropertyListingByProperOwner(this.userInfo?.uuid)
+    this.RentPropertyListingService.getAllRentPropertyListingByProperOwner(this.userInfo?.uuid || '')
       .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: (res: any) => {
+        next: (res: PropertyListing[]) => {
           this.products = res
-        },
-        error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
-        },
-        complete: () => {
-
         },
       });
   }
@@ -110,41 +105,41 @@ export class RentPropertyListingTableComponent implements OnInit {
   public createRentListing() {
     const dialogConfig: DialogConfig = dialogConfigObj(false)
     const createRentListingDialogRef = openDialog(RentPropertyListingFormComponent, dialogConfig, this.dialogService)
-    createRentListingDialogRef.onClose.subscribe((res: any) => {
-      if (res.data = 'Create rent listing') this.getAllRentPropertyListingByProperOwner()
+    createRentListingDialogRef.onClose.subscribe((res: { action: string; data: string }) => {
+      if (res.data === 'Create rent listing') this.getAllRentPropertyListingByProperOwner()
     })
   }
 
-  private editRentListing(propertyRentListData: any) {
+  private editRentListing(propertyRentListData: PropertyListing) {
     const dialogConfig: DialogConfig = dialogConfigObj(true, propertyRentListData)
     const editRentListingDialogRef = openDialog(RentPropertyListingFormComponent, dialogConfig, this.dialogService);
-    editRentListingDialogRef.onClose.subscribe((res: any) => {
-      if (res.data = 'Edit rent listing') this.getAllRentPropertyListingByProperOwner()
+    editRentListingDialogRef.onClose.subscribe((res: { action: string; data: string }) => {
+      if (res.data === 'Edit rent listing') this.getAllRentPropertyListingByProperOwner()
     })
   }
 
-  public getTableRowIndex(rowIndex: any) {
+  public getTableRowIndex(rowIndex: number) {
     this.rowPropertyRentIndex = rowIndex
   }
 
-  uploadFiles(propertyRentListData: any) {
+  uploadFiles(propertyRentListData: PropertyListing) {
     const dialogConfig: DialogConfig = dialogConfigObj(true, propertyRentListData)
     const RentPropertyUploadFilesDialogRef = openDialog(RentPropertyUploadMediaFilesComponent, dialogConfig, this.dialogService)
-    RentPropertyUploadFilesDialogRef.onClose.subscribe((res: any) => {
+    RentPropertyUploadFilesDialogRef.onClose.subscribe((res: { action: string; data: { isFilesUploadedToS3bucket: boolean } }) => {
       if (res?.data?.isFilesUploadedToS3bucket) this.getAllRentPropertyListingByProperOwner()
     })
   }
 
-  confirmDeleteRentListing(rentPropertyListData: any) {
+  confirmDeleteRentListing(rentPropertyListData: PropertyListing) {
     this.deleteRentListingComponentRef.deleteRentListing(rentPropertyListData)
   }
 
-  updateRentListingTableDataOnRentPropertyDelete(event: any) {
+  updateRentListingTableDataOnRentPropertyDelete() {
     this.getAllRentPropertyListingByProperOwner()
   }
 
   onRegeneratedSignedUrlFilesUploadedToS3bucket() {
-    this.S3FilesService.refetchRentPropertTableData.asObservable().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res: any) => {
+    this.S3FilesService.refetchRentPropertTableData.asObservable().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res: boolean) => {
       if (res) this.getAllRentPropertyListingByProperOwner()
     })
   }

@@ -1,5 +1,5 @@
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { DestroyRef } from '@angular/core';
@@ -9,7 +9,7 @@ import { CommonToastService } from '../../../../app/shared/toast/common-toast.se
 import { AuthFormData } from '../../interfaces/auth/auth-login.form.interface';
 import { AuthApiResponse } from '../../interfaces/auth/auth-login.interface';
 import { AuthService } from '../../services/auth.service';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { MessageService } from 'primeng/api';
@@ -22,7 +22,6 @@ describe('YourComponentName', () => {
   let routerSpy: jasmine.SpyObj<Router>;
   let destroyRefSpy: jasmine.SpyObj<DestroyRef>;
   beforeEach(() => {
-    let httpTestingController: HttpTestingController;
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     authServiceSpy = jasmine.createSpyObj('AuthService', ['loginWithEmailAndPassword']);
     commonToastServiceSpy = jasmine.createSpyObj('CommonToastService', ['successToast', 'errorToast']);
@@ -45,7 +44,6 @@ describe('YourComponentName', () => {
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   it('should create the component and initialize the form', () => {

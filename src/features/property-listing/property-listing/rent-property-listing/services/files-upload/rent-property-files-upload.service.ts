@@ -3,7 +3,9 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
 import { environment } from '../../../../../../environments/environment.development';
 import { ApiEndPoints } from '../../../../../../app/shared/api-ends-points/admin-home-hunt-api-endpoints';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, map } from 'rxjs';
+import { PropertyImage, PropertyListing } from '../../rent-property-listing-interfaces/property-listing-interface';
+import { PropertyListingDeleteFilesApiResponse } from '../../rent-property-listing-interfaces/property-listing-delete-filesApi-response.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +16,9 @@ export class RentPropertyFilesUploadService {
 
   private httpService = inject(HttpClient)
 
-  deleteUploadedFilesFromS3Bucket(files: any, propertyOwnerId: string): Observable<any> {
-    return this.httpService.delete<any>(
+  deleteUploadedFilesFromS3Bucket(files: { data: { Key: string; _id: string }[] }, propertyOwnerId: string): Observable<PropertyListing> {
+    console.log('deleteUploadedFilesFromS3Bucket', files);
+    return this.httpService.delete<PropertyListingDeleteFilesApiResponse>(
       `${environment.baseUrl}${environment.apiVersion}${ApiEndPoints.deleteRentPropertyFiles}/${propertyOwnerId}`,
       {
         body: JSON.stringify(files),
@@ -24,11 +27,13 @@ export class RentPropertyFilesUploadService {
           'X-HTTP-Method-Override': 'DELETE'
         })
       }
+    ).pipe(
+      map((response: PropertyListingDeleteFilesApiResponse) => response.data as PropertyListing)
     );
   }
 
-  regenerateFilesSignedUrl(propertyOwnerId: string, fileData: any): Observable<any> {
-    return this.httpService.post<any>(
+  regenerateFilesSignedUrl(propertyOwnerId: string, fileData: PropertyImage[]): Observable<PropertyListing> {
+    return this.httpService.post<PropertyListing>(
       `${environment.baseUrl}${environment.apiVersion}${ApiEndPoints.regenerateFilesSignedUrl}${propertyOwnerId}`,
       { fileData: fileData }
     );

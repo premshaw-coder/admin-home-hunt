@@ -1,6 +1,6 @@
 <div class="card">
     <p-toast />
-    @let showDragDropIcon = this.uploadedFilesToS3?.length > 0 ? false: true;
+    @let showDragDropIcon = (this.uploadedFilesToS3 && this.uploadedFilesToS3.length > 0) ? false : true;
     <p-fileupload fileLimit="5" name="files" [url]="uploadFilesUrl" [multiple]="true" accept="image/*"
         maxFileSize="5000000" (onUpload)="onTemplatedUpload($event)" (onSelect)="onSelectedFiles($event)">
         <ng-template #header let-files let-chooseCallback="chooseCallback" let-clearCallback="clearCallback"
@@ -41,7 +41,7 @@
                         </div>
                     </div>
                 </div>
-                <div *ngIf="uploadedFilesToS3?.length > 0">
+                <div *ngIf="(uploadedFilesToS3?.length ?? 0) > 0">
                     <h5>Completed</h5>
                     <div class="flex flex-wrap gap-4">
                         <div *ngFor="let file of uploadedFilesToS3; let i = index"
@@ -52,7 +52,7 @@
                             </div>
                             <span class="font-semibold text-ellipsis max-w-60 whitespace-nowrap overflow-hidden">{{
                                 file.fileName }}</span>
-                            <div>{{ formatSize(file?.fileSize) }}</div>
+                            <div>{{ formatSize(file?.fileSize ?? 0) }}</div>
                             <p-badge value="Completed" class="mt-4" severity="success" />
                             <p-button icon="pi pi-times" (onClick)="removeUploadedFile(file)" [outlined]="true"
                                 [rounded]="true" severity="danger" />
