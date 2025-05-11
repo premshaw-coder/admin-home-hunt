@@ -5,6 +5,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { MessageService } from 'primeng/api';
 describe('RentPropertyListingFormComponent', () => {
   let component: RentPropertyListingFormComponent;
   let fixture: ComponentFixture<RentPropertyListingFormComponent>;
@@ -18,6 +19,7 @@ describe('RentPropertyListingFormComponent', () => {
         DynamicDialogConfig,
         provideHttpClient(withInterceptors([])),
         provideHttpClientTesting(),
+        MessageService,
       ]
     })
       .compileComponents();

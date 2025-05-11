@@ -26,7 +26,6 @@ export class RentPropertyListingService {
   }
 
   deleteRentPropertyListing(propertyOwnerId: string): Observable<PropertyDeleteResponse> {
-    console.log('deleteRentPropertyListing', typeof propertyOwnerId);
     return this.httpService.delete<PropertyDeleteResponse>(environment.baseUrl + environment.apiVersion + ApiEndPoints.deleteRentProperty + propertyOwnerId);
   }
 }

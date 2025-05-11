@@ -12,10 +12,6 @@ import { AuthFormData } from '../interfaces/auth/auth-login.form.interface';
 export class AuthService {
   private http = inject(HttpClient)
 
-  constructor() {
-    console.log(environment.from);
-  }
-
   loginWithEmailAndPassword(loginUserData: AuthFormData): Observable<AuthApiResponse> {
     return this.http.post<AuthApiResponse>(environment.baseUrl + ApiEndPoints.login, loginUserData)
   }

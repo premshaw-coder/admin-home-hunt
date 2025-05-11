@@ -17,7 +17,6 @@ export class RentPropertyFilesUploadService {
   private httpService = inject(HttpClient)
 
   deleteUploadedFilesFromS3Bucket(files: { data: { Key: string; _id: string }[] }, propertyOwnerId: string): Observable<PropertyListing> {
-    console.log('deleteUploadedFilesFromS3Bucket', files);
     return this.httpService.delete<PropertyListingDeleteFilesApiResponse>(
       `${environment.baseUrl}${environment.apiVersion}${ApiEndPoints.deleteRentPropertyFiles}/${propertyOwnerId}`,
       {
