@@ -10,11 +10,11 @@ export interface AuthApiResponse {
     uuid?: string;
 }
 export interface Address {
-    address: string;
-    city: string;
-    state: string;
-    zip: number;
-    country: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zip?: number;
+    country?: string;
 }
 export interface SubscriptionInfo {
     startDate: Date;

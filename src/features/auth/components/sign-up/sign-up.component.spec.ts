@@ -107,10 +107,9 @@ describe('SignUpComponent', () => {
       is_registered: true,
       address: [
         {
-          street: "123 Main St",
           city: "Springfield",
           state: "IL",
-          zip: "62704",
+          zip: 62704,
           country: "USA",
         },
       ],
