@@ -109,9 +109,7 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
     payload = { "data": [{ "Key": "test/property-owner-rent/" + filesInfo.fileName, "_id": filesInfo._id || "" }] }
     this.S3FilesService.deleteUploadedFilesFromS3Bucket(payload, this.propertyOwnerId).subscribe({
       next: (res: PropertyListing) => {
-        this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Deleted Sucessfully', life: 3000 });
-        console.log('File Delted', res)
-        this.uploadedFilesToS3 = res?.propertyDetails?.propertyImages || [];
+        this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Deleted Sucessfully', life: 3000 });        this.uploadedFilesToS3 = res?.propertyDetails?.propertyImages || [];
       },
       error: (err: Error) => {
         console.error('Error Deleting File:', err);
