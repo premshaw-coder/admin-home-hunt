@@ -11,4 +11,5 @@ export const ApiEndPoints = {
     deleteRentProperty: '/property-rent/delete-house/',
     regenerateFilesSignedUrl: '/property-rent/re-generate-signed-url/',
     uploadRentPropertyFiles: '/property-rent/files-upload/',
+    subscriptionStatus:'subscription_status/'
 }

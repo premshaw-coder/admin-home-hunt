@@ -8,6 +8,7 @@ export interface AuthApiResponse {
     address: Address[]; // Address can be of various formats, keep it generic
     token: string;
     uuid?: string;
+    id:string;
 }
 export interface Address {
     address?: string;

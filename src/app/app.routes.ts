@@ -19,6 +19,10 @@ export const routes: Routes = [
         }]
 
     },
+
+    {
+        path: RoutesPaths.subscription, loadComponent: () => import('../features/subscription/subscription/subscription.component').then((c) => c.SubscriptionComponent)
+    }
 ];
 
 /*
