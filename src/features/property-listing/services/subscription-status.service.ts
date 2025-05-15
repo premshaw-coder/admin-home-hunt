@@ -4,7 +4,8 @@ import {
   Subject,
   switchMap,
   shareReplay,
-  startWith
+  startWith,
+  defer
 } from 'rxjs';
 import { SubscriptionService } from '../../subscription/services/subscription.service';
 import { SubscriptionStatus } from '../../subscription/interface/subscription-status.interface';
@@ -23,7 +24,9 @@ export class SubscriptionStatusService {
     // Start with an immediate call (auto-fetch)
     startWith(void 0),
     switchMap(() =>
-      this.subscriptionService.subscriptionStatus(this.userInfo?.id)
+      defer(() => 
+        this.subscriptionService.subscriptionStatus(this.userInfo?.id)
+      )
     ),
     shareReplay(1) // Cache the latest result for all subscribers
   );

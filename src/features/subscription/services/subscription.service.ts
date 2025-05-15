@@ -11,7 +11,12 @@ import { SubscriptionStatus } from '../interface/subscription-status.interface';
 export class SubscriptionService {
 
   private http = inject(HttpClient)
+  
   subscriptionStatus(userId: string): Observable<SubscriptionStatus> {
     return this.http.get<SubscriptionStatus>(environment.baseUrl + ApiEndPoints.subscriptionStatus + userId)
+  }
+
+  checkAndExpireSubscribedUser(userId: string, payload: { startDate: string; endDate: string }): Observable<SubscriptionStatus> {
+    return this.http.post<SubscriptionStatus>(environment.baseUrl + ApiEndPoints.checkAndExpireSubscribedUser + userId, payload)
   }
 }

@@ -9,6 +9,7 @@ import { RippleModule } from 'primeng/ripple';
 import { Toolbar } from 'primeng/toolbar';
 import { RoutesPaths } from '../../application-routes/app-routes';
 import { SubscriptionStatusService } from '../../../../features/property-listing/services/subscription-status.service';
+import { skip, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-header',
@@ -19,7 +20,7 @@ import { SubscriptionStatusService } from '../../../../features/property-listing
 export class HeaderComponent implements OnInit {
   items: MenuItem[] | undefined;
   private router = inject(Router)
-  private service = inject(SubscriptionStatusService)
+  private subscriptionStatusService = inject(SubscriptionStatusService)
 
   ngOnInit() {
     this.items = [
@@ -56,16 +57,19 @@ export class HeaderComponent implements OnInit {
     ];
   }
 
-//test to invalidate the cache of subscription status hav to remove in the future
+  //test to invalidate the cache of subscription status hav to remove in the future
   public onClick1() {
-    this.router.navigate([RoutesPaths.basePath + 'subscription'])
-    this.service.refreshStatus()
-
+    this.subscriptionStatusService.refreshStatus();
+    this.subscriptionStatusService.getSubscriptionStatus().pipe(skip(1), take(1)).subscribe(() => {
+      this.router.navigate([RoutesPaths.basePath + 'subscription'])
+    })
   }
 
   public onClick2() {
-    this.router.navigate([RoutesPaths.basePath + 'property-listing/rent'])
-    this.service.refreshStatus()
+    this.subscriptionStatusService.refreshStatus();
+    this.subscriptionStatusService.getSubscriptionStatus().pipe(skip(1), take(1)).subscribe(() => {
+      this.router.navigate([RoutesPaths.basePath + 'property-listing/rent'])
+    })
   }
 }
 
