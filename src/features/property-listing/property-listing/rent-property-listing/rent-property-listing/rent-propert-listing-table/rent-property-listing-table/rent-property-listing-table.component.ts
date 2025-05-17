@@ -106,7 +106,7 @@ export class RentPropertyListingTableComponent implements OnInit {
     const dialogConfig: DialogConfig = dialogConfigObj(false)
     const createRentListingDialogRef = openDialog(RentPropertyListingFormComponent, dialogConfig, this.dialogService)
     createRentListingDialogRef.onClose.subscribe((res: { action: string; data: string }) => {
-      if (res.data === 'Create rent listing') this.getAllRentPropertyListingByProperOwner()
+      if (res?.data === 'Create rent listing') this.getAllRentPropertyListingByProperOwner()
     })
   }
 

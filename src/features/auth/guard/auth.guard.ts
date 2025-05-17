@@ -21,7 +21,6 @@ export const authGuard: CanActivateFn = () => {
         (startDate.getTime() > new Date(userSubscription.subscriptionInfo.endDate).getTime())) {
         console.log('date expired', startDate.getTime() > new Date(userSubscription.subscriptionInfo.endDate).getTime());
         const payload = {
-          startDate: new Date(userSubscription.subscriptionInfo.startDate).toISOString(),
           endDate: new Date(userSubscription.subscriptionInfo.endDate).toISOString()
         }
         console.log('payload', payload);

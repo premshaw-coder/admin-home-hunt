@@ -20,6 +20,10 @@ export class AuthService {
     return this.http.post<AuthApiResponse>(environment.baseUrl + ApiEndPoints.signUp, signUpUserData)
   }
 
+  regenerateJwtToken(userId: string): Observable<AuthApiResponse> {
+    return this.http.get<AuthApiResponse>(environment.baseUrl + ApiEndPoints.regenerateJwtToken + userId,)
+  }
+
   isUserAuthenticated(): boolean {
     return !!localStorage.getItem('UserInfo')
   }
