@@ -13,6 +13,7 @@ import { CardModule } from 'primeng/card';
 import { ToastModule } from 'primeng/toast';
 import { Router } from '@angular/router';
 import { RoutesPaths } from '../../../../app/shared/application-routes/app-routes';
+import { SubscriptionStatusService } from '../../../property-listing/services/subscription-status.service';
 
 @Component({
   selector: 'app-login',
@@ -26,6 +27,7 @@ export class LoginComponent implements OnInit {
   public loginForm!: FormGroup<AuthFormControl>
   private authService = inject(AuthService)
   private commonService = inject(CommonToastService)
+  private ssService = inject(SubscriptionStatusService)
   private destroyRef = inject(DestroyRef)
   private router = inject(Router)
 
@@ -46,18 +48,19 @@ export class LoginComponent implements OnInit {
       return
     }
     this.authService.loginWithEmailAndPassword(loginFormData)?.pipe(takeUntilDestroyed(this.destroyRef))?.subscribe({
-        next: (res: AuthApiResponse) => {
-          this.commonService.successToast('Login Successful')
-          localStorage.setItem('UserInfo', JSON.stringify(res))
-          this.router.navigate([RoutesPaths.basePath + RoutesPaths.createPropertyListing])
-        },
-        error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
-          this.commonService.errorToast(err.error.errMsg, err.error?.data?.message)
-        },
-        complete: () => {
-          this.loginForm.reset()
-        },
-      })
+      next: (res: AuthApiResponse) => {
+        this.commonService.successToast('Login Successful')
+        localStorage.setItem('UserInfo', JSON.stringify(res))
+        this.ssService.updateUserData();
+        this.router.navigate([RoutesPaths.basePath + RoutesPaths.createPropertyListing])
+      },
+      error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
+        this.commonService.errorToast(err.error.errMsg, err.error?.data?.message)
+      },
+      complete: () => {
+        this.loginForm.reset()
+      },
+    })
   }
 
   private isFormInValid(): boolean {

@@ -24,7 +24,7 @@ export class SubscriptionStatusService {
     // Start with an immediate call (auto-fetch)
     startWith(void 0),
     switchMap(() =>
-      defer(() => 
+      defer(() =>
         this.subscriptionService.subscriptionStatus(this.userInfo?.id)
       )
     ),
@@ -33,11 +33,19 @@ export class SubscriptionStatusService {
 
   /** Get cached subscription status (auto-refreshed once) */
   getSubscriptionStatus(): Observable<SubscriptionStatus> {
+    this.status$.subscribe(data => {
+      console.log(data);
+
+    })
     return this.status$;
   }
 
   /** Force refresh of subscription status */
   refreshStatus(): void {
     this.refreshTrigger$.next();
+  }
+
+  updateUserData(): void {
+    this.userInfo = JSON.parse(localStorage.getItem('UserInfo') || '{}')
   }
 }
