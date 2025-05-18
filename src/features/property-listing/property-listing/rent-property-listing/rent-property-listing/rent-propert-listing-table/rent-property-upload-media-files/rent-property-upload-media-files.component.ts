@@ -13,6 +13,7 @@ import { RentPropertyFilesUploadService } from '../../../services/files-upload/r
 import { environment } from '../../../../../../../environments/environment.development';
 import { ApiEndPoints } from '../../../../../../../app/shared/api-ends-points/admin-home-hunt-api-endpoints';
 import { PropertyImage, PropertyListing } from '../../../rent-property-listing-interfaces/property-listing-interface';
+import imageCompression, { Options } from 'browser-image-compression';
 @Component({
   selector: 'app-rent-property-upload-media-files',
   imports: [FileUpload, ButtonModule, BadgeModule, ProgressBar, ToastModule, HttpClientModule, CommonModule],
@@ -109,7 +110,7 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
     payload = { "data": [{ "Key": "test/property-owner-rent/" + filesInfo.fileName, "_id": filesInfo._id || "" }] }
     this.S3FilesService.deleteUploadedFilesFromS3Bucket(payload, this.propertyOwnerId).subscribe({
       next: (res: PropertyListing) => {
-        this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Deleted Sucessfully', life: 3000 });        this.uploadedFilesToS3 = res?.propertyDetails?.propertyImages || [];
+        this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Deleted Sucessfully', life: 3000 }); this.uploadedFilesToS3 = res?.propertyDetails?.propertyImages || [];
       },
       error: (err: Error) => {
         console.error('Error Deleting File:', err);
@@ -144,27 +145,37 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
     }
   }
 
-  uploadHandler(event: FileUploadHandlerEvent): void {
+  async uploadHandler(event: FileUploadHandlerEvent): Promise<void> {
     const formData = new FormData();
-    // Append selected files to the FormData object
-    // eslint-disable-next-line @typescript-eslint/prefer-for-of
+    const options: Options = {
+      maxSizeMB: 0.4,       // Maximum size in MB
+      maxWidthOrHeight: 1920, // Maximum width or height
+      useWebWorker: true,   // Use a web worker for performance
+      alwaysKeepResolution: true,
+      fileType: 'image/webp' // Keep the original resolution
+    };
+
     for (let i = 0; i < event.files.length; i++) {
       const file: File = event.files[i];
       if (file instanceof File) {
-        formData.append('files', file, file.name); // Add file with its name
-        console.log(`File appended: ${file.name}`);
-        console.log('formdata:', formData);
+        try {
+          const compressedFile: File = await imageCompression(file, options);
+          const fileName = file.name.split('.').slice(0, -1).join('.') + '.webp'; // Change the file extension to .webp
+          // Now you can upload compressedFile using FormData
+          formData.append('files', compressedFile, fileName);
+
+          // Use Angular's HttpClient to send the formData
+          // this.http.post('/upload-endpoint', formData).subscribe(...)
+
+        } catch (error) {
+          console.error('Error compressing image:', error);
+        }
       } else {
         console.error('File is undefined or null at index:', i);
       }
     }
     if (!formData.has('files')) {
       console.error('FormData is empty. No files were appended.');
-    }
-
-    console.log('--- FormData Contents ---');
-    for (const [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
     }
 
     // Make the HTTP request with the Bearer token

@@ -49,13 +49,14 @@ export class LoginComponent implements OnInit {
         next: (res: AuthApiResponse) => {
           this.commonService.successToast('Login Successful')
           localStorage.setItem('UserInfo', JSON.stringify(res))
-          this.router.navigate([RoutesPaths.basePath + RoutesPaths.createPropertyListing])
+         
         },
         error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
           this.commonService.errorToast(err.error.errMsg, err.error?.data?.message)
         },
         complete: () => {
           this.loginForm.reset()
+          this.router.navigate([RoutesPaths.basePath + RoutesPaths.createPropertyListing])
         },
       })
   }
