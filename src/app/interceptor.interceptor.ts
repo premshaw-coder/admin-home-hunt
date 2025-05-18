@@ -13,13 +13,11 @@ import { Router } from '@angular/router';
 import { SubscriptionService } from '../features/subscription/services/subscription.service';
 
 export const MyHttpInterceptor: HttpInterceptorFn = (
-  req: HttpRequest<any>,
+  req: HttpRequest<unknown>,
   next: HttpHandlerFn
-): Observable<HttpEvent<any>> => {
+): Observable<HttpEvent<unknown>> => {
   const router = inject(Router);
   const subscriptionService = inject(SubscriptionService)
-
-
   const userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') || '{}')
   const access_token = userInfo.token
   let cloned = req;
@@ -35,15 +33,14 @@ export const MyHttpInterceptor: HttpInterceptorFn = (
   }
   return next(cloned).pipe(
     catchError((error: HttpErrorResponse) => {
-      console.log(error);
       if ([403].includes(error.status) && error.error?.subscriptionExpired && error.error?.message === 'Subscription expired') {
-        const startDate = new Date();
-        if (startDate.getTime() > new Date(error.error.subscriptionEndDate).getTime()) {
+        // const startDate = new Date();
+        // if (startDate.getTime() > new Date(error.error.subscriptionEndDate).getTime()) {
           const payload = {
             endDate: new Date(error.error.subscriptionEndDate).toISOString()
           }
           subscriptionService.checkAndExpireSubscribedUser(userInfo.id, payload).subscribe()
-        }
+        // }
         router.navigate([RoutesPaths.basePath + RoutesPaths.subscription])
 
       }

@@ -1,11 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { PrimeNG } from 'primeng/config';
-import { FileUpload, FileUploadEvent } from 'primeng/fileupload';
+import { FileUpload, FileUploadEvent, FileUploadHandlerEvent } from 'primeng/fileupload';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { BadgeModule } from 'primeng/badge';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpEvent } from '@angular/common/http';
 import { ProgressBar } from 'primeng/progressbar';
 import { ToastModule } from 'primeng/toast';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -70,7 +70,7 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
         data: { isFilesUploadedToS3bucket: this.isFilesUploadedToS3bucket }
       });
     }
-
+    console.log('onTemplateFunctioncalled')
     this.messageService.add({
       severity: 'info',
       summary: 'Success',
@@ -142,6 +142,45 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
         }
       })
     }
+  }
+
+  uploadHandler(event: FileUploadHandlerEvent): void {
+    const formData = new FormData();
+    // Append selected files to the FormData object
+    // eslint-disable-next-line @typescript-eslint/prefer-for-of
+    for (let i = 0; i < event.files.length; i++) {
+      const file: File = event.files[i];
+      if (file instanceof File) {
+        formData.append('files', file, file.name); // Add file with its name
+        console.log(`File appended: ${file.name}`);
+        console.log('formdata:', formData);
+      } else {
+        console.error('File is undefined or null at index:', i);
+      }
+    }
+    if (!formData.has('files')) {
+      console.error('FormData is empty. No files were appended.');
+    }
+
+    console.log('--- FormData Contents ---');
+    for (const [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
+
+    // Make the HTTP request with the Bearer token
+    this.S3FilesService.uploadFilesToS3Bucket(formData, this.propertyOwnerId).subscribe({
+      next: (response) => {
+        console.log('Files uploaded successfully:', response);
+        const fileUploadEvent: FileUploadEvent = {
+          files: event.files,
+          originalEvent: { body: response } as HttpEvent<unknown>
+        };
+        this.onTemplatedUpload(fileUploadEvent); // Call the existing handler
+      },
+      error: (error) => {
+        console.error('Error uploading files:', error);
+      },
+    });
   }
 }
 

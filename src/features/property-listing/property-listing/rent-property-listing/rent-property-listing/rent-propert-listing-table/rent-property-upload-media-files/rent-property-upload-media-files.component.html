@@ -2,7 +2,8 @@
     <p-toast />
     @let showDragDropIcon = (this.uploadedFilesToS3 && this.uploadedFilesToS3.length > 0) ? false : true;
     <p-fileupload fileLimit="5" name="files" [url]="uploadFilesUrl" [multiple]="true" accept="image/*"
-        maxFileSize="5000000" (onUpload)="onTemplatedUpload($event)" (onSelect)="onSelectedFiles($event)">
+        maxFileSize="5000000" (onSelect)="onSelectedFiles($event)" [customUpload]="true"
+        (uploadHandler)="uploadHandler($event)">
         <ng-template #header let-files let-chooseCallback="chooseCallback" let-clearCallback="clearCallback"
             let-uploadCallback="uploadCallback">
             <div class="flex flex-wrap justify-between items-center flex-1 gap-4">

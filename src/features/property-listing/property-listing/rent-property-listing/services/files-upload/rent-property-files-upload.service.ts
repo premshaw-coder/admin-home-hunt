@@ -16,6 +16,13 @@ export class RentPropertyFilesUploadService {
 
   private httpService = inject(HttpClient)
 
+  uploadFilesToS3Bucket(files:any, propertyOwnerId: string): Observable<PropertyImage[]> {
+    return this.httpService.post<PropertyImage[]>(
+      `${environment.baseUrl}${environment.apiVersion}${ApiEndPoints.uploadRentPropertyFiles}${propertyOwnerId}`,
+      files
+    );
+  }
+
   deleteUploadedFilesFromS3Bucket(files: { data: { Key: string; _id: string }[] }, propertyOwnerId: string): Observable<PropertyListing> {
     return this.httpService.delete<PropertyListingDeleteFilesApiResponse>(
       `${environment.baseUrl}${environment.apiVersion}${ApiEndPoints.deleteRentPropertyFiles}/${propertyOwnerId}`,
