@@ -24,7 +24,7 @@ export class SubscriptionStatusService {
     // Start with an immediate call (auto-fetch)
     startWith(void 0),
     switchMap(() =>
-      defer(() => 
+      defer(() =>
         this.subscriptionService.subscriptionStatus(this.userInfo?.id)
       )
     ),

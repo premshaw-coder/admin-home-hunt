@@ -13,6 +13,7 @@ import { CardModule } from 'primeng/card';
 import { ToastModule } from 'primeng/toast';
 import { Router } from '@angular/router';
 import { RoutesPaths } from '../../../../app/shared/application-routes/app-routes';
+import { SubscriptionStatusService } from '../../../property-listing/services/subscription-status.service';
 
 @Component({
   selector: 'app-login',
@@ -26,6 +27,7 @@ export class LoginComponent implements OnInit {
   public loginForm!: FormGroup<AuthFormControl>
   private authService = inject(AuthService)
   private commonService = inject(CommonToastService)
+  private ssService = inject(SubscriptionStatusService)
   private destroyRef = inject(DestroyRef)
   private router = inject(Router)
 
