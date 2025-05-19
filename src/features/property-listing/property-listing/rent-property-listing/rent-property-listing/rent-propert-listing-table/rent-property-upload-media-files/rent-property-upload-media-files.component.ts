@@ -147,59 +147,62 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
   }
 
   uploadHandler(event: FileUploadHandlerEvent): void {
-    const formData = new FormData();
-    const uploadFilesToS3 = (formData: any) => {
-      // Make the HTTP request with the Bearer token
-      this.S3FilesService.uploadFilesToS3Bucket(formData, this.propertyOwnerId).subscribe({
-        next: (response) => {
-          console.log('Files uploaded successfully:', response);
-          const fileUploadEvent: FileUploadEvent = {
-            files: event.files,
-            originalEvent: { body: response } as HttpEvent<unknown>
-          };
-          this.onTemplatedUpload(fileUploadEvent); // Call the existing handler
-        },
-        error: (error) => {
-          console.error('Error uploading files:', error);
-        },
-      });
-    }
     const options: Compressor.Options = {
-      maxHeight: 1080,
-      maxWidth: 1920,
-      convertSize: 500000,
-      convertTypes: 'image/webp',
-      quality: 0.6,
-      mimeType: 'image/webp' // Keep the original resolution
+      maxHeight: 1080, maxWidth: 1920, convertSize: 500000, convertTypes: 'image/webp', quality: 0.6, mimeType: 'image/webp'
     };
 
-    for (let i = 0; i < event.files.length; i++) {
-      const file: File = event.files[i];
+    const formData = new FormData();
+    const compressedFiles: Promise<void>[] = [];
+    event.files.forEach((file: File) => {
       if (file instanceof File) {
         const fileName = file.name.split('.').slice(0, -1).join('.') + '.webp'; // Change the file extension to .webp
-        // Now you can upload compressedFile using FormData
-        new Compressor(file, {
-          ...options,
-
-          // The compression process is asynchronous,
-          // which means you have to access the `result` in the `success` hook function.
-          success(result) {
-            formData.append('files', result, fileName);
-            if (!formData.has('files')) {
-              console.error('FormData is empty. No files were appended.');
-              return;
-            }
-            uploadFilesToS3(formData);
-          },
-          error(err) {
-            console.log(err.message);
-          },
+        const compressionPromise = new Promise<void>((resolve, reject) => {
+          new Compressor(file, {
+            ...options,
+            success: (result) => {
+              formData.append('files', result, fileName);
+              resolve();
+            },
+            error(err) {
+              console.error(err.message);
+              reject(err);
+            },
+          });
         });
+        compressedFiles.push(compressionPromise);
       } else {
-        console.error('File is undefined or null at index:', i);
+        console.error('File is undefined or null');
       }
-    }
+    });
+    Promise.all(compressedFiles)
+      .then(() => {
+        if (!formData.has('files')) {
+          console.error('FormData is empty. No files were appended.');
+          return;
+        }
+        this.uploadFilesToS3(formData, event);
+      })
+      .catch((error) => {
+        console.error('Error during file compression:', error);
+      });
+  }
+
+  uploadFilesToS3(formData: FormData, event: FileUploadHandlerEvent): void {
+    // Make the HTTP request with the Bearer token
+    this.S3FilesService.uploadFilesToS3Bucket(formData, this.propertyOwnerId).subscribe({
+      next: (response) => {
+        const fileUploadEvent: FileUploadEvent = {
+          files: event.files,
+          originalEvent: { body: response } as HttpEvent<unknown>
+        };
+        this.onTemplatedUpload(fileUploadEvent); // Call the existing handler
+      },
+      error: (error) => {
+        console.error('Error uploading files:', error);
+      },
+    });
   }
 }
+
 
 
