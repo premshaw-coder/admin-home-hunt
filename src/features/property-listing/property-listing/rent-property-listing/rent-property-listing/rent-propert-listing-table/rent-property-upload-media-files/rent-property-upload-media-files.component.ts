@@ -13,7 +13,8 @@ import { RentPropertyFilesUploadService } from '../../../services/files-upload/r
 import { environment } from '../../../../../../../environments/environment.development';
 import { ApiEndPoints } from '../../../../../../../app/shared/api-ends-points/admin-home-hunt-api-endpoints';
 import { PropertyImage, PropertyListing } from '../../../rent-property-listing-interfaces/property-listing-interface';
-import imageCompression, { Options } from 'browser-image-compression';
+import Compressor from 'compressorjs';
+
 @Component({
   selector: 'app-rent-property-upload-media-files',
   imports: [FileUpload, ButtonModule, BadgeModule, ProgressBar, ToastModule, HttpClientModule, CommonModule],
@@ -145,53 +146,59 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
     }
   }
 
-  async uploadHandler(event: FileUploadHandlerEvent): Promise<void> {
+  uploadHandler(event: FileUploadHandlerEvent): void {
     const formData = new FormData();
-    const options: Options = {
-      maxSizeMB: 0.4,       // Maximum size in MB
-      maxWidthOrHeight: 1920, // Maximum width or height
-      useWebWorker: true,   // Use a web worker for performance
-      alwaysKeepResolution: true,
-      fileType: 'image/webp' // Keep the original resolution
+    const uploadFilesToS3 = (formData: any) => {
+      // Make the HTTP request with the Bearer token
+      this.S3FilesService.uploadFilesToS3Bucket(formData, this.propertyOwnerId).subscribe({
+        next: (response) => {
+          console.log('Files uploaded successfully:', response);
+          const fileUploadEvent: FileUploadEvent = {
+            files: event.files,
+            originalEvent: { body: response } as HttpEvent<unknown>
+          };
+          this.onTemplatedUpload(fileUploadEvent); // Call the existing handler
+        },
+        error: (error) => {
+          console.error('Error uploading files:', error);
+        },
+      });
+    }
+    const options: Compressor.Options = {
+      maxHeight: 1080,
+      maxWidth: 1920,
+      convertSize: 500000,
+      convertTypes: 'image/webp',
+      quality: 0.6,
+      mimeType: 'image/webp' // Keep the original resolution
     };
 
     for (let i = 0; i < event.files.length; i++) {
       const file: File = event.files[i];
       if (file instanceof File) {
-        try {
-          const compressedFile: File = await imageCompression(file, options);
-          const fileName = file.name.split('.').slice(0, -1).join('.') + '.webp'; // Change the file extension to .webp
-          // Now you can upload compressedFile using FormData
-          formData.append('files', compressedFile, fileName);
+        const fileName = file.name.split('.').slice(0, -1).join('.') + '.webp'; // Change the file extension to .webp
+        // Now you can upload compressedFile using FormData
+        new Compressor(file, {
+          ...options,
 
-          // Use Angular's HttpClient to send the formData
-          // this.http.post('/upload-endpoint', formData).subscribe(...)
-
-        } catch (error) {
-          console.error('Error compressing image:', error);
-        }
+          // The compression process is asynchronous,
+          // which means you have to access the `result` in the `success` hook function.
+          success(result) {
+            formData.append('files', result, fileName);
+            if (!formData.has('files')) {
+              console.error('FormData is empty. No files were appended.');
+              return;
+            }
+            uploadFilesToS3(formData);
+          },
+          error(err) {
+            console.log(err.message);
+          },
+        });
       } else {
         console.error('File is undefined or null at index:', i);
       }
     }
-    if (!formData.has('files')) {
-      console.error('FormData is empty. No files were appended.');
-    }
-
-    // Make the HTTP request with the Bearer token
-    this.S3FilesService.uploadFilesToS3Bucket(formData, this.propertyOwnerId).subscribe({
-      next: (response) => {
-        console.log('Files uploaded successfully:', response);
-        const fileUploadEvent: FileUploadEvent = {
-          files: event.files,
-          originalEvent: { body: response } as HttpEvent<unknown>
-        };
-        this.onTemplatedUpload(fileUploadEvent); // Call the existing handler
-      },
-      error: (error) => {
-        console.error('Error uploading files:', error);
-      },
-    });
   }
 }
 
