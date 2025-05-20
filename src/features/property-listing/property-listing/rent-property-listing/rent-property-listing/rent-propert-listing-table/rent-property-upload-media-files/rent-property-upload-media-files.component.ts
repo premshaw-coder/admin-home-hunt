@@ -3,9 +3,9 @@ import { MessageService } from 'primeng/api';
 import { PrimeNG } from 'primeng/config';
 import { FileUpload, FileUploadEvent, FileUploadHandlerEvent } from 'primeng/fileupload';
 import { ButtonModule } from 'primeng/button';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { BadgeModule } from 'primeng/badge';
-import { HttpClientModule, HttpEvent } from '@angular/common/http';
+import { HttpEvent } from '@angular/common/http';
 import { ProgressBar } from 'primeng/progressbar';
 import { ToastModule } from 'primeng/toast';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -13,12 +13,13 @@ import { RentPropertyFilesUploadService } from '../../../services/files-upload/r
 import { environment } from '../../../../../../../environments/environment.development';
 import { ApiEndPoints } from '../../../../../../../app/shared/api-ends-points/admin-home-hunt-api-endpoints';
 import { PropertyImage, PropertyListing } from '../../../rent-property-listing-interfaces/property-listing-interface';
-import Compressor from 'compressorjs';
+import { fileCompression } from '../../../../../../../app/shared/reusable-function/file-compress';
 
 @Component({
   selector: 'app-rent-property-upload-media-files',
-  imports: [FileUpload, ButtonModule, BadgeModule, ProgressBar, ToastModule, HttpClientModule, CommonModule],
+  imports: [FileUpload, ButtonModule, BadgeModule, ProgressBar, ToastModule, CommonModule, NgOptimizedImage],
   providers: [MessageService],
+  
   templateUrl: './rent-property-upload-media-files.component.html',
   styleUrl: './rent-property-upload-media-files.component.scss'
 })
@@ -147,33 +148,16 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
   }
 
   uploadHandler(event: FileUploadHandlerEvent): void {
-    const options: Compressor.Options = {
-      maxHeight: 1080, maxWidth: 1920, convertSize: 500000, convertTypes: 'image/webp', quality: 0.6, mimeType: 'image/webp'
-    };
-
+    // Create a new FormData instance for each upload
     const formData = new FormData();
+
+    // Create a new array to hold promises for compressed files
     const compressedFiles: Promise<void>[] = [];
-    event.files.forEach((file: File) => {
-      if (file instanceof File) {
-        const fileName = file.name.split('.').slice(0, -1).join('.') + '.webp'; // Change the file extension to .webp
-        const compressionPromise = new Promise<void>((resolve, reject) => {
-          new Compressor(file, {
-            ...options,
-            success: (result) => {
-              formData.append('files', result, fileName);
-              resolve();
-            },
-            error(err) {
-              console.error(err.message);
-              reject(err);
-            },
-          });
-        });
-        compressedFiles.push(compressionPromise);
-      } else {
-        console.error('File is undefined or null');
-      }
-    });
+
+    // Call the fileCompress function and pass the event files
+    fileCompression(event.files, formData, compressedFiles);
+
+    // Wait for all compression promises to resolve
     Promise.all(compressedFiles)
       .then(() => {
         if (!formData.has('files')) {
