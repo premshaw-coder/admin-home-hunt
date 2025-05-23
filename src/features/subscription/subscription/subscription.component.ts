@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { skip, take } from 'rxjs';
 import { RoutesPaths } from '../../../app/shared/application-routes/app-routes';
 import { SubscriptionStatusService } from '../../property-listing/services/subscription-status.service';
 import { AuthService } from '../../auth/services/auth.service';
 import { AuthApiResponse } from '../../auth/interfaces/auth/auth-login.interface';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 declare let Razorpay: any;
 
 @Component({
@@ -21,6 +21,7 @@ export class SubscriptionComponent {
   private router = inject(Router)
   private subscriptionStatusService = inject(SubscriptionStatusService)
   private authService = inject(AuthService)
+  private destroyRef = inject(DestroyRef)
 
   razorPayOptions = {
     "key": "p2MwtaUtgj7eeVc4JNK6ZXQm",
@@ -33,13 +34,13 @@ export class SubscriptionComponent {
       console.log(res);
       try {
         this.http.post('http://localhost:3000/razorpay/verify-payment', res).subscribe(() => {
-          this.authService.regenerateJwtToken(this.userInfo.id).pipe().subscribe((res) => {
+          this.authService.regenerateJwtToken(this.userInfo.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res) => {
             localStorage.setItem('UserInfo', JSON.stringify(res))
             this.subscriptionStatusService.refreshStatus()
           },
             (err) => { console.error(err) },
             () => {
-              this.subscriptionStatusService.getSubscriptionStatus().pipe(take(1)).subscribe(() => {
+              this.subscriptionStatusService.getSubscriptionStatus().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
                 console.log('subscription status refreshed');
                 this.router.navigate([RoutesPaths.basePath + 'property-listing/rent'])
               })

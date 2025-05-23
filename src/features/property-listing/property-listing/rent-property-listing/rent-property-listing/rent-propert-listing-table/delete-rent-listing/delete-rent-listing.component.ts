@@ -1,10 +1,11 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, Output } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { RentPropertyListingService } from '../../../services/rent-property-listing.service';
 import { PropertyListing } from '../../../rent-property-listing-interfaces/property-listing-interface';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 @Component({
   selector: 'app-delete-rent-listing',
   imports: [ConfirmDialog, ButtonModule, ToastModule],
@@ -16,6 +17,7 @@ export class DeleteRentListingComponent {
   private confirmationService = inject(ConfirmationService)
   private messageService = inject(MessageService)
   private RentPropertyListingService = inject(RentPropertyListingService)
+  private destroyRef = inject(DestroyRef)
 
   deleteRentListing(rentPropertyListData?: PropertyListing) {
     this.confirmationService.confirm({
@@ -32,7 +34,7 @@ export class DeleteRentListingComponent {
   }
 
   onDeleteRentPropertyListing(propertyOwnerId: string) {
-    this.RentPropertyListingService.deleteRentPropertyListing(propertyOwnerId).subscribe({
+    this.RentPropertyListingService.deleteRentPropertyListing(propertyOwnerId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Property Listing Deleted Successfully' });
       },

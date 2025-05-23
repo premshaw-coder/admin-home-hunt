@@ -105,7 +105,7 @@ export class RentPropertyListingTableComponent implements OnInit {
   public createRentListing() {
     const dialogConfig: DialogConfig = dialogConfigObj(false)
     const createRentListingDialogRef = openDialog(RentPropertyListingFormComponent, dialogConfig, this.dialogService)
-    createRentListingDialogRef.onClose.subscribe((res: { action: string; data: string }) => {
+    createRentListingDialogRef.onClose.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res: { action: string; data: string }) => {
       if (res?.data === 'Create rent listing') this.getAllRentPropertyListingByProperOwner()
     })
   }
@@ -113,7 +113,7 @@ export class RentPropertyListingTableComponent implements OnInit {
   private editRentListing(propertyRentListData: PropertyListing) {
     const dialogConfig: DialogConfig = dialogConfigObj(true, propertyRentListData)
     const editRentListingDialogRef = openDialog(RentPropertyListingFormComponent, dialogConfig, this.dialogService);
-    editRentListingDialogRef.onClose.subscribe((res: { action: string; data: string }) => {
+    editRentListingDialogRef.onClose.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res: { action: string; data: string }) => {
       if (res.data === 'Edit rent listing') this.getAllRentPropertyListingByProperOwner()
     })
   }
@@ -125,7 +125,7 @@ export class RentPropertyListingTableComponent implements OnInit {
   uploadFiles(propertyRentListData: PropertyListing) {
     const dialogConfig: DialogConfig = dialogConfigObj(true, propertyRentListData)
     const RentPropertyUploadFilesDialogRef = openDialog(RentPropertyUploadMediaFilesComponent, dialogConfig, this.dialogService)
-    RentPropertyUploadFilesDialogRef.onClose.subscribe((res: { action: string; data: { isFilesUploadedToS3bucket: boolean } }) => {
+    RentPropertyUploadFilesDialogRef.onClose.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res: { action: string; data: { isFilesUploadedToS3bucket: boolean } }) => {
       if (res?.data?.isFilesUploadedToS3bucket) this.getAllRentPropertyListingByProperOwner()
     })
   }

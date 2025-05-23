@@ -1,9 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { TabsModule } from 'primeng/tabs';
 import { RoutesPaths } from '../../../app/shared/application-routes/app-routes';
 import { filter, map } from 'rxjs/operators';
 import { PropertyListingTabsInterface } from '../property-listing-interfaces/property-listing-tabs-interface';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-property-listing',
@@ -15,6 +16,7 @@ export class PropertyListingComponent {
   tabs: PropertyListingTabsInterface[] = [];
   private router = inject(Router)
   currentUrl!: string;
+  private destroyRef = inject(DestroyRef)
 
   constructor() {
     this.tabs = [
@@ -26,7 +28,7 @@ export class PropertyListingComponent {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
       map(() => this.router.url)
-    ).subscribe(url => {
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(url => {
       this.currentUrl = url.split('/').pop() || '';
     });
   }

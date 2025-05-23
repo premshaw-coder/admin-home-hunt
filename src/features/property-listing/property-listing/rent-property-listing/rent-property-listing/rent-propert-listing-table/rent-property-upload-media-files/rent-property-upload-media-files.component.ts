@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { PrimeNG } from 'primeng/config';
 import { FileUpload, FileUploadEvent, FileUploadHandlerEvent } from 'primeng/fileupload';
@@ -14,12 +14,13 @@ import { environment } from '../../../../../../../environments/environment.devel
 import { ApiEndPoints } from '../../../../../../../app/shared/api-ends-points/admin-home-hunt-api-endpoints';
 import { PropertyImage, PropertyListing } from '../../../rent-property-listing-interfaces/property-listing-interface';
 import { fileCompression } from '../../../../../../../app/shared/reusable-function/file-compress';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-rent-property-upload-media-files',
   imports: [FileUpload, ButtonModule, BadgeModule, ProgressBar, ToastModule, CommonModule, NgOptimizedImage],
   providers: [MessageService],
-  
+
   templateUrl: './rent-property-upload-media-files.component.html',
   styleUrl: './rent-property-upload-media-files.component.scss'
 })
@@ -39,6 +40,7 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
   private config = inject(PrimeNG);
   private messageService = inject(MessageService);
   public dialogRef = inject(DynamicDialogRef)
+  private destroyRef = inject(DestroyRef)
 
   ngOnInit(): void {
     this.propertyOwnerId = this.dialogConfig?.data?.propertyRentListData?._id;
@@ -73,7 +75,6 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
         data: { isFilesUploadedToS3bucket: this.isFilesUploadedToS3bucket }
       });
     }
-    console.log('onTemplateFunctioncalled')
     this.messageService.add({
       severity: 'info',
       summary: 'Success',
@@ -110,17 +111,19 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
   removeUploadedFile(filesInfo: PropertyImage) {
     let payload: { data: { Key: string; _id: string }[] } = { data: [] };
     payload = { "data": [{ "Key": "test/property-owner-rent/" + filesInfo.fileName, "_id": filesInfo._id || "" }] }
-    this.S3FilesService.deleteUploadedFilesFromS3Bucket(payload, this.propertyOwnerId).subscribe({
-      next: (res: PropertyListing) => {
-        this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Deleted Sucessfully', life: 3000 }); this.uploadedFilesToS3 = res?.propertyDetails?.propertyImages || [];
-      },
-      error: (err: Error) => {
-        console.error('Error Deleting File:', err);
-      },
-      complete: () => {
-        this.S3FilesService.refetchRentPropertTableData.next(true);
-      }
-    });
+    this.S3FilesService.deleteUploadedFilesFromS3Bucket(payload, this.propertyOwnerId).pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res: PropertyListing) => {
+          this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Deleted Sucessfully', life: 3000 });
+          this.uploadedFilesToS3 = res?.propertyDetails?.propertyImages || [];
+        },
+        error: (err: Error) => {
+          console.error('Error Deleting File:', err);
+        },
+        complete: () => {
+          this.S3FilesService.refetchRentPropertTableData.next(true);
+        }
+      });
 
   }
   regenerateFilesSignedUrl(uploadedFilesToS3: PropertyImage[]): void {
@@ -131,19 +134,20 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
     });
 
     if (payload?.length > 0) {
-      this.S3FilesService.regenerateFilesSignedUrl(this.propertyOwnerId, payload).subscribe({
-        next: (res: PropertyListing) => {
-          this.uploadedFilesToS3 = res?.propertyDetails?.propertyImages || [];
-          this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Regenerated Sucessfully', life: 3000 });
-        },
-        error: (err: Error) => {
-          console.error('Error Regenerating File:', err);
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error Regenerating File', life: 3000 });
-        },
-        complete: () => {
-          this.S3FilesService.refetchRentPropertTableData.next(true);
-        }
-      })
+      this.S3FilesService.regenerateFilesSignedUrl(this.propertyOwnerId, payload).pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (res: PropertyListing) => {
+            this.uploadedFilesToS3 = res?.propertyDetails?.propertyImages || [];
+            this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Regenerated Sucessfully', life: 3000 });
+          },
+          error: (err: Error) => {
+            console.error('Error Regenerating File:', err);
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error Regenerating File', life: 3000 });
+          },
+          complete: () => {
+            this.S3FilesService.refetchRentPropertTableData.next(true);
+          }
+        })
     }
   }
 
@@ -173,18 +177,19 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
 
   uploadFilesToS3(formData: FormData, event: FileUploadHandlerEvent): void {
     // Make the HTTP request with the Bearer token
-    this.S3FilesService.uploadFilesToS3Bucket(formData, this.propertyOwnerId).subscribe({
-      next: (response) => {
-        const fileUploadEvent: FileUploadEvent = {
-          files: event.files,
-          originalEvent: { body: response } as HttpEvent<unknown>
-        };
-        this.onTemplatedUpload(fileUploadEvent); // Call the existing handler
-      },
-      error: (error) => {
-        console.error('Error uploading files:', error);
-      },
-    });
+    this.S3FilesService.uploadFilesToS3Bucket(formData, this.propertyOwnerId).pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          const fileUploadEvent: FileUploadEvent = {
+            files: event.files,
+            originalEvent: { body: response } as HttpEvent<unknown>
+          };
+          this.onTemplatedUpload(fileUploadEvent); // Call the existing handler
+        },
+        error: (error) => {
+          console.error('Error uploading files:', error);
+        },
+      });
   }
 }
 

@@ -16,7 +16,7 @@ export class RentPropertyFilesUploadService {
 
   private httpService = inject(HttpClient)
 
-  uploadFilesToS3Bucket(files:any, propertyOwnerId: string): Observable<PropertyImage[]> {
+  uploadFilesToS3Bucket(files: any, propertyOwnerId: string): Observable<PropertyImage[]> {
     return this.httpService.post<PropertyImage[]>(
       `${environment.baseUrl}${environment.apiVersion}${ApiEndPoints.uploadRentPropertyFiles}${propertyOwnerId}`,
       files
