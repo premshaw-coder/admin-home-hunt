@@ -2,6 +2,7 @@ import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { PrimeNG } from 'primeng/config';
 import { FileUpload, FileUploadEvent, FileUploadHandlerEvent } from 'primeng/fileupload';
+import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { BadgeModule } from 'primeng/badge';
@@ -15,10 +16,12 @@ import { ApiEndPoints } from '../../../../../../../app/shared/api-ends-points/ad
 import { PropertyImage, PropertyListing } from '../../../rent-property-listing-interfaces/property-listing-interface';
 import { fileCompression } from '../../../../../../../app/shared/reusable-function/file-compress';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Checkbox } from 'primeng/checkbox';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-rent-property-upload-media-files',
-  imports: [FileUpload, ButtonModule, BadgeModule, ProgressBar, ToastModule, CommonModule, NgOptimizedImage],
+  imports: [FileUpload, ButtonModule, BadgeModule, ProgressBar, ToastModule, CommonModule, NgOptimizedImage, CardModule, Checkbox, FormsModule],
   providers: [MessageService],
 
   templateUrl: './rent-property-upload-media-files.component.html',
@@ -34,6 +37,8 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
   isFilesUploadedToS3bucket = false;
   isRegeneratedSignedUrlFilesUploadedToS3bucket = false;
 
+  public removeFiles: PropertyImage[] = [];
+  public filesToDelete: boolean = false
 
   private dialogConfig = inject(DynamicDialogConfig)
   private S3FilesService = inject(RentPropertyFilesUploadService);
@@ -108,12 +113,16 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
     return `${formattedSize} ${sizes[i]}`;
   }
 
-  removeUploadedFile(filesInfo: PropertyImage) {
+  removeUploadedFiles() {
+    this.filesToDelete = true;
     let payload: { data: { Key: string; _id: string }[] } = { data: [] };
-    payload = { "data": [{ "Key": "test/property-owner-rent/" + filesInfo.fileName, "_id": filesInfo._id || "" }] }
+    this.removeFiles.forEach((filesInfo: PropertyImage) => {
+      payload.data.push({ "Key": "test/property-owner-rent/" + filesInfo.fileName, "_id": filesInfo._id || "" })
+    })
     this.S3FilesService.deleteUploadedFilesFromS3Bucket(payload, this.propertyOwnerId).pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res: PropertyListing) => {
+          this.removeFiles = [];
           this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Deleted Sucessfully', life: 3000 });
           this.uploadedFilesToS3 = res?.propertyDetails?.propertyImages || [];
         },
@@ -122,6 +131,7 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
         },
         complete: () => {
           this.S3FilesService.refetchRentPropertTableData.next(true);
+          this.filesToDelete = false;
         }
       });
 

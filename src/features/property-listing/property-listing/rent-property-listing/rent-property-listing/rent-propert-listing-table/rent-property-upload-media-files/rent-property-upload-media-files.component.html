@@ -42,20 +42,29 @@
                     </div>
                 </div>
                 <div *ngIf="(uploadedFilesToS3?.length ?? 0) > 0">
-                    <h5>Completed</h5>
+                    <div class="flex justify-between">
+                        <h5>Completed</h5>
+                        <p-button title="Remove File" [loading]="filesToDelete" (onClick)="removeUploadedFiles()"
+                            icon="pi pi-times" [outlined]="true" [rounded]="true" severity="danger"
+                            [disabled]="removeFiles.length > 0" />
+                    </div>
                     <div class="flex flex-wrap gap-4">
                         <div *ngFor="let file of uploadedFilesToS3; let i = index"
                             class="card m-0 px-12 flex flex-col border border-surface items-center gap-4">
                             <div class="image-container">
-                                <img role="presentation" [alt]="file.fileName" [ngSrc]="file.url" fill
-                                    style="object-fit: cover;" />
+                                <div>
+                                    <p-checkbox [inputId]="file.fileName" [name]="file.fileName" [value]="file"
+                                        [(ngModel)]="removeFiles" />
+                                </div>
+                                <label [for]="file.fileName" class="ml-2">
+                                    <img role="presentation" [alt]="file.fileName" [ngSrc]="file.url" fill
+                                        style="object-fit: cover;" />
+                                </label>
                             </div>
                             <span class="font-semibold text-ellipsis max-w-60 whitespace-nowrap overflow-hidden">{{
                                 file.fileName }}</span>
                             <div>{{ formatSize(file?.fileSize ?? 0) }}</div>
                             <p-badge value="Completed" class="mt-4" severity="success" />
-                            <p-button icon="pi pi-times" (onClick)="removeUploadedFile(file)" [outlined]="true"
-                                [rounded]="true" severity="danger" />
                         </div>
                     </div>
                 </div>
