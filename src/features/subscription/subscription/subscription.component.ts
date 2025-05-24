@@ -7,6 +7,9 @@ import { SubscriptionStatusService } from '../../property-listing/services/subsc
 import { AuthService } from '../../auth/services/auth.service';
 import { AuthApiResponse } from '../../auth/interfaces/auth/auth-login.interface';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { switchMap } from 'rxjs/internal/operators/switchMap';
+import { tap } from 'rxjs/internal/operators/tap';
+import { SubscriptionStatus } from '../interface/subscription-status.interface';
 declare let Razorpay: any;
 
 @Component({
@@ -33,19 +36,25 @@ export class SubscriptionComponent {
     "handler": (res: any) => {
       console.log(res);
       try {
-        this.http.post('http://localhost:3000/razorpay/verify-payment', res).subscribe(() => {
-          this.authService.regenerateJwtToken(this.userInfo.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res) => {
-            localStorage.setItem('UserInfo', JSON.stringify(res))
-            this.subscriptionStatusService.refreshStatus()
+        /* This block of code is handling the process after a successful payment verification using
+        Razorpay. Here's a breakdown of what each step is doing: */
+        this.http.post('http://localhost:3000/razorpay/verify-payment', res).pipe(
+          switchMap(() => this.authService.regenerateJwtToken(this.userInfo.id)),
+          tap((tokenResponse) => {
+            localStorage.setItem('UserInfo', JSON.stringify(tokenResponse));
+            this.subscriptionStatusService.refreshStatus();
+          }),
+          switchMap(() => this.subscriptionStatusService.getSubscriptionStatus()),
+          takeUntilDestroyed(this.destroyRef)
+        ).subscribe({
+          next: (response: SubscriptionStatus) => {
+            console.log('Payment verified and JWT token regenerated:', response);
+            this.router.navigate([RoutesPaths.basePath + 'property-listing/rent']);
           },
-            (err) => { console.error(err) },
-            () => {
-              this.subscriptionStatusService.getSubscriptionStatus().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-                console.log('subscription status refreshed');
-                this.router.navigate([RoutesPaths.basePath + 'property-listing/rent'])
-              })
-            })
-        })
+          error: (error) => {
+            console.error('Error verifying payment or regenerating JWT token:', error);
+          }
+        });
       }
       catch (err) {
         console.error(err)
