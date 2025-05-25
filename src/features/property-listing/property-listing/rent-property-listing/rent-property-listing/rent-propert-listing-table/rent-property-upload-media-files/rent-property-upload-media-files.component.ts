@@ -38,7 +38,7 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
   isRegeneratedSignedUrlFilesUploadedToS3bucket = false;
 
   public removeFiles: PropertyImage[] = [];
-  public filesToDelete: boolean = false
+  public filesToDelete = false
 
   private dialogConfig = inject(DynamicDialogConfig)
   private S3FilesService = inject(RentPropertyFilesUploadService);
@@ -115,7 +115,7 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
 
   removeUploadedFiles() {
     this.filesToDelete = true;
-    let payload: { data: { Key: string; _id: string }[] } = { data: [] };
+    const payload: { data: { Key: string; _id: string }[] } = { data: [] };
     this.removeFiles.forEach((filesInfo: PropertyImage) => {
       payload.data.push({ "Key": "test/property-owner-rent/" + filesInfo.fileName, "_id": filesInfo._id || "" })
     })
