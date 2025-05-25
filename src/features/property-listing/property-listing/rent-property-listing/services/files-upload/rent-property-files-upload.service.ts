@@ -34,7 +34,7 @@ export class RentPropertyFilesUploadService {
         })
       }
     ).pipe(
-      map((response: PropertyListingDeleteFilesApiResponse) => response.data as PropertyListing)
+      map((response: PropertyListingDeleteFilesApiResponse) => response.data)
     );
   }
 

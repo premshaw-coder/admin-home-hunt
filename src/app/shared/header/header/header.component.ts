@@ -19,8 +19,8 @@ import { skip, take } from 'rxjs/operators';
 })
 export class HeaderComponent implements OnInit {
   items: MenuItem[] | undefined;
-  private router = inject(Router)
-  private subscriptionStatusService = inject(SubscriptionStatusService)
+  private readonly router = inject(Router)
+  private readonly subscriptionStatusService = inject(SubscriptionStatusService)
 
   ngOnInit() {
     this.items = [

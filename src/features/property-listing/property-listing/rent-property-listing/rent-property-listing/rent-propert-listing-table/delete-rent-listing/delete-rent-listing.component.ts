@@ -25,7 +25,7 @@ export class DeleteRentListingComponent {
       header: 'Are you sure?',
       message: 'Please confirm to proceed.',
       accept: () => {
-        this.onDeleteRentPropertyListing(rentPropertyListData?._id || '');
+        this.onDeleteRentPropertyListing(rentPropertyListData?._id ?? '');
         this.messageService.add({ severity: 'success', summary: 'Confirmed', detail: 'You have accepted' });
       },
       reject: () => {

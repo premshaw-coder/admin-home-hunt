@@ -30,7 +30,7 @@ export class PropertyListingComponent {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd), map(() => this.router.url)).pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(url => {
-        this.currentUrl = url.split('/').pop() || '';
+        this.currentUrl = url.split('/').pop() ?? '';
       });
   }
 }

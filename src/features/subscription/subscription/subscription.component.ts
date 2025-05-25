@@ -20,7 +20,7 @@ declare let Razorpay: any;
   styleUrl: './subscription.component.scss'
 })
 export class SubscriptionComponent {
-  private readonly userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') || '{}')
+  private readonly userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') ?? '{}')
   private readonly router = inject(Router)
   private readonly subscriptionStatusService = inject(SubscriptionStatusService)
   private readonly authService = inject(AuthService)
@@ -39,7 +39,7 @@ export class SubscriptionComponent {
         /* This block of code is handling the process after a successful payment verification using
         Razorpay. Here's a breakdown of what each step is doing: */
         this.razorpayPaymentService.verifyRazorpayPayment(res).pipe(
-          switchMap(() => this.authService.regenerateJwtToken(this.userInfo.id || '')),
+          switchMap(() => this.authService.regenerateJwtToken(this.userInfo.id ?? '')),
           tap((tokenResponse) => {
             localStorage.setItem('UserInfo', JSON.stringify(tokenResponse));
             this.subscriptionStatusService.refreshStatus();
@@ -64,13 +64,13 @@ export class SubscriptionComponent {
 
   buyRazorPay(amount: number): void {
     const payload: RazorPayOrderCreationPayload = {
-      "amount": amount, "receipt": "sfbbs", "payment_capture": 1, "userId": this.userInfo.id || '',
+      "amount": amount, "receipt": "sfbbs", "payment_capture": 1, "userId": this.userInfo.id ?? '',
     }
     this.razorpayPaymentService.createRazorpayOrder(payload).subscribe((res: RazorPayOrderCreation) => {
       this.razorPayOptions.key = 'rzp_test_F01quPXBiDbfVY';
       this.razorPayOptions.amount = res['amount'];
       this.razorPayOptions.name = "prem";
-      this.razorPayOptions.order_id = res['id'] || ''
+      this.razorPayOptions.order_id = res['id'] ?? ''
       const rzp1 = new Razorpay(this.razorPayOptions);
       rzp1.open()
     })

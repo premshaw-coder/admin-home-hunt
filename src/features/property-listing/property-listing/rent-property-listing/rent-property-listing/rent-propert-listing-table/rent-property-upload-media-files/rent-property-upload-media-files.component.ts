@@ -92,7 +92,7 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
     this.filesToDelete = true;
     const payload: { data: { Key: string; _id: string }[] } = { data: [] };
     this.removeFiles.forEach((filesInfo: PropertyImage) => {
-      payload.data.push({ "Key": "test/property-owner-rent/" + filesInfo.fileName, "_id": filesInfo._id || "" })
+      payload.data.push({ "Key": "test/property-owner-rent/" + filesInfo.fileName, "_id": filesInfo._id ?? "" })
     })
     this.S3FilesService.deleteUploadedFilesFromS3Bucket(payload, this.propertyOwnerId).pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

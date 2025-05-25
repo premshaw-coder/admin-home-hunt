@@ -38,7 +38,7 @@ export class RentPropertyListingTableComponent implements OnInit {
   public items: ({ label: string; icon: string; command: () => void; separator?: undefined; } | { separator: boolean; label?: undefined; icon?: undefined; command?: undefined; })[];
   public products!: PropertyListing[];
   private rowPropertyRentIndex!: number
-  private readonly userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') || '{}')
+  private readonly userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') ?? '{}')
 
   private readonly dialogService = inject(DialogService)
   private readonly RentPropertyListingService = inject(RentPropertyListingService)
@@ -135,7 +135,7 @@ export class RentPropertyListingTableComponent implements OnInit {
   }
 
   private getAllRentPropertyListingByProperOwner(): void {
-    this.RentPropertyListingService.getAllRentPropertyListingByProperOwner(this.userInfo?.uuid || '')
+    this.RentPropertyListingService.getAllRentPropertyListingByProperOwner(this.userInfo?.uuid ?? '')
       .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (res: PropertyListing[]) => {
           this.products = res

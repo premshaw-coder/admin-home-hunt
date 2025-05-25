@@ -34,15 +34,11 @@ export const MyHttpInterceptor: HttpInterceptorFn = (
   return next(cloned).pipe(
     catchError((error: HttpErrorResponse) => {
       if ([403].includes(error.status) && error.error?.subscriptionExpired && error.error?.message === 'Subscription expired') {
-        // const startDate = new Date();
-        // if (startDate.getTime() > new Date(error.error.subscriptionEndDate).getTime()) {
         const payload = {
           endDate: new Date(error.error.subscriptionEndDate).toISOString()
         }
-        subscriptionService.checkAndExpireSubscribedUser(userInfo.id || '', payload).subscribe()
-        // }
+        subscriptionService.checkAndExpireSubscribedUser(userInfo.id ?? '', payload).subscribe()
         router.navigate([RoutesPaths.basePath + RoutesPaths.subscription])
-
       }
       return throwError(() => error);
     })

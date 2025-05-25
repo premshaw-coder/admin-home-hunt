@@ -34,7 +34,7 @@ export class SignUpComponent implements OnInit {
     signUpFormData = { ...signUpFormData, user_type: 'Property-Owner' }
     this.authService.signUpWithEmailAndPassword(signUpFormData)
       .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: async () => {
+        next: () => {
           this.commonService.successToast('User Registered Successfully')
         },
         error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {

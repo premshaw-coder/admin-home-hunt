@@ -33,7 +33,7 @@ export class RentPropertyListingFormComponent implements OnInit {
   private readonly furnishingStatusValues: PropertyListingForm[] = ApiStaticData.furnishingStatusValues;
   private readonly propertyFacingValues: PropertyListingForm[] = ApiStaticData.propertyFacingValues;
   private readonly propertyParkingValues: PropertyListingForm[] = ApiStaticData.propertyParkingValues;
-  private readonly userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') || '{}')
+  private readonly userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') ?? '{}')
   private isEditMode!: boolean;
   private rentPropertyData!: PropertyListing
 
@@ -81,7 +81,7 @@ export class RentPropertyListingFormComponent implements OnInit {
   ngOnInit() {
     this.initiliseForm()
     this.testFormData()
-    this.isEditMode = this.dialogConfig?.data?.edit || false;
+    this.isEditMode = this.dialogConfig?.data?.edit ?? false;
     this.rentPropertyData = this.dialogConfig?.data?.propertyRentListData;
     this.patchFormData()
   }
@@ -96,7 +96,7 @@ export class RentPropertyListingFormComponent implements OnInit {
   }
 
   private editRentPropertyListing(formData: PropertyListing): void {
-    this.rentPropertyListingService.editRentPropertyListing(formData, this.rentPropertyData?._id || '').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.rentPropertyListingService.editRentPropertyListing(formData, this.rentPropertyData?._id ?? '').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.messageService.add({ severity: 'info', summary: 'Success', detail: 'Property listing edited sucessfully', life: 3000 });
       },
@@ -239,7 +239,7 @@ export class RentPropertyListingFormComponent implements OnInit {
 
   private getSelectedValueAsString(formGroupName: string, FormControlName: string): string {
     const selectedValue = this.RentPropertyListingForm.get(formGroupName)?.get(FormControlName)?.value ?? {}
-    return selectedValue?.['name'] || "";
+    return selectedValue?.['name'] ?? "";
   }
 
   private createRentPropertyListing(formData: PropertyListing): void {

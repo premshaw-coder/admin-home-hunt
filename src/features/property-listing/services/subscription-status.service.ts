@@ -8,17 +8,17 @@ import { AuthApiResponse } from '../../auth/interfaces/auth/auth-login.interface
   providedIn: 'root'
 })
 export class SubscriptionStatusService {
-  private readonly userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') || '{}')
+  private readonly userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') ?? '{}')
   private readonly subscriptionService = inject(SubscriptionService);
-  private refreshTrigger$ = new Subject<void>();
+  private readonly refreshTrigger$ = new Subject<void>();
 
   // Shared observable, invalidated when refreshTrigger$ emits
-  private status$: Observable<SubscriptionStatus> = this.refreshTrigger$.pipe(
+  private readonly status$: Observable<SubscriptionStatus> = this.refreshTrigger$.pipe(
     // Start with an immediate call (auto-fetch)
     startWith(void 0),
     switchMap(() =>
       defer(() =>
-        this.subscriptionService.subscriptionStatus(this.userInfo?.id || '')
+        this.subscriptionService.subscriptionStatus(this.userInfo?.id ?? '')
       )
     ),
     shareReplay(1) // Cache the latest result for all subscribers
