@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SubscriptionComponent } from './subscription.component';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('SubscriptionComponent', () => {
   let component: SubscriptionComponent;
@@ -8,7 +10,11 @@ describe('SubscriptionComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SubscriptionComponent]
+      imports: [SubscriptionComponent],
+      providers: [
+        provideHttpClient(withInterceptors([])),
+        provideHttpClientTesting(),
+      ]
     })
     .compileComponents();
 

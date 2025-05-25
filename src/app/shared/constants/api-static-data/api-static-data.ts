@@ -1,4 +1,4 @@
-import { PropertyListingForm } from "../../../features/property-listing/property-listing/rent-property-listing/rent-property-listing-interfaces/property-listing-form-interface";
+import { PropertyListingForm } from "../../../../features/property-listing/property-listing/rent-property-listing/rent-property-listing-interfaces/property-listing-form-interface";
 
 export const ApiStaticData = {
     bhktypeValues: [

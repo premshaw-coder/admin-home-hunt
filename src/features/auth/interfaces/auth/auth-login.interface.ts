@@ -1,24 +1,24 @@
 export interface AuthApiResponse {
-    name: string;
-    email: string;
-    auth_type: string;
-    user_type: string;
-    last_login: string;
-    is_registered?: boolean;
-    address: Address[]; // Address can be of various formats, keep it generic
-    token: string;
-    uuid?: string;
-    id:string;
+    readonly name: string;
+    readonly email: string;
+    readonly auth_type: string;
+    readonly user_type: string;
+    readonly last_login: string;
+    readonly is_registered?: boolean;
+    readonly address: Address[]; // Address can be of various formats, keep it generic
+    readonly token: string;
+    readonly uuid?: string;
+    readonly id?: string;
 }
 export interface Address {
-    address?: string;
-    city?: string;
-    state?: string;
-    zip?: number;
-    country?: string;
+    readonly address?: string;
+    readonly city?: string;
+    readonly state?: string;
+    readonly zip?: number;
+    readonly country?: string;
 }
 export interface SubscriptionInfo {
-    startDate: Date;
-    endDate?: Date;
-    subscriptionsType?: 'basic' | 'pro' | 'premium';
+    readonly startDate: Date;
+    readonly endDate?: Date;
+    readonly subscriptionsType?: 'basic' | 'pro' | 'premium';
 }

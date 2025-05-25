@@ -1,12 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import {
-  Observable,
-  Subject,
-  switchMap,
-  shareReplay,
-  startWith,
-  defer
-} from 'rxjs';
+import { Observable, Subject, switchMap, shareReplay, startWith, defer } from 'rxjs';
 import { SubscriptionService } from '../../subscription/services/subscription.service';
 import { SubscriptionStatus } from '../../subscription/interface/subscription-status.interface';
 import { AuthApiResponse } from '../../auth/interfaces/auth/auth-login.interface';
@@ -15,7 +8,7 @@ import { AuthApiResponse } from '../../auth/interfaces/auth/auth-login.interface
   providedIn: 'root'
 })
 export class SubscriptionStatusService {
-  private userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') || '{}')
+  private readonly userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') || '{}')
   private readonly subscriptionService = inject(SubscriptionService);
   private refreshTrigger$ = new Subject<void>();
 
@@ -25,7 +18,7 @@ export class SubscriptionStatusService {
     startWith(void 0),
     switchMap(() =>
       defer(() =>
-        this.subscriptionService.subscriptionStatus(this.userInfo?.id)
+        this.subscriptionService.subscriptionStatus(this.userInfo?.id || '')
       )
     ),
     shareReplay(1) // Cache the latest result for all subscribers

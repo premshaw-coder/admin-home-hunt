@@ -4,7 +4,7 @@ import { ButtonModule } from 'primeng/button';
 import { StepperModule } from 'primeng/stepper';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { ApiStaticData } from '../../../../../../../app/shared/api-static-data/api-static-data';
+import { ApiStaticData } from '../../../../../../../app/shared/constants/api-static-data/api-static-data';
 import { SelectModule } from 'primeng/select';
 import { NgClass } from '@angular/common';
 import { RentPropertyListingService } from '../../../services/rent-property-listing.service';
@@ -26,22 +26,22 @@ import { MessageService } from 'primeng/api';
   styleUrl: './rent-property-listing-form.component.scss',
 })
 export class RentPropertyListingFormComponent implements OnInit {
-  RentPropertyListingForm!: FormGroup;
-  private bhktypeValues: PropertyListingForm[] = ApiStaticData.bhktypeValues;
-  private propertypeValues: PropertyListingForm[] = ApiStaticData.propertyTypeValues;
-  private propertyPreferredTenantsValues: PropertyListingForm[] = ApiStaticData.propertyPreferredTenantsValues;
-  private furnishingStatusValues: PropertyListingForm[] = ApiStaticData.furnishingStatusValues;
-  private propertyFacingValues: PropertyListingForm[] = ApiStaticData.propertyFacingValues;
-  private propertyParkingValues: PropertyListingForm[] = ApiStaticData.propertyParkingValues;
-  private userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') || '{}')
+  public RentPropertyListingForm!: FormGroup;
+  private readonly bhktypeValues: PropertyListingForm[] = ApiStaticData.bhktypeValues;
+  private readonly propertypeValues: PropertyListingForm[] = ApiStaticData.propertyTypeValues;
+  private readonly propertyPreferredTenantsValues: PropertyListingForm[] = ApiStaticData.propertyPreferredTenantsValues;
+  private readonly furnishingStatusValues: PropertyListingForm[] = ApiStaticData.furnishingStatusValues;
+  private readonly propertyFacingValues: PropertyListingForm[] = ApiStaticData.propertyFacingValues;
+  private readonly propertyParkingValues: PropertyListingForm[] = ApiStaticData.propertyParkingValues;
+  private readonly userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') || '{}')
   private isEditMode!: boolean;
   private rentPropertyData!: PropertyListing
 
-  private messageService = inject(MessageService);
-  private rentPropertyListingService = inject(RentPropertyListingService)
-  private destroyRef = inject(DestroyRef)
-  public dialogConfig = inject(DynamicDialogConfig)
-  public dialogRef = inject(DynamicDialogRef)
+  public readonly dialogConfig = inject(DynamicDialogConfig)
+  public readonly dialogRef = inject(DynamicDialogRef)
+  private readonly messageService = inject(MessageService);
+  private readonly rentPropertyListingService = inject(RentPropertyListingService)
+  private readonly destroyRef = inject(DestroyRef)
 
   public propertyFullAddressFormData = [
     { id: 1, control: 'propertyCityName', placeholder: 'Enter city' },
@@ -86,49 +86,6 @@ export class RentPropertyListingFormComponent implements OnInit {
     this.patchFormData()
   }
 
-  initiliseForm() {
-    this.RentPropertyListingForm = new FormGroup({
-      propertyFullAddress: new FormGroup({
-        propertyCityName: new FormControl('', Validators.required),
-        houseNumber: new FormControl('', Validators.required),
-        street: new FormControl('', Validators.required),
-        area: new FormControl('', Validators.required),
-        city: new FormControl('', Validators.required),
-        state: new FormControl('', Validators.required),
-        country: new FormControl('', Validators.required),
-        pincode: new FormControl('', Validators.required),
-        landmark: new FormControl('', Validators.required),
-        latitude: new FormControl('', Validators.required),
-        longitude: new FormControl('', Validators.required),
-      }),
-      propertyDetails: new FormGroup({
-        propertyName: new FormControl('', Validators.required),
-        propertyDescription: new FormControl('', Validators.required),
-        propertyOwner: new FormControl('', Validators.required),
-        propertyPostedBy: new FormControl('', Validators.required),
-        propertyCost: new FormControl('', Validators.required),
-        availability: new FormControl('', Validators.required),
-        bhkType: new FormControl('', Validators.required),
-        propertyType: new FormControl('', Validators.required),
-        propertySecurityDeposit: new FormControl('', Validators.required),
-        propertyPostedOnDate: new FormControl('', Validators.required),
-        propertyCoveredArea: new FormControl('', Validators.required),
-        propertyPreferredTenants: new FormControl('', Validators.required),
-        furnishingStatus: new FormControl('', Validators.required),
-        propertyFacing: new FormControl('', Validators.required),
-        propertTotalBathroom: new FormControl('', Validators.required),
-        propertyParking: new FormControl('', Validators.required),
-        propertyFloors: new FormControl('', Validators.required),
-      }),
-      propertyAmnities: new FormGroup({
-        waterSupply: new FormControl('', Validators.required),
-        attachedBathroom: new FormControl('', Validators.required),
-        security: new FormControl('', Validators.required),
-        lift: new FormControl('', Validators.required)
-      }),
-    });
-  }
-
   public onSubmit(): void {
     if (this.RentPropertyListingForm.invalid) return;
     else if (!this.isEditMode) {
@@ -136,6 +93,57 @@ export class RentPropertyListingFormComponent implements OnInit {
       return;
     }
     else this.editRentPropertyListing(this.createPaylaod())
+  }
+
+  private editRentPropertyListing(formData: PropertyListing): void {
+    this.rentPropertyListingService.editRentPropertyListing(formData, this.rentPropertyData?._id || '').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.messageService.add({ severity: 'info', summary: 'Success', detail: 'Property listing edited sucessfully', life: 3000 });
+      },
+      error: (err: Error) => {
+        console.error('Error occurred while editing rent property listing:', err);
+      },
+      complete: () => {
+        this.RentPropertyListingForm.reset()
+        this.dialogRef.close({ action: 'submit', data: 'Edit rent listing' });
+      },
+    });
+  }
+
+  private createPaylaod(): PropertyListing {
+    const propertyDetailFormData = this.RentPropertyListingForm.get('propertyDetails')
+    const formData: PropertyListing = {
+      ...this.RentPropertyListingForm.value, propertyDetails: {
+        ...propertyDetailFormData?.value,
+        bhkType: this.getSelectedValueAsString('propertyDetails', 'bhkType'),
+        propertyPreferredTenants: this.getSelectedValueAsString('propertyDetails', 'propertyPreferredTenants'),
+        furnishingStatus: this.getSelectedValueAsString('propertyDetails', 'furnishingStatus'),
+        propertyFacing: this.getSelectedValueAsString('propertyDetails', 'propertyFacing'),
+        propertyParking: this.getSelectedValueAsString('propertyDetails', 'propertyParking'),
+        propertyType: this.getSelectedValueAsString('propertyDetails', 'propertyType'),
+        propertyCoveredArea: +propertyDetailFormData?.get('propertyCoveredArea')?.value,
+        propertyOwner: this.userInfo?.uuid,
+        propertyPostedBy: this.userInfo?.name
+      }
+    }
+    return formData
+  }
+
+  private patchFormData(): void {
+    // Patching the form with the provided data
+    const rentPropertyDetailsData: PropertyDetails = this.rentPropertyData?.propertyDetails
+    this.RentPropertyListingForm.patchValue(this.rentPropertyData);
+    this.patchValueForSelectDropdownData('bhkType', this.bhktypeValues, rentPropertyDetailsData?.bhkType)
+    this.patchValueForSelectDropdownData('furnishingStatus', this.furnishingStatusValues, rentPropertyDetailsData?.furnishingStatus)
+    this.patchValueForSelectDropdownData('propertyFacing', this.propertyFacingValues, rentPropertyDetailsData?.propertyFacing)
+    this.patchValueForSelectDropdownData('propertyParking', this.propertyParkingValues, rentPropertyDetailsData?.propertyParking)
+    this.patchValueForSelectDropdownData('propertyType', this.propertypeValues, rentPropertyDetailsData?.propertyType)
+    this.patchValueForSelectDropdownData('propertyPreferredTenants', this.propertyPreferredTenantsValues, rentPropertyDetailsData?.propertyPreferredTenants)
+  }
+
+  private patchValueForSelectDropdownData(FormControlName: string, selectOptionData: PropertyListingForm[], selectedData: string): void {
+    const selectedDropdownFormData = selectOptionData.find((data: PropertyListingForm) => data.name === selectedData)
+    this.RentPropertyListingForm.get('propertyDetails')?.get(FormControlName)?.patchValue(selectedDropdownFormData);
   }
 
   private testFormData() {
@@ -186,12 +194,55 @@ export class RentPropertyListingFormComponent implements OnInit {
 
   }
 
-  private getSelectedValueAsString(formGroupName: string, FormControlName: string) {
+  private initiliseForm(): void {
+    this.RentPropertyListingForm = new FormGroup({
+      propertyFullAddress: new FormGroup({
+        propertyCityName: new FormControl('', Validators.required),
+        houseNumber: new FormControl('', Validators.required),
+        street: new FormControl('', Validators.required),
+        area: new FormControl('', Validators.required),
+        city: new FormControl('', Validators.required),
+        state: new FormControl('', Validators.required),
+        country: new FormControl('', Validators.required),
+        pincode: new FormControl('', Validators.required),
+        landmark: new FormControl('', Validators.required),
+        latitude: new FormControl('', Validators.required),
+        longitude: new FormControl('', Validators.required),
+      }),
+      propertyDetails: new FormGroup({
+        propertyName: new FormControl('', Validators.required),
+        propertyDescription: new FormControl('', Validators.required),
+        propertyOwner: new FormControl('', Validators.required),
+        propertyPostedBy: new FormControl('', Validators.required),
+        propertyCost: new FormControl('', Validators.required),
+        availability: new FormControl('', Validators.required),
+        bhkType: new FormControl('', Validators.required),
+        propertyType: new FormControl('', Validators.required),
+        propertySecurityDeposit: new FormControl('', Validators.required),
+        propertyPostedOnDate: new FormControl('', Validators.required),
+        propertyCoveredArea: new FormControl('', Validators.required),
+        propertyPreferredTenants: new FormControl('', Validators.required),
+        furnishingStatus: new FormControl('', Validators.required),
+        propertyFacing: new FormControl('', Validators.required),
+        propertTotalBathroom: new FormControl('', Validators.required),
+        propertyParking: new FormControl('', Validators.required),
+        propertyFloors: new FormControl('', Validators.required),
+      }),
+      propertyAmnities: new FormGroup({
+        waterSupply: new FormControl('', Validators.required),
+        attachedBathroom: new FormControl('', Validators.required),
+        security: new FormControl('', Validators.required),
+        lift: new FormControl('', Validators.required)
+      }),
+    });
+  }
+
+  private getSelectedValueAsString(formGroupName: string, FormControlName: string): string {
     const selectedValue = this.RentPropertyListingForm.get(formGroupName)?.get(FormControlName)?.value ?? {}
     return selectedValue?.['name'] || "";
   }
 
-  private createRentPropertyListing(formData: PropertyListing) {
+  private createRentPropertyListing(formData: PropertyListing): void {
     this.rentPropertyListingService.createRentPropertyListing(formData).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.messageService.add({ severity: 'info', summary: 'Success', detail: 'Property listing created sucessfully', life: 3000 });
@@ -204,57 +255,6 @@ export class RentPropertyListingFormComponent implements OnInit {
         this.dialogRef.close({ action: 'submit', data: 'Create rent listing' });
       },
     });
-  }
-
-  editRentPropertyListing(formData: PropertyListing) {
-    this.rentPropertyListingService.editRentPropertyListing(formData, this.rentPropertyData?._id || '').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
-        this.messageService.add({ severity: 'info', summary: 'Success', detail: 'Property listing edited sucessfully', life: 3000 });
-      },
-      error: (err: Error) => {
-        console.error('Error occurred while editing rent property listing:', err);
-      },
-      complete: () => {
-        this.RentPropertyListingForm.reset()
-        this.dialogRef.close({ action: 'submit', data: 'Edit rent listing' });
-      },
-    });
-  }
-
-  createPaylaod(): PropertyListing {
-    const propertyDetailFormData = this.RentPropertyListingForm.get('propertyDetails')
-    const formData: PropertyListing = {
-      ...this.RentPropertyListingForm.value, propertyDetails: {
-        ...propertyDetailFormData?.value,
-        bhkType: this.getSelectedValueAsString('propertyDetails', 'bhkType'),
-        propertyPreferredTenants: this.getSelectedValueAsString('propertyDetails', 'propertyPreferredTenants'),
-        furnishingStatus: this.getSelectedValueAsString('propertyDetails', 'furnishingStatus'),
-        propertyFacing: this.getSelectedValueAsString('propertyDetails', 'propertyFacing'),
-        propertyParking: this.getSelectedValueAsString('propertyDetails', 'propertyParking'),
-        propertyType: this.getSelectedValueAsString('propertyDetails', 'propertyType'),
-        propertyCoveredArea: +propertyDetailFormData?.get('propertyCoveredArea')?.value,
-        propertyOwner: this.userInfo?.uuid,
-        propertyPostedBy: this.userInfo?.name
-      }
-    }
-    return formData
-  }
-
-  patchFormData() {
-    // Patching the form with the provided data
-    const rentPropertyDetailsData: PropertyDetails = this.rentPropertyData?.propertyDetails
-    this.RentPropertyListingForm.patchValue(this.rentPropertyData);
-    this.patchValueForSelectDropdownData('bhkType', this.bhktypeValues, rentPropertyDetailsData?.bhkType)
-    this.patchValueForSelectDropdownData('furnishingStatus', this.furnishingStatusValues, rentPropertyDetailsData?.furnishingStatus)
-    this.patchValueForSelectDropdownData('propertyFacing', this.propertyFacingValues, rentPropertyDetailsData?.propertyFacing)
-    this.patchValueForSelectDropdownData('propertyParking', this.propertyParkingValues, rentPropertyDetailsData?.propertyParking)
-    this.patchValueForSelectDropdownData('propertyType', this.propertypeValues, rentPropertyDetailsData?.propertyType)
-    this.patchValueForSelectDropdownData('propertyPreferredTenants', this.propertyPreferredTenantsValues, rentPropertyDetailsData?.propertyPreferredTenants)
-  }
-
-  patchValueForSelectDropdownData(FormControlName: string, selectOptionData: PropertyListingForm[], selectedData: string) {
-    const selectedDropdownFormData = selectOptionData.find((data: PropertyListingForm) => data.name === selectedData)
-    this.RentPropertyListingForm.get('propertyDetails')?.get(FormControlName)?.patchValue(selectedDropdownFormData);
   }
 
 }

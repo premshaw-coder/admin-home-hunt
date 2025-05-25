@@ -7,7 +7,7 @@ import { ButtonModule } from 'primeng/button';
 import { MenuModule } from 'primeng/menu';
 import { RippleModule } from 'primeng/ripple';
 import { Toolbar } from 'primeng/toolbar';
-import { RoutesPaths } from '../../application-routes/app-routes';
+import { RoutesPaths } from '../../constants/application-routes/app-routes';
 import { SubscriptionStatusService } from '../../../../features/property-listing/services/subscription-status.service';
 import { skip, take } from 'rxjs/operators';
 

@@ -1,19 +1,20 @@
 import { TestBed } from '@angular/core/testing';
 
-import { SubscriptionService } from './subscription.service';
+import { RazorpayPaymentService } from './razorpay-payment.service';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-describe('SubscriptionService', () => {
-  let service: SubscriptionService;
+describe('RazorpayPaymentService', () => {
+  let service: RazorpayPaymentService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(withInterceptors([])),
-      provideHttpClientTesting()
+      providers: [
+        provideHttpClient(withInterceptors([])),
+        provideHttpClientTesting(),
       ]
     });
-    service = TestBed.inject(SubscriptionService);
+    service = TestBed.inject(RazorpayPaymentService);
   });
 
   it('should be created', () => {

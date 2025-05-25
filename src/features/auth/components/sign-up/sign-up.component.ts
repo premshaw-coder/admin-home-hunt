@@ -18,27 +18,16 @@ import { ToastModule } from 'primeng/toast';
   styleUrl: './sign-up.component.scss'
 })
 export class SignUpComponent implements OnInit {
-  signUpForm!: FormGroup<AuthFormControl>
-
-  private authService = inject(AuthService)
-  private commonService = inject(CommonToastService)
-  private destroyRef = inject(DestroyRef)
+  public signUpForm!: FormGroup<AuthFormControl>
+  private readonly authService = inject(AuthService)
+  private readonly commonService = inject(CommonToastService)
+  private readonly destroyRef = inject(DestroyRef)
 
   ngOnInit(): void {
     this.setForm()
   }
 
-  private setForm(): void {
-    this.signUpForm = new FormGroup<AuthFormControl>({
-      name: new FormControl('', [Validators.required]),
-      email: new FormControl('', [Validators.email, Validators.required]),
-      phoneNumber: new FormControl(null, [Validators.minLength(10), Validators.maxLength(10), Validators.required]),
-      password: new FormControl('', [Validators.minLength(8), Validators.maxLength(20),
-      Validators.required]),
-    })
-  }
-
-  onSubmit(signUpFormData: AuthFormData): void {
+  public onSubmit(signUpFormData: AuthFormData): void {
     if (this.isFormInValid()) {
       return
     }
@@ -55,6 +44,16 @@ export class SignUpComponent implements OnInit {
           this.signUpForm.reset()
         },
       })
+  }
+
+  private setForm(): void {
+    this.signUpForm = new FormGroup<AuthFormControl>({
+      name: new FormControl('', [Validators.required]),
+      email: new FormControl('', [Validators.email, Validators.required]),
+      phoneNumber: new FormControl(null, [Validators.minLength(10), Validators.maxLength(10), Validators.required]),
+      password: new FormControl('', [Validators.minLength(8), Validators.maxLength(20),
+      Validators.required]),
+    })
   }
 
   private isFormInValid(): boolean {

@@ -7,7 +7,7 @@ import {
 } from '@angular/common/http';
 import { catchError, Observable, throwError } from 'rxjs';
 import { AuthApiResponse } from '../features/auth/interfaces/auth/auth-login.interface';
-import { RoutesPaths } from './shared/application-routes/app-routes';
+import { RoutesPaths } from './shared/constants/application-routes/app-routes';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { SubscriptionService } from '../features/subscription/services/subscription.service';
@@ -36,10 +36,10 @@ export const MyHttpInterceptor: HttpInterceptorFn = (
       if ([403].includes(error.status) && error.error?.subscriptionExpired && error.error?.message === 'Subscription expired') {
         // const startDate = new Date();
         // if (startDate.getTime() > new Date(error.error.subscriptionEndDate).getTime()) {
-          const payload = {
-            endDate: new Date(error.error.subscriptionEndDate).toISOString()
-          }
-          subscriptionService.checkAndExpireSubscribedUser(userInfo.id, payload).subscribe()
+        const payload = {
+          endDate: new Date(error.error.subscriptionEndDate).toISOString()
+        }
+        subscriptionService.checkAndExpireSubscribedUser(userInfo.id || '', payload).subscribe()
         // }
         router.navigate([RoutesPaths.basePath + RoutesPaths.subscription])
 

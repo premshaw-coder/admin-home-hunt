@@ -12,7 +12,7 @@ import { ToastModule } from 'primeng/toast';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { RentPropertyFilesUploadService } from '../../../services/files-upload/rent-property-files-upload.service';
 import { environment } from '../../../../../../../environments/environment.development';
-import { ApiEndPoints } from '../../../../../../../app/shared/api-ends-points/admin-home-hunt-api-endpoints';
+import { ApiEndPoints } from '../../../../../../../app/shared/constants/api-ends-points/admin-home-hunt-api-endpoints';
 import { PropertyImage, PropertyListing } from '../../../rent-property-listing-interfaces/property-listing-interface';
 import { fileCompression } from '../../../../../../../app/shared/reusable-function/file-compress';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -28,24 +28,24 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './rent-property-upload-media-files.component.scss'
 })
 export class RentPropertyUploadMediaFilesComponent implements OnInit {
-  files: File[] = [];
-  totalSize = 0;
-  totalSizePercent = 0;
-  uploadedFilesToS3: PropertyImage[] = [];
-  propertyOwnerId = '';
-  uploadFilesUrl = '';
-  isFilesUploadedToS3bucket = false;
-  isRegeneratedSignedUrlFilesUploadedToS3bucket = false;
+  public files: File[] = [];
+  public totalSize = 0;
+  public totalSizePercent = 0;
+  public uploadedFilesToS3: PropertyImage[] = [];
+  public uploadFilesUrl = '';
+
+  private propertyOwnerId = '';
+  private isFilesUploadedToS3bucket = false;
 
   public removeFiles: PropertyImage[] = [];
   public filesToDelete = false
 
-  private dialogConfig = inject(DynamicDialogConfig)
-  private S3FilesService = inject(RentPropertyFilesUploadService);
-  private config = inject(PrimeNG);
-  private messageService = inject(MessageService);
-  public dialogRef = inject(DynamicDialogRef)
-  private destroyRef = inject(DestroyRef)
+  public readonly dialogRef = inject(DynamicDialogRef)
+  private readonly dialogConfig = inject(DynamicDialogConfig)
+  private readonly S3FilesService = inject(RentPropertyFilesUploadService);
+  private readonly config = inject(PrimeNG);
+  private readonly messageService = inject(MessageService);
+  private readonly destroyRef = inject(DestroyRef)
 
   ngOnInit(): void {
     this.propertyOwnerId = this.dialogConfig?.data?.propertyRentListData?._id;
@@ -54,42 +54,17 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
     this.regenerateFilesSignedUrl(this.uploadedFilesToS3);
   }
 
-  choose(event: MouseEvent, callback: () => void): void {
+  public choose(event: MouseEvent, callback: () => void): void {
     callback();
   }
 
-  onRemoveTemplatingFile(event: Event, file: File, removeFileCallback: (event: Event, index: number) => void, index: number) {
+  public onRemoveTemplatingFile(event: Event, file: File, removeFileCallback: (event: Event, index: number) => void, index: number): void {
     removeFileCallback(event, index);
     this.totalSize -= parseInt(this.formatSize(file.size));
     this.totalSizePercent = this.totalSize / 10;
   }
 
-  onClearTemplatingUpload(clear: () => void) {
-    clear();
-    this.totalSize = 0;
-    this.totalSizePercent = 0;
-  }
-
-  onTemplatedUpload(event: FileUploadEvent): void {
-    const responseBody = (event.originalEvent && 'body' in event.originalEvent) ? event.originalEvent.body as PropertyListing : null;
-    if (responseBody) {
-      this.uploadedFilesToS3 = responseBody?.propertyDetails?.propertyImages || [];
-      this.isFilesUploadedToS3bucket = true;
-      this.dialogRef.close({
-        action: 'file uploaded successfully',
-        data: { isFilesUploadedToS3bucket: this.isFilesUploadedToS3bucket }
-      });
-    }
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Success',
-      detail: 'File Uploaded',
-      life: 3000
-    });
-  }
-
-
-  onSelectedFiles(event: { originalEvent: Event; files: File[] }): void {
+  public onSelectedFiles(event: { originalEvent: Event; files: File[] }): void {
     this.files = Array.isArray(event.files) ? event.files : [];
 
     this.files?.forEach((file: File) => {
@@ -99,11 +74,11 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
     this.totalSizePercent = this.totalSize / 10;
   }
 
-  uploadEvent(callback: () => void) {
+  public uploadEvent(callback: () => void): void {
     callback();
   }
 
-  formatSize(bytes: number) {
+  public formatSize(bytes: number): string {
     const k = 1024;
     const dm = 3;
     const sizes = this.config.translation.fileSizeTypes || '';
@@ -113,7 +88,7 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
     return `${formattedSize} ${sizes[i]}`;
   }
 
-  removeUploadedFiles() {
+  public removeUploadedFiles(): void {
     this.filesToDelete = true;
     const payload: { data: { Key: string; _id: string }[] } = { data: [] };
     this.removeFiles.forEach((filesInfo: PropertyImage) => {
@@ -136,7 +111,49 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
       });
 
   }
-  regenerateFilesSignedUrl(uploadedFilesToS3: PropertyImage[]): void {
+
+  public uploadHandler(event: FileUploadHandlerEvent): void {
+    // Create a new FormData instance for each upload
+    const formData = new FormData();
+
+    // Create a new array to hold promises for compressed files
+    const compressedFiles: Promise<void>[] = [];
+
+    // Call the fileCompress function and pass the event files
+    fileCompression(event.files, formData, compressedFiles);
+
+    // Wait for all compression promises to resolve
+    Promise.all(compressedFiles)
+      .then(() => {
+        if (!formData.has('files')) {
+          console.error('FormData is empty. No files were appended.');
+          return;
+        }
+        this.uploadFilesToS3(formData, event);
+      })
+      .catch((error) => {
+        console.error('Error during file compression:', error);
+      });
+  }
+
+  private uploadFilesToS3(formData: FormData, event: FileUploadHandlerEvent): void {
+    // Make the HTTP request with the Bearer token
+    this.S3FilesService.uploadFilesToS3Bucket(formData, this.propertyOwnerId).pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          const fileUploadEvent: FileUploadEvent = {
+            files: event.files,
+            originalEvent: { body: response } as HttpEvent<unknown>
+          };
+          this.onTemplatedUpload(fileUploadEvent); // Call the existing handler
+        },
+        error: (error) => {
+          console.error('Error uploading files:', error);
+        },
+      });
+  }
+
+  private regenerateFilesSignedUrl(uploadedFilesToS3: PropertyImage[]): void {
     const payload: PropertyImage[] = uploadedFilesToS3?.filter((file: PropertyImage) => {
       const signedUrlExpirationDate: number = Date.parse(file.fileExpirationTime);
       const currentDate: number = Date.now();
@@ -161,45 +178,22 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
     }
   }
 
-  uploadHandler(event: FileUploadHandlerEvent): void {
-    // Create a new FormData instance for each upload
-    const formData = new FormData();
-
-    // Create a new array to hold promises for compressed files
-    const compressedFiles: Promise<void>[] = [];
-
-    // Call the fileCompress function and pass the event files
-    fileCompression(event.files, formData, compressedFiles);
-
-    // Wait for all compression promises to resolve
-    Promise.all(compressedFiles)
-      .then(() => {
-        if (!formData.has('files')) {
-          console.error('FormData is empty. No files were appended.');
-          return;
-        }
-        this.uploadFilesToS3(formData, event);
-      })
-      .catch((error) => {
-        console.error('Error during file compression:', error);
+  private onTemplatedUpload(event: FileUploadEvent): void {
+    const responseBody = (event.originalEvent && 'body' in event.originalEvent) ? event.originalEvent.body as PropertyListing : null;
+    if (responseBody) {
+      this.uploadedFilesToS3 = responseBody?.propertyDetails?.propertyImages || [];
+      this.isFilesUploadedToS3bucket = true;
+      this.dialogRef.close({
+        action: 'file uploaded successfully',
+        data: { isFilesUploadedToS3bucket: this.isFilesUploadedToS3bucket }
       });
-  }
-
-  uploadFilesToS3(formData: FormData, event: FileUploadHandlerEvent): void {
-    // Make the HTTP request with the Bearer token
-    this.S3FilesService.uploadFilesToS3Bucket(formData, this.propertyOwnerId).pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (response) => {
-          const fileUploadEvent: FileUploadEvent = {
-            files: event.files,
-            originalEvent: { body: response } as HttpEvent<unknown>
-          };
-          this.onTemplatedUpload(fileUploadEvent); // Call the existing handler
-        },
-        error: (error) => {
-          console.error('Error uploading files:', error);
-        },
-      });
+    }
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Success',
+      detail: 'File Uploaded',
+      life: 3000
+    });
   }
 }
 
