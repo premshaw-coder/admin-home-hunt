@@ -2,6 +2,7 @@ import { Type } from "@angular/core";
 import { DialogConfig } from "../../../features/property-listing/property-listing-types/dialog-config";
 import { DialogService, DynamicDialogConfig, DynamicDialogRef } from "primeng/dynamicdialog";
 import { PropertyListing } from "../../../features/property-listing/property-listing/rent-property-listing/rent-property-listing-interfaces/property-listing-interface";
+import { AuthApiResponse } from "../../../features/auth/interfaces/auth/auth-login.interface";
 
 /**
  * Opens a dialog with the specified component and configuration
@@ -45,4 +46,14 @@ export function dialogConfigObj(isEdit = false, rentPropertyData?: PropertyListi
         closable: true
     };
     return dialogConfig
+}
+
+export function getUserInfo(): AuthApiResponse | Record<string, unknown> {
+    try {
+        const userInfoStr = localStorage.getItem('UserInfo');
+        return userInfoStr ? JSON.parse(userInfoStr) : {};
+    } catch (error) {
+        console.error('Error parsing user info from localStorage:', error);
+        return {};
+    }
 }

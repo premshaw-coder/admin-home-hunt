@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { DestroyRef } from '@angular/core';
 import { LoginComponent } from './login.component';
-import { RoutesPaths } from '../../../../app/shared/application-routes/app-routes';
+import { RoutesPaths } from '../../../../app/shared/constants/application-routes/app-routes';
 import { CommonToastService } from '../../../../app/shared/toast/common-toast.service';
 import { AuthFormData } from '../../interfaces/auth/auth-login.form.interface';
 import { AuthApiResponse } from '../../interfaces/auth/auth-login.interface';
@@ -95,6 +95,7 @@ describe('YourComponentName', () => {
     };
 
     const loginApiResponse: AuthApiResponse = {
+      id: '12345', // Added the missing 'id' property
       name: 'PREM Ranjan Shaw',
       email: 'premranjanshaw@gmail.com',
       auth_type: 'Email',
@@ -171,6 +172,7 @@ describe('YourComponentName', () => {
     // spyOn(component as any, 'isFormInValid').and.returnValue(false);
 
     const mockUser: AuthApiResponse = {
+      id: '12345', // Added the missing 'id' property
       name: 'John',
       email: 'john@example.com',
       auth_type: 'Email',

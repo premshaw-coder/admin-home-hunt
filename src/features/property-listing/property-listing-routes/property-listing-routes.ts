@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { RoutesPaths } from '../../../app/shared/application-routes/app-routes';
+import { RoutesPaths } from '../../../app/shared/constants/application-routes/app-routes';
 
 export const PropertyListingRoutes: Routes = [
     { path: '', redirectTo: RoutesPaths.rentPropertyListing, pathMatch: 'full' },

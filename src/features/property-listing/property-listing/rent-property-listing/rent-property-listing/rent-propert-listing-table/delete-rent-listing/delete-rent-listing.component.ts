@@ -1,10 +1,11 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, Output } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { RentPropertyListingService } from '../../../services/rent-property-listing.service';
 import { PropertyListing } from '../../../rent-property-listing-interfaces/property-listing-interface';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 @Component({
   selector: 'app-delete-rent-listing',
   imports: [ConfirmDialog, ButtonModule, ToastModule],
@@ -13,16 +14,18 @@ import { PropertyListing } from '../../../rent-property-listing-interfaces/prope
 })
 export class DeleteRentListingComponent {
   @Output() isRentListingPropertyDeleted = new EventEmitter<boolean>();
-  private confirmationService = inject(ConfirmationService)
-  private messageService = inject(MessageService)
-  private RentPropertyListingService = inject(RentPropertyListingService)
+  private readonly confirmationService = inject(ConfirmationService)
+  private readonly messageService = inject(MessageService)
+  private readonly RentPropertyListingService = inject(RentPropertyListingService)
+  private readonly destroyRef = inject(DestroyRef)
 
-  deleteRentListing(rentPropertyListData?: PropertyListing) {
+  // its being used to delete the rent property listing in viewChild of rent-property-listing-table.component.ts
+  public deleteRentListing(rentPropertyListData?: PropertyListing): void {
     this.confirmationService.confirm({
       header: 'Are you sure?',
       message: 'Please confirm to proceed.',
       accept: () => {
-        this.onDeleteRentPropertyListing(rentPropertyListData?._id || '');
+        this.onDeleteRentPropertyListing(rentPropertyListData?._id ?? '');
         this.messageService.add({ severity: 'success', summary: 'Confirmed', detail: 'You have accepted' });
       },
       reject: () => {
@@ -31,14 +34,14 @@ export class DeleteRentListingComponent {
     });
   }
 
-  onDeleteRentPropertyListing(propertyOwnerId: string) {
-    this.RentPropertyListingService.deleteRentPropertyListing(propertyOwnerId).subscribe({
+  private onDeleteRentPropertyListing(propertyOwnerId: string): void {
+    this.RentPropertyListingService.deleteRentPropertyListing(propertyOwnerId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Property Listing Deleted Successfully' });
       },
       error: () => {
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to Delete Property Listing' });
-      },  
+      },
       complete: () => {
         this.isRentListingPropertyDeleted.emit(true);
       }

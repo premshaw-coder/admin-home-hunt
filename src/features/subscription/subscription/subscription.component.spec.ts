@@ -1,26 +1,24 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { HeaderComponent } from './header.component';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { SubscriptionComponent } from './subscription.component';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-describe('HeaderComponent', () => {
-  let component: HeaderComponent;
-  let fixture: ComponentFixture<HeaderComponent>;
+describe('SubscriptionComponent', () => {
+  let component: SubscriptionComponent;
+  let fixture: ComponentFixture<SubscriptionComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HeaderComponent],
+      imports: [SubscriptionComponent],
       providers: [
-        provideAnimationsAsync(),
         provideHttpClient(withInterceptors([])),
         provideHttpClientTesting(),
       ]
     })
-      .compileComponents();
+    .compileComponents();
 
-    fixture = TestBed.createComponent(HeaderComponent);
+    fixture = TestBed.createComponent(SubscriptionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

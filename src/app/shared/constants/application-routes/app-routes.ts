@@ -15,4 +15,7 @@ export const RoutesPaths = {
     rentPropertyListing: 'rent',
     sellPropertyListing: 'sell',
     leasePropertyListing: 'lease',
+
+    // Subscription Routes
+    subscription: 'subscription',
 }

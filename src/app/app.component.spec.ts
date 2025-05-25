@@ -1,12 +1,18 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
-      providers: [provideAnimationsAsync()]
+      providers: [
+        provideAnimationsAsync(),
+        provideHttpClient(withInterceptors([])),
+        provideHttpClientTesting(),
+      ]
     }).compileComponents();
   });
 

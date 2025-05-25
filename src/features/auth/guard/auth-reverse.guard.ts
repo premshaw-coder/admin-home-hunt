@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { RoutesPaths } from '../../../app/shared/application-routes/app-routes';
+import { RoutesPaths } from '../../../app/shared/constants/application-routes/app-routes';
 
 export const authReverseGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
