@@ -1,6 +1,5 @@
 <div>
-    <p-toolbar
-        [styleClass]="'toolbar_container'">
+    <p-toolbar [styleClass]="'toolbar_container'">
         <ng-template #start>
             <div class="flex items-center gap-2 flex_row">
                 <svg width="31" height="33" viewBox="0 0 31 33" fill="none" xmlns="http://www.w3.org/2000/svg"
@@ -44,8 +43,8 @@
                     <path d="M11.4013 8.27235L8.00893 7.94938L10.2705 5.68861H12.5321L11.4013 8.27235Z"
                         fill="var(--ground-background)" />
                 </svg>
-                <p-button label="Dashboard" (click)="onClick2()" text plain />
-                <p-button label="Create Property Listing" (click)="onClick1()" text plain />
+                <p-button label="Dashboard" (onClick)="onClick2()" text plain />
+                <p-button label="Create Property Listing" (onClick)="onClick1()" text plain />
             </div>
         </ng-template>
 
@@ -64,7 +63,7 @@
                     </p-button>
                 </div>
                 <div>
-                    <p-avatar (click)="menu.toggle($event)"
+                    <p-avatar (onClick)="menu.toggle($event)"
                         image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png"
                         [style]="{ width: '40px', height: '40px' }" />
                     <div>
