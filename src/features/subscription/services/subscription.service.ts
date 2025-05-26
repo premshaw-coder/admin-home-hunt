@@ -13,10 +13,10 @@ export class SubscriptionService {
   private readonly http = inject(HttpClient)
 
   public subscriptionStatus(userId: string): Observable<SubscriptionStatus> {
-    return this.http.get<SubscriptionStatus>(environment.baseUrl + ApiEndPoints.subscriptionStatus + userId)
+    return this.http.get<SubscriptionStatus>(environment.baseUrl + ApiEndPoints.Subscription.status + userId)
   }
 
   public checkAndExpireSubscribedUser(userId: string, payload: { endDate: string }): Observable<SubscriptionStatus> {
-    return this.http.post<SubscriptionStatus>(environment.baseUrl + ApiEndPoints.checkAndExpireSubscribedUser + userId, payload)
+    return this.http.post<SubscriptionStatus>(environment.baseUrl + ApiEndPoints.Subscription.checkAndExpireUser + userId, payload)
   }
 }

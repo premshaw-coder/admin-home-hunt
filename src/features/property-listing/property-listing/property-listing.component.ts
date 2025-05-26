@@ -23,9 +23,9 @@ export class PropertyListingComponent {
 
   constructor() {
     this.tabs = [
-      { label: 'Rent property', value: 0, route: RoutesPaths.rentPropertyListing },
-      { label: 'Sell property', value: 1, route: RoutesPaths.sellPropertyListing },
-      { label: 'Lease property', value: 2, route: RoutesPaths.leasePropertyListing },
+      { label: 'Rent property', value: 0, route: RoutesPaths.PropertyListing.rent},
+      { label: 'Sell property', value: 1, route: RoutesPaths.PropertyListing.sell },
+      { label: 'Lease property', value: 2, route: RoutesPaths.PropertyListing.lease },
     ];
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd), map(() => this.router.url)).pipe(takeUntilDestroyed(this.destroyRef))

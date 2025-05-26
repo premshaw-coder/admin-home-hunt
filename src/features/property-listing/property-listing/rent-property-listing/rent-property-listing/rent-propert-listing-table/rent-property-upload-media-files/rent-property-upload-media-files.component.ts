@@ -49,7 +49,7 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
 
   ngOnInit(): void {
     this.propertyOwnerId = this.dialogConfig?.data?.propertyRentListData?._id;
-    this.uploadFilesUrl = `${environment.baseUrl}${environment.apiVersion}${ApiEndPoints.uploadRentPropertyFiles}${this.propertyOwnerId}`;
+    this.uploadFilesUrl = `${environment.baseUrl}${environment.apiVersion}${ApiEndPoints.RentProperty.uploadS3Files}${this.propertyOwnerId}`;
     this.uploadedFilesToS3 = this.dialogConfig?.data?.propertyRentListData?.propertyDetails?.propertyImages
     this.regenerateFilesSignedUrl(this.uploadedFilesToS3);
   }

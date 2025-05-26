@@ -1,10 +1,4 @@
-import {
-  HttpRequest,
-  HttpErrorResponse,
-  HttpEvent,
-  HttpInterceptorFn,
-  HttpHandlerFn,
-} from '@angular/common/http';
+import { HttpRequest, HttpErrorResponse, HttpEvent, HttpInterceptorFn, HttpHandlerFn } from '@angular/common/http';
 import { catchError, Observable, throwError } from 'rxjs';
 import { AuthApiResponse } from '../features/auth/interfaces/auth/auth-login.interface';
 import { RoutesPaths } from './shared/constants/application-routes/app-routes';
@@ -38,7 +32,7 @@ export const MyHttpInterceptor: HttpInterceptorFn = (
           endDate: new Date(error.error.subscriptionEndDate).toISOString()
         }
         subscriptionService.checkAndExpireSubscribedUser(userInfo.id ?? '', payload).subscribe()
-        router.navigate([RoutesPaths.basePath + RoutesPaths.subscription])
+        router.navigate([RoutesPaths.BasePath + RoutesPaths.Subscription])
       }
       return throwError(() => error);
     })

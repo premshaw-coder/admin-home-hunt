@@ -27,18 +27,18 @@ export const authGuard: CanActivateFn = () => {
           endDate: new Date(userSubscriptionEndDate).toISOString()
         }
         subscriptionService.checkAndExpireSubscribedUser(userSubscription.userId, payload).pipe(takeUntilDestroyed(destroyRef)).subscribe()
-        router.navigate([RoutesPaths.basePath + RoutesPaths.subscription]);
+        router.navigate([RoutesPaths.BasePath + RoutesPaths.Subscription]);
         return false;
       }
       if (userSubscriptionStatus === SUBSCRIPTION_STATUS.ACTIVE && authService.isUserAuthenticated()) {
         return true;
       }
       if ((userSubscriptionStatus === SUBSCRIPTION_STATUS.INACTIVE || userSubscriptionStatus === SUBSCRIPTION_STATUS.EXPIRED) && authService.isUserAuthenticated()) {
-        router.navigate([RoutesPaths.basePath + RoutesPaths.subscription]);
+        router.navigate([RoutesPaths.BasePath + RoutesPaths.Subscription]);
         return false;
       }
       else {
-        router.navigate([RoutesPaths.basePath + RoutesPaths.login]);
+        router.navigate([RoutesPaths.BasePath + RoutesPaths.Auth.login]);
         return false;
       }
 

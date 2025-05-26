@@ -14,18 +14,18 @@ export class RentPropertyListingService {
   private readonly httpService = inject(HttpClient)
 
   public createRentPropertyListing(rentListinginfo: PropertyListing): Observable<PropertyListing> {
-    return this.httpService.post<PropertyListing>(environment.baseUrl + environment.apiVersion + ApiEndPoints.addRentListing, { ...rentListinginfo });
+    return this.httpService.post<PropertyListing>(environment.baseUrl + environment.apiVersion + ApiEndPoints.RentProperty.addListing, { ...rentListinginfo });
   }
 
   public editRentPropertyListing(rentListinginfo: PropertyListing, docId: string): Observable<PropertyListing> {
-    return this.httpService.put<PropertyListing>(environment.baseUrl + environment.apiVersion + ApiEndPoints.editRentListing + docId, { ...rentListinginfo });
+    return this.httpService.put<PropertyListing>(environment.baseUrl + environment.apiVersion + ApiEndPoints.RentProperty.editListing + docId, { ...rentListinginfo });
   }
 
   public getAllRentPropertyListingByProperOwner(propertyOwnerUUID: string): Observable<PropertyListing[]> {
-    return this.httpService.get<PropertyListing[]>(environment.baseUrl + environment.apiVersion + ApiEndPoints.getAllRentPropertyListingByProperOwner + propertyOwnerUUID);
+    return this.httpService.get<PropertyListing[]>(environment.baseUrl + environment.apiVersion + ApiEndPoints.RentProperty.getAllPropertyListingByByOwner + propertyOwnerUUID);
   }
 
   public deleteRentPropertyListing(propertyOwnerId: string): Observable<PropertyDeleteResponse> {
-    return this.httpService.delete<PropertyDeleteResponse>(environment.baseUrl + environment.apiVersion + ApiEndPoints.deleteRentProperty + propertyOwnerId);
+    return this.httpService.delete<PropertyDeleteResponse>(environment.baseUrl + environment.apiVersion + ApiEndPoints.RentProperty.deleteListing + propertyOwnerId);
   }
 }

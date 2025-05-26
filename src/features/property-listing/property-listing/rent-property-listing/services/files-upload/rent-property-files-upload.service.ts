@@ -18,14 +18,14 @@ export class RentPropertyFilesUploadService {
 
   public uploadFilesToS3Bucket(files: FormData, propertyOwnerId: string): Observable<PropertyImage[]> {
     return this.httpService.post<PropertyImage[]>(
-      `${environment.baseUrl}${environment.apiVersion}${ApiEndPoints.uploadRentPropertyFiles}${propertyOwnerId}`,
+      `${environment.baseUrl}${environment.apiVersion}${ApiEndPoints.RentProperty.uploadS3Files}${propertyOwnerId}`,
       files
     );
   }
 
   public deleteUploadedFilesFromS3Bucket(files: { data: { Key: string; _id: string }[] }, propertyOwnerId: string): Observable<PropertyListing> {
     return this.httpService.delete<PropertyListingDeleteFilesApiResponse>(
-      `${environment.baseUrl}${environment.apiVersion}${ApiEndPoints.deleteRentPropertyFiles}/${propertyOwnerId}`,
+      `${environment.baseUrl}${environment.apiVersion}${ApiEndPoints.RentProperty.deleteS3Files}/${propertyOwnerId}`,
       {
         body: JSON.stringify(files),
         headers: new HttpHeaders({
@@ -40,7 +40,7 @@ export class RentPropertyFilesUploadService {
 
   public regenerateFilesSignedUrl(propertyOwnerId: string, fileData: PropertyImage[]): Observable<PropertyListing> {
     return this.httpService.post<PropertyListing>(
-      `${environment.baseUrl}${environment.apiVersion}${ApiEndPoints.regenerateFilesSignedUrl}${propertyOwnerId}`,
+      `${environment.baseUrl}${environment.apiVersion}${ApiEndPoints.RentProperty.regenerateS3FilesSignedUrl}${propertyOwnerId}`,
       { fileData: fileData }
     );
   }

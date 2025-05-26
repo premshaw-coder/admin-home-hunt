@@ -13,10 +13,10 @@ export class RazorpayPaymentService {
   private readonly http = inject(HttpClient)
 
   public createRazorpayOrder(payload: RazorPayOrderCreationPayload): Observable<RazorPayOrderCreation> {
-    return this.http.post<RazorPayOrderCreation>(environment.baseUrl + ApiEndPoints.createRazorpayOrder, payload)
+    return this.http.post<RazorPayOrderCreation>(environment.baseUrl + ApiEndPoints.RazorpayPayment.createOrder, payload)
   }
 
   public verifyRazorpayPayment(res: RazorPayOrderCreation): Observable<RazorPayOrderCreation> {
-    return this.http.post<RazorPayOrderCreation>(environment.baseUrl + ApiEndPoints.verifyRazorPayPayment, res)
+    return this.http.post<RazorPayOrderCreation>(environment.baseUrl + ApiEndPoints.RazorpayPayment.verifyPayment, res)
   }
 }

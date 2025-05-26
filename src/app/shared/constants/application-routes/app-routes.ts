@@ -1,21 +1,26 @@
+const BASE_AUTH = 'auth';
+const BASE_SUBSCRIPTION = 'subscription';
+
 export const RoutesPaths = {
     // Application Base Path
-    basePath: '/',
-    
-    //Authentication Routes
-    auth: 'auth',
-    login: 'auth/login',
-    signUp: 'auth/sign-up',
-    resetPassword: 'auth/reset-password',
+    BasePath: '/',
 
-    // Application Routes
+    // Authentication Routes
+    Auth: {
+        base: BASE_AUTH,
+        login: `${BASE_AUTH}/login`,
+        signUp: `${BASE_AUTH}/sign-up`,
+        resetPassword: `${BASE_AUTH}/reset-pass word`,
+    },
 
     // Property Listing Routes
-    createPropertyListing: 'property-listing',
-    rentPropertyListing: 'rent',
-    sellPropertyListing: 'sell',
-    leasePropertyListing: 'lease',
+    PropertyListing: {
+        create: 'property-listing',
+        rent: 'rent',
+        sell: 'sell',
+        lease: 'lease',
+    },
 
     // Subscription Routes
-    subscription: 'subscription',
-}
+    Subscription: BASE_SUBSCRIPTION,
+} as const;

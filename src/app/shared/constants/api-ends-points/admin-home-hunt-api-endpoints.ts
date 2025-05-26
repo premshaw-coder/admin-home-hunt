@@ -1,43 +1,34 @@
+const BASE_PROPERTY_RENT = '/property-rent';
+const BASE_RAZORPAY_PAYMENT = 'razorpay';
+
 export const ApiEndPoints = {
     //auth endpoints
-    login: 'login',
-    signUp: 'signup',
+    Auth: {
+        login: 'login',
+        signUp: 'signup',
+        regenerateJwtToken: 're-generate-jwt-token/',
+    },
 
     //rent property list endpoint
-    addRentListing: '/property-rent/add-house',
-    editRentListing: '/property-rent/update-house-by-propertyOwner/',
-    getAllRentPropertyListingByProperOwner: '/property-rent/get-all-house-by-propertyOwner/',
-    deleteRentPropertyFiles: '/property-rent/delete-files',
-    deleteRentProperty: '/property-rent/delete-house/',
-    regenerateFilesSignedUrl: '/property-rent/re-generate-signed-url/',
-    uploadRentPropertyFiles: '/property-rent/files-upload/',
-    subscriptionStatus: 'subscription_status/',
-    checkAndExpireSubscribedUser: 'expire_subscribed_user/',
-    regenerateJwtToken: 're-generate-jwt-token/',
+    RentProperty: {
+        addListing: `${BASE_PROPERTY_RENT}/add-house`,
+        editListing: `${BASE_PROPERTY_RENT}/update-house-by-propertyOwner/`,
+        getAllPropertyListingByByOwner: `${BASE_PROPERTY_RENT}/get-all-house-by-propertyOwner/`,
+        deleteS3Files: `${BASE_PROPERTY_RENT}/delete-files`,
+        deleteListing: `${BASE_PROPERTY_RENT}/delete-house/`,
+        regenerateS3FilesSignedUrl: `${BASE_PROPERTY_RENT}/re-generate-signed-url/`,
+        uploadS3Files: `${BASE_PROPERTY_RENT}/files-upload/`,
+    },
 
-    createRazorpayOrder: 'razorpay/order',
-    verifyRazorPayPayment: 'razorpay/verify-payment'
-}
+    //subscription endpoints
+    Subscription: {
+        status: 'subscription_status/',
+        checkAndExpireUser: 'expire_subscribed_user/',
+    },
 
-// const BASE_PROPERTY_RENT = '/property-rent';
-
-// export const ApiEndPoints = {
-//     auth: {
-//         login: 'login',
-//         signUp: 'signup',
-//         regenerateJwtToken: 're-generate-jwt-token/',
-//     },
-//     rentProperty: {
-//         add: `${BASE_PROPERTY_RENT}/add-house`,
-//         edit: `${BASE_PROPERTY_RENT}/update-house-by-propertyOwner/`,
-//         getAllByOwner: `${BASE_PROPERTY_RENT}/get-all-house-by-propertyOwner/`,
-//         deleteFiles: `${BASE_PROPERTY_RENT}/delete-files`,
-//         delete: `${BASE_PROPERTY_RENT}/delete-house/`,
-//         regenerateFilesSignedUrl: `${BASE_PROPERTY_RENT}/re-generate-signed-url/`,
-//         uploadFiles: `${BASE_PROPERTY_RENT}/files-upload/`,
-//     },
-//     subscription: {
-//         status: 'subscription_status/',
-//         checkAndExpire: 'expire_subscribed_user/',
-//     },
-// };
+    // Razorpay payment endpoints
+    RazorpayPayment: {
+        createOrder: `${BASE_RAZORPAY_PAYMENT}/order`,
+        verifyPayment: `${BASE_RAZORPAY_PAYMENT}/verify-payment`,
+    },
+} as const;

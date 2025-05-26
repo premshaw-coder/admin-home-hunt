@@ -3,14 +3,14 @@ import { authGuard } from '../features/auth/guard/auth.guard';
 import { RoutesPaths } from './shared/constants/application-routes/app-routes';
 
 export const routes: Routes = [
-    { path: '', redirectTo: RoutesPaths.login, pathMatch: 'full' },
+    { path: '', redirectTo: RoutesPaths.Auth.login, pathMatch: 'full' },
     {
-        path: RoutesPaths.auth,
+        path: RoutesPaths.Auth.base,
         loadChildren: () => import('../features/auth/routes/auth.routes').then(c => c.authRoutes)
     },
 
     {
-        path: RoutesPaths.createPropertyListing, canActivate: [authGuard],
+        path: RoutesPaths.PropertyListing.create, canActivate: [authGuard],
         loadComponent: () => import('../features/property-listing/property-listing/property-listing.component')
             .then(c => c.PropertyListingComponent),
         children: [{
@@ -21,6 +21,6 @@ export const routes: Routes = [
     },
 
     {
-        path: RoutesPaths.subscription, loadComponent: () => import('../features/subscription/subscription/subscription.component').then((c) => c.SubscriptionComponent)
+        path: RoutesPaths.Subscription, loadComponent: () => import('../features/subscription/subscription/subscription.component').then((c) => c.SubscriptionComponent)
     }
 ];

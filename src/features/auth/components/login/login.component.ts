@@ -49,7 +49,7 @@ export class LoginComponent implements OnInit {
       },
       complete: () => {
         this.loginForm.reset()
-        this.router.navigate([RoutesPaths.basePath + RoutesPaths.createPropertyListing])
+        this.router.navigate([RoutesPaths.BasePath + RoutesPaths.PropertyListing.create])
       },
     })
   }

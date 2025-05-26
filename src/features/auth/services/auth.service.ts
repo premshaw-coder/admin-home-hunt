@@ -13,15 +13,15 @@ export class AuthService {
   private readonly http = inject(HttpClient)
 
   public loginWithEmailAndPassword(loginUserData: AuthFormData): Observable<AuthApiResponse> {
-    return this.http.post<AuthApiResponse>(environment.baseUrl + ApiEndPoints.login, loginUserData)
+    return this.http.post<AuthApiResponse>(environment.baseUrl + ApiEndPoints.Auth.login, loginUserData)
   }
 
   public signUpWithEmailAndPassword(signUpUserData: AuthFormData): Observable<AuthApiResponse> {
-    return this.http.post<AuthApiResponse>(environment.baseUrl + ApiEndPoints.signUp, signUpUserData)
+    return this.http.post<AuthApiResponse>(environment.baseUrl + ApiEndPoints.Auth.signUp, signUpUserData)
   }
 
   public regenerateJwtToken(userId: string): Observable<AuthApiResponse> {
-    return this.http.get<AuthApiResponse>(environment.baseUrl + ApiEndPoints.regenerateJwtToken + userId,)
+    return this.http.get<AuthApiResponse>(environment.baseUrl + ApiEndPoints.Auth.regenerateJwtToken + userId,)
   }
 
   public isUserAuthenticated(): boolean {

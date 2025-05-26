@@ -10,11 +10,11 @@ export function fileCompression(files: File[], formData: FormData, compressedFil
         const compressionPromise = new Promise<void>((resolve, reject) => {
             new Compressor(file, {
                 ...options,
-                success: (result) => {
+                success: (result: File) => {
                     formData.append('files', result, fileName);
                     resolve();
                 },
-                error: (err) => {
+                error: (err: Error) => {
                     console.error('Error compressing file:', err);
                     reject(err);
                 },

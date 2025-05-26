@@ -49,7 +49,7 @@ export class HeaderComponent implements OnInit {
             icon: 'pi pi-sign-out',
             command: () => {
               localStorage.removeItem('UserInfo');
-              this.router.navigate([RoutesPaths.basePath + RoutesPaths.login]);
+              this.router.navigate([RoutesPaths.BasePath + RoutesPaths.Auth.login]);
             }
           }
         ]
@@ -61,14 +61,14 @@ export class HeaderComponent implements OnInit {
   public onClick1() {
     this.subscriptionStatusService.refreshStatus();
     this.subscriptionStatusService.getSubscriptionStatus().pipe(skip(1), take(1)).subscribe(() => {
-      this.router.navigate([RoutesPaths.basePath + 'subscription'])
+      this.router.navigate([RoutesPaths.BasePath + 'subscription'])
     })
   }
 
   public onClick2() {
     this.subscriptionStatusService.refreshStatus();
     this.subscriptionStatusService.getSubscriptionStatus().pipe(skip(1), take(1)).subscribe(() => {
-      this.router.navigate([RoutesPaths.basePath + 'property-listing/rent'])
+      this.router.navigate([RoutesPaths.BasePath + 'property-listing/rent'])
     })
   }
 }

@@ -7,7 +7,7 @@ export const authReverseGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
   if (authService.isUserAuthenticated()) {
-    router.navigate([RoutesPaths.basePath + RoutesPaths.createPropertyListing]);
+    router.navigate([RoutesPaths.BasePath + RoutesPaths.PropertyListing.create]);
     return false
   }
   return true
