@@ -10,30 +10,30 @@
         </div>
         <div class="flex px-4 py-3">
             <div class="flex h-10 flex-1 items-center justify-center rounded-xl bg-[#ffffff] p-1">
-                @for (subscriptionPlanDuration of subscriptionInfoData; let index=$index; track $index) {
+                @for (subscriptionPlanDuration of subscriptionPlanDurations; let index=$index; track $index) {
                 <label
                     class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-xl px-2 has-[:checked]:bg-[#3b9aed] has-[:checked]:shadow-[0_0_4px_rgba(0,0,0,0.1)] has-[:checked]:text-white text-[#9aaec1] text-sm font-medium leading-normal">
-                    <span class="truncate">{{subscriptionPlanDuration[index].duration}}</span>
+                    <span class="truncate">{{subscriptionPlanDuration}}</span>
                     <input type="radio" name="0c06aa5c-ce51-441a-abd9-cf606416bf2c" class="invisible w-0"
-                        value="{{subscriptionPlanDuration[index].duration}}" [checked]="index === 0"
-                        (click)="chooseDuration(index)" (keydown.enter)="chooseDuration(index)" />
+                        value="{{subscriptionPlanDuration}}" [checked]="index === 0"
+                        (click)="chooseDuration(subscriptionPlanDuration)" (keydown.enter)="chooseDuration(subscriptionPlanDuration)" />
                 </label>
                 }
             </div>
         </div>
         <div class="grid grid-cols-[repeat(auto-fit,minmax(228px,1fr))] gap-2.5 px-4 py-3 @3xl:grid-cols-4">
-            @for (subscriptionInfo of subscriptionInfos; track subscriptionInfo.id) {
+            @for (subscriptionPlanData of subscriptionPlansData; track subscriptionPlanData.id) {
             <div class="flex flex-1 flex-col gap-4 rounded-lg border border-solid border-[#dbe0e6] bg-white p-6">
                 <div class="flex flex-col gap-1">
-                    <h1 class="text-[#111418] text-base font-bold leading-tight">{{subscriptionInfo.title}}</h1>
+                    <h1 class="text-[#111418] text-base font-bold leading-tight">{{subscriptionPlanData.title}}</h1>
                     <p class="flex items-baseline gap-1 text-[#111418]">
                         <span
-                            class="text-[#111418] text-4xl font-black leading-tight tracking-[-0.033em]">${{subscriptionInfo.amount}}</span>
+                            class="text-[#111418] text-4xl font-black leading-tight tracking-[-0.033em]">${{subscriptionPlanData.amount}}</span>
                         <span
-                            class="text-[#111418] text-base font-bold leading-tight">/{{subscriptionInfo.duration?.slice(1)?.toLowerCase()}}</span>
+                            class="text-[#111418] text-base font-bold leading-tight">/{{subscriptionPlanData?.duration}}</span>
                     </p>
                 </div>
-                @for (feature of subscriptionInfo.features; track $index) {
+                @for (feature of subscriptionPlanData.features; track $index) {
                 <div class="flex flex-col gap-2">
                     <div class="text-[13px] font-normal leading-normal flex gap-3 text-[#111418]">
                         <div class="text-[#111418]" data-icon="Check" data-size="20px" data-weight="regular">
@@ -44,7 +44,7 @@
                 </div>
                 }
                 <p-button styleClass="w-full cursor-pointer" label="Choose plan" [loading]="loading"
-                    (onClick)="buyRazorPay(subscriptionInfo.amount)" />
+                    (onClick)="buyRazorPay(subscriptionPlanData.amount)" />
             </div>
             }
         </div>

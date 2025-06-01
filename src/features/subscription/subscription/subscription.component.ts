@@ -10,24 +10,25 @@ import { switchMap } from 'rxjs/internal/operators/switchMap';
 import { tap } from 'rxjs/internal/operators/tap';
 import { RazorPayOrderCreation, RazorPayOrderCreationPayload } from '../interface/razorpay-payment-interface';
 import { RazorpayPaymentService } from '../services/razorpay-payment.service';
-import { JsonPipe } from '@angular/common';
 import { SubscriptionStatus } from '../interface/subscription-status.interface';
-import { ApiStaticData } from '../../../app/shared/constants/api-static-data/api-static-data';
 import { SubscriptionInfoDetails } from '../interface/subscription-info-details.interface';
+import { SubscriptionPlanService } from '../services/subscription-plan.service';
+import { ApiStaticData } from '../constants/subscription-plans.constants';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Razorpay: any;
 
 @Component({
   selector: 'app-subscription',
-  imports: [ButtonModule, JsonPipe],
+  imports: [ButtonModule],
   templateUrl: './subscription.component.html',
   styleUrl: './subscription.component.scss'
 })
 export class SubscriptionComponent implements OnInit {
   public loading = false;
   public subscriptionEndDate = '';
-  public subscriptionInfos: SubscriptionInfoDetails[] = [];
-  public readonly subscriptionInfoData = ApiStaticData.subscriptionInfoData;
+  public subscriptionPlans: Record<string, SubscriptionInfoDetails[]> = {};
+  public subscriptionPlansData: SubscriptionInfoDetails[] = [];
+  public subscriptionPlanDurations: string[] = ApiStaticData.subscriptionPlanDuration
 
   private readonly userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') ?? '{}')
   private readonly router = inject(Router)
@@ -35,6 +36,7 @@ export class SubscriptionComponent implements OnInit {
   private readonly authService = inject(AuthService)
   private readonly destroyRef = inject(DestroyRef)
   private readonly razorpayPaymentService = inject(RazorpayPaymentService)
+  private readonly subscriptionPlanService = inject(SubscriptionPlanService)
 
   ngOnInit(): void {
     this.subscriptionStatusService.getSubscriptionStatus().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
@@ -42,7 +44,18 @@ export class SubscriptionComponent implements OnInit {
         this.subscriptionEndDate = new Date(res.subscriptionInfo?.endDate || '').toLocaleString();
       }
     })
-    this.chooseDuration(0)
+    this.subscriptionPlanService.getSubscriptionPlanByUserCategory(this.userInfo.id ?? '').pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (res: SubscriptionInfoDetails[]) => {
+        this.subscriptionPlans = Object.groupBy(res, ({ duration }) => duration) as Record<string, SubscriptionInfoDetails[]>;
+        const sortedSubscriptionPlans: [string, SubscriptionInfoDetails[]][] = this.subscriptionPlanDurations.map(key => [key, this.subscriptionPlans[key.trim()]])
+          .filter(([, value]) => Array.isArray(value) && value.length > 0) as [string, SubscriptionInfoDetails[]][];
+        this.subscriptionPlans = Object.fromEntries(sortedSubscriptionPlans);
+        this.subscriptionPlansData = structuredClone(this.subscriptionPlans[this.subscriptionPlanDurations[0]])
+      }
+    })
+    this.chooseDuration(this.subscriptionPlanDurations[0])
   }
 
   razorPayOptions = {
@@ -80,7 +93,7 @@ export class SubscriptionComponent implements OnInit {
     }
   }
 
-  buyRazorPay(amount: number): void {
+  public buyRazorPay(amount: number): void {
     this.loading = true
     const payload: RazorPayOrderCreationPayload = {
       "amount": amount, "receipt": "sfbbs", "payment_capture": 1, "userId": this.userInfo.id ?? '',
@@ -96,9 +109,7 @@ export class SubscriptionComponent implements OnInit {
     })
   }
 
-
-
-  chooseDuration(index: number): void {
-    this.subscriptionInfos = this.subscriptionInfoData[index];
+  public chooseDuration(subscriptionPlanDuration: string): void {
+    this.subscriptionPlansData = structuredClone(this.subscriptionPlans[subscriptionPlanDuration])
   }
 }

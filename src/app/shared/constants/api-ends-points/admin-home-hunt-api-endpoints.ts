@@ -24,6 +24,7 @@ export const ApiEndPoints = {
     Subscription: {
         status: 'subscription_status/',
         checkAndExpireUser: 'expire_subscribed_user/',
+        subscriptionPlanByUserCategory: 'v1/offers/get-subscription-plan-category/'
     },
 
     // Razorpay payment endpoints
