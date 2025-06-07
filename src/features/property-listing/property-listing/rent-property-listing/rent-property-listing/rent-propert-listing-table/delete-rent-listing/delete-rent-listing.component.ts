@@ -18,18 +18,22 @@ export class DeleteRentListingComponent {
   private readonly messageService = inject(MessageService)
   private readonly RentPropertyListingService = inject(RentPropertyListingService)
   private readonly destroyRef = inject(DestroyRef)
+  isShowConfirmPopUpVisible=false // temparory solution
 
   // its being used to delete the rent property listing in viewChild of rent-property-listing-table.component.ts
   public deleteRentListing(rentPropertyListData?: PropertyListing): void {
+    this.isShowConfirmPopUpVisible=true
     this.confirmationService.confirm({
       header: 'Are you sure?',
       message: 'Please confirm to proceed.',
       accept: () => {
         this.onDeleteRentPropertyListing(rentPropertyListData?._id ?? '');
         this.messageService.add({ severity: 'success', summary: 'Confirmed', detail: 'You have accepted' });
+        this.isShowConfirmPopUpVisible = false
       },
       reject: () => {
         this.messageService.add({ severity: 'info', summary: 'Rejected', detail: 'You have rejected' });
+        this.isShowConfirmPopUpVisible = false
       },
     });
   }

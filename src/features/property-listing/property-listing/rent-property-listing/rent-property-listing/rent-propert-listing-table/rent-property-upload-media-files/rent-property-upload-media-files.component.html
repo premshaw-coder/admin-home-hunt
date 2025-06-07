@@ -1,9 +1,9 @@
 <div class="card">
     <p-toast />
     @let showDragDropIcon = (this.uploadedFilesToS3 && this.uploadedFilesToS3.length > 0) ? false : true;
-    <p-fileupload fileLimit="5" name="files" [url]="uploadFilesUrl" [multiple]="true" accept="image/*"
+    <p-fileupload #fileUpload fileLimit="5" name="files" [url]="uploadFilesUrl" [multiple]="true" accept="image/*"
         (onSelect)="onSelectedFiles($event)" [customUpload]="true" (uploadHandler)="uploadHandler($event)">
-        <ng-template #header let-files let-chooseCallback="chooseCallback" let-clearCallback="clearCallback"
+        <ng-template #header let-files let-chooseCallback="chooseCallback"
             let-uploadCallback="uploadCallback">
             <div class="flex flex-wrap justify-between items-center flex-1 gap-4">
                 <div class="flex gap-2">
@@ -11,42 +11,37 @@
                         [outlined]="true" />
                     <p-button (onClick)="uploadEvent(uploadCallback)" icon="pi pi-cloud-upload" [rounded]="true"
                         [outlined]="true" severity="success" [disabled]="!files || files.length === 0" />
-                    <p-button (onClick)="clearCallback()" icon="pi pi-times" [rounded]="true" [outlined]="true"
-                        severity="danger" [disabled]="!files || files.length === 0" />
+                    <p-button (onClick)="onRemoveFiles($event)" icon="pi pi-times" [rounded]="true" [outlined]="true"
+                        severity="danger" [disabled]="files.length === 0 && uploadedFilesToS3.length===0" />
                 </div>
-                <p-progressbar [value]="totalSizePercent" [showValue]="false" class="w-full"
-                    styleClass="md:w-20rem h-1 w-full md:ml-auto">
-                    <span class="whitespace-nowrap">{{ totalSize }}B / 1Mb</span>
-                </p-progressbar>
             </div>
         </ng-template>
-        <ng-template #content let-files let-removeFileCallback="removeFileCallback">
+        <ng-template #content let-files>
             <div class="flex flex-col gap-8 pt-4">
                 <div *ngIf="files?.length > 0">
                     <h5>Pending</h5>
                     <div class="flex flex-wrap gap-4">
                         <div *ngFor="let file of files; let i = index"
                             class="p-8 rounded-border flex flex-col border border-surface items-center gap-4">
-                            <div>
-                                <img role="presentation" [alt]="file.name" [src]="file?.objectURL" width="100"
-                                    height="50" />
+                            <div class="image-container">
+                                <div>
+                                    <p-checkbox [inputId]="file.fileName" [name]="file.fileName" [value]="i"
+                                        [(ngModel)]="removeLocalFilesIndex" />
+                                </div>
+                                <label [for]="file.fileName" class="ml-2">
+                                    <img role="presentation" [alt]="file.name" [src]="file?.objectURL" fill />
+                                </label>
                             </div>
                             <span class="font-semibold text-ellipsis max-w-60 whitespace-nowrap overflow-hidden">{{
                                 file.name }}</span>
                             <div>{{ formatSize(file.size) }}</div>
                             <p-badge value="Pending" severity="warn" />
-                            <p-button icon="pi pi-times"
-                                (click)="onRemoveTemplatingFile($event, file, removeFileCallback, i)" [outlined]="true"
-                                [rounded]="true" severity="danger" />
                         </div>
                     </div>
                 </div>
                 <div *ngIf="(uploadedFilesToS3?.length ?? 0) > 0">
                     <div class="flex justify-between">
                         <h5>Completed</h5>
-                        <p-button title="Remove File" [loading]="filesToDelete" (onClick)="removeUploadedFiles()"
-                            icon="pi pi-times" [outlined]="true" [rounded]="true" severity="danger"
-                            [disabled]="removeFiles.length > 0" />
                     </div>
                     <div class="flex flex-wrap gap-4">
                         <div *ngFor="let file of uploadedFilesToS3; let i = index"
@@ -81,3 +76,20 @@
         </ng-template>
     </p-fileupload>
 </div>
+
+<p-confirmdialog #cd>
+    <ng-template #headless let-message let-onAccept="onAccept" let-onReject="onReject">
+        <div class="flex flex-col items-center p-8 bg-surface-0 dark:bg-surface-900 rounded">
+            <div
+                class="rounded-full bg-red-500 text-primary-contrast inline-flex justify-center items-center h-24 w-24 -mt-20">
+                <i class="pi pi-question !text-5xl"></i>
+            </div>
+            <span class="font-bold text-2xl block mb-2 mt-6">{{ message.header }}</span>
+            <p class="mb-0">{{ message.message }}</p>
+            <div class="flex items-center gap-2 mt-6">
+                <p-button label="Cancel" [outlined]="true" (onClick)="onReject()" styleClass="w-32"></p-button>
+                <p-button label="Delete" (onClick)="onAccept()" styleClass="w-32"></p-button>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmdialog>

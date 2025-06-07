@@ -1,5 +1,5 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
-import { MessageService } from 'primeng/api';
+import { Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { PrimeNG } from 'primeng/config';
 import { FileUpload, FileUploadEvent, FileUploadHandlerEvent } from 'primeng/fileupload';
 import { CardModule } from 'primeng/card';
@@ -7,7 +7,6 @@ import { ButtonModule } from 'primeng/button';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { BadgeModule } from 'primeng/badge';
 import { HttpEvent } from '@angular/common/http';
-import { ProgressBar } from 'primeng/progressbar';
 import { ToastModule } from 'primeng/toast';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { RentPropertyFilesUploadService } from '../../../services/files-upload/rent-property-files-upload.service';
@@ -18,19 +17,21 @@ import { fileCompression } from '../../../../../../../app/shared/reusable-functi
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Checkbox } from 'primeng/checkbox';
 import { FormsModule } from '@angular/forms';
+import { ConfirmDialog } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-rent-property-upload-media-files',
-  imports: [FileUpload, ButtonModule, BadgeModule, ProgressBar, ToastModule, CommonModule, NgOptimizedImage, CardModule, Checkbox, FormsModule],
+  imports: [FileUpload, ButtonModule, BadgeModule, ToastModule, CommonModule,
+    NgOptimizedImage, CardModule, Checkbox, FormsModule, ConfirmDialog
+  ],
   providers: [MessageService],
 
   templateUrl: './rent-property-upload-media-files.component.html',
   styleUrl: './rent-property-upload-media-files.component.scss'
 })
 export class RentPropertyUploadMediaFilesComponent implements OnInit {
+  @ViewChild('fileUpload') fileUpload!: FileUpload;
   public files: File[] = [];
-  public totalSize = 0;
-  public totalSizePercent = 0;
   public uploadedFilesToS3: PropertyImage[] = [];
   public uploadFilesUrl = '';
 
@@ -38,6 +39,7 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
   private isFilesUploadedToS3bucket = false;
 
   public removeFiles: PropertyImage[] = [];
+  public removeLocalFilesIndex: number[] = []
   public filesToDelete = false
 
   public readonly dialogRef = inject(DynamicDialogRef)
@@ -46,6 +48,7 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
   private readonly config = inject(PrimeNG);
   private readonly messageService = inject(MessageService);
   private readonly destroyRef = inject(DestroyRef)
+  private readonly confirmationService = inject(ConfirmationService)
 
   ngOnInit(): void {
     this.propertyOwnerId = this.dialogConfig?.data?.propertyRentListData?._id;
@@ -58,20 +61,8 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
     callback();
   }
 
-  public onRemoveTemplatingFile(event: Event, file: File, removeFileCallback: (event: Event, index: number) => void, index: number): void {
-    removeFileCallback(event, index);
-    this.totalSize -= parseInt(this.formatSize(file.size));
-    this.totalSizePercent = this.totalSize / 10;
-  }
-
   public onSelectedFiles(event: { originalEvent: Event; files: File[] }): void {
     this.files = Array.isArray(event.files) ? event.files : [];
-
-    this.files?.forEach((file: File) => {
-      this.totalSize += parseInt(this.formatSize(file.size));
-    });
-
-    this.totalSizePercent = this.totalSize / 10;
   }
 
   public uploadEvent(callback: () => void): void {
@@ -136,6 +127,26 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
       });
   }
 
+
+  public onRemoveFiles(event?: Event): void {
+    if (this.removeFiles.length > 0 && this.removeLocalFilesIndex?.length > 0 && event) {
+      this.onDeleteConfirm(() => {
+        this.removeLocalFiles(event);
+        this.removeUploadedFiles();
+      });
+      return
+    }
+
+    if (this.removeLocalFilesIndex?.length > 0 && event) {
+      this.onDeleteConfirm(() => this.removeLocalFiles(event))
+      return
+    }
+
+    if (this.removeFiles.length > 0) {
+      this.onDeleteConfirm(() => this.removeUploadedFiles())
+    }
+  }
+
   private uploadFilesToS3(formData: FormData, event: FileUploadHandlerEvent): void {
     // Make the HTTP request with the Bearer token
     this.S3FilesService.uploadFilesToS3Bucket(formData, this.propertyOwnerId).pipe(takeUntilDestroyed(this.destroyRef))
@@ -193,6 +204,30 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
       summary: 'Success',
       detail: 'File Uploaded',
       life: 3000
+    });
+  }
+
+  private onDeleteConfirm(onAccept: () => void): void {
+    this.confirmationService.confirm({
+      header: 'Are you sure?',
+      message: 'Please confirm to proceed.',
+      accept: () => {
+        onAccept();
+        this.messageService.add({ severity: 'success', summary: 'Confirmed', detail: 'You have accepted' });
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'info', summary: 'Rejected', detail: 'You have rejected' });
+      },
+    });
+  }
+
+  private removeLocalFiles(event: Event) {
+    // Sort indices in descending order to avoid shifting issues
+    this.removeLocalFilesIndex.toSorted((a, b) => b - a).forEach(index => {
+      if (this.fileUpload && this.fileUpload.files.length > index) {
+        this.fileUpload.remove(event, index)
+      };
+      this.removeLocalFilesIndex = [];
     });
   }
 }
