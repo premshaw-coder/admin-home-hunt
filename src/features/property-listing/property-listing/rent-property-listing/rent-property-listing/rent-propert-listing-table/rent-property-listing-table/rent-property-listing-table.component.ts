@@ -115,7 +115,10 @@ export class RentPropertyListingTableComponent implements OnInit {
   }
 
   private confirmDeleteRentListing(rentPropertyListData: PropertyListing): void {
-    this.deleteRentListingComponentRef.deleteRentListing(rentPropertyListData)
+    this.deleteRentListingComponentRef.isShowConfirmPopUpVisible = true;
+    setTimeout(()=>{
+      this.deleteRentListingComponentRef.deleteRentListing(rentPropertyListData)
+    },0)
   }
 
   private uploadFiles(propertyRentListData: PropertyListing): void {

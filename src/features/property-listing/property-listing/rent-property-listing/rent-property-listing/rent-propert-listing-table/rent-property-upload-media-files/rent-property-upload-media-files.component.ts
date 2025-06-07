@@ -131,7 +131,7 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
 
   public onRemoveFiles(event?: Event): void {
     const { header, message } = this.CreateMessageAndHeaderTitle();
-    let confirmPopUpConfig: ConfirmPopUpConfig = this.confirmPopUp.confirmDialogConfiguration(header, message);
+    const confirmPopUpConfig: ConfirmPopUpConfig = this.confirmPopUp.confirmDialogConfiguration(header, message);
     const OnAccept = () => {
       if (this.removeFiles.length > 0 && this.removeLocalFilesIndex?.length > 0 && event) {
         this.removeLocalFiles(event);
@@ -146,10 +146,7 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
     const OnReject = () => {
       // Optional: logic for reject
     };
-
-    confirmPopUpConfig = { ...confirmPopUpConfig, OnAccept, OnReject };
-
-    this.confirmPopUp.onDeleteConfirm(confirmPopUpConfig);
+    this.confirmPopUp.onDeleteConfirm({ ...confirmPopUpConfig, OnAccept, OnReject });
   }
 
   private uploadFilesToS3(formData: FormData, event: FileUploadHandlerEvent): void {
