@@ -44,15 +44,20 @@ export class SubscriptionComponent implements OnInit {
         this.subscriptionEndDate = new Date(res.subscriptionInfo?.endDate || '').toLocaleString();
       }
     })
-    this.subscriptionPlanService.getSubscriptionPlanByUserCategory(this.userInfo.id ?? '').pipe(
+    this.subscriptionPlanService.getSubscriptionPlanByUserCategory(this.userInfo?.id ?? '').pipe(
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (res: SubscriptionInfoDetails[]) => {
         this.subscriptionPlans = Object.groupBy(res, ({ duration }) => duration) as Record<string, SubscriptionInfoDetails[]>;
-        const sortedSubscriptionPlans: [string, SubscriptionInfoDetails[]][] = this.subscriptionPlanDurations.map(key => [key, this.subscriptionPlans[key.trim()]])
+        const sortedSubscriptionPlansByDuration: [string, SubscriptionInfoDetails[]][] = this.subscriptionPlanDurations
+          .map((duration: string) => {
+            const subscriptionPlans = this.subscriptionPlans[duration.trim()];
+            const sortedSubscriptionPlansByTile = this.getSortedSubscriptionPlansByTile(subscriptionPlans);
+            return [duration, sortedSubscriptionPlansByTile];
+          })
           .filter(([, value]) => Array.isArray(value) && value.length > 0) as [string, SubscriptionInfoDetails[]][];
-        this.subscriptionPlans = Object.fromEntries(sortedSubscriptionPlans);
-        this.subscriptionPlansData = structuredClone(this.subscriptionPlans[this.subscriptionPlanDurations[0]])
+        this.subscriptionPlans = Object.fromEntries(sortedSubscriptionPlansByDuration);
+        this.subscriptionPlansData = structuredClone(this.subscriptionPlans[this.subscriptionPlanDurations[0]]);
       }
     })
     this.chooseDuration(this.subscriptionPlanDurations[0])
@@ -111,5 +116,13 @@ export class SubscriptionComponent implements OnInit {
 
   public chooseDuration(subscriptionPlanDuration: string): void {
     this.subscriptionPlansData = structuredClone(this.subscriptionPlans[subscriptionPlanDuration])
+  }
+
+  private getSortedSubscriptionPlansByTile(subscriptionPlans: SubscriptionInfoDetails[]): SubscriptionInfoDetails[] {
+    return ApiStaticData?.subscriptionCategories?.map((category: string) => {
+      const subscriptionPlansIndex = subscriptionPlans
+        .findIndex((subscriptionPlan: SubscriptionInfoDetails) => subscriptionPlan.title === category);
+      return subscriptionPlans[subscriptionPlansIndex];
+    });
   }
 }
