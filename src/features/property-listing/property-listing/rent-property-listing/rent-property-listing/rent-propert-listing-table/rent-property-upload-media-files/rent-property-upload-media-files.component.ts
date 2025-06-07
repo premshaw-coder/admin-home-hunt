@@ -1,5 +1,5 @@
 import { Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { PrimeNG } from 'primeng/config';
 import { FileUpload, FileUploadEvent, FileUploadHandlerEvent } from 'primeng/fileupload';
 import { CardModule } from 'primeng/card';
@@ -17,13 +17,13 @@ import { fileCompression } from '../../../../../../../app/shared/reusable-functi
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Checkbox } from 'primeng/checkbox';
 import { FormsModule } from '@angular/forms';
-import { ConfirmDialog } from 'primeng/confirmdialog';
+import { ConfirmationPopupComponent } from "../../../../../../../app/shared/components/confirmation-popup/confirmation-popup.component";
+import { ConfirmPopUpConfig } from '../../../../../../../app/shared/interfaces/confirmDialog.interface';
 
 @Component({
   selector: 'app-rent-property-upload-media-files',
   imports: [FileUpload, ButtonModule, BadgeModule, ToastModule, CommonModule,
-    NgOptimizedImage, CardModule, Checkbox, FormsModule, ConfirmDialog
-  ],
+    NgOptimizedImage, CardModule, Checkbox, FormsModule, ConfirmationPopupComponent],
   providers: [MessageService],
 
   templateUrl: './rent-property-upload-media-files.component.html',
@@ -31,6 +31,8 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
 })
 export class RentPropertyUploadMediaFilesComponent implements OnInit {
   @ViewChild('fileUpload') fileUpload!: FileUpload;
+  @ViewChild('confirmPopUp', { static: false }) confirmPopUp!: ConfirmationPopupComponent;
+  
   public files: File[] = [];
   public uploadedFilesToS3: PropertyImage[] = [];
   public uploadFilesUrl = '';
@@ -48,7 +50,6 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
   private readonly config = inject(PrimeNG);
   private readonly messageService = inject(MessageService);
   private readonly destroyRef = inject(DestroyRef)
-  private readonly confirmationService = inject(ConfirmationService)
 
   ngOnInit(): void {
     this.propertyOwnerId = this.dialogConfig?.data?.propertyRentListData?._id;
@@ -129,22 +130,26 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
 
 
   public onRemoveFiles(event?: Event): void {
-    if (this.removeFiles.length > 0 && this.removeLocalFilesIndex?.length > 0 && event) {
-      this.onDeleteConfirm(() => {
+    const { header, message } = this.CreateMessageAndHeaderTitle();
+    let confirmPopUpConfig: ConfirmPopUpConfig = this.confirmPopUp.confirmDialogConfiguration(header, message);
+    const OnAccept = () => {
+      if (this.removeFiles.length > 0 && this.removeLocalFilesIndex?.length > 0 && event) {
         this.removeLocalFiles(event);
         this.removeUploadedFiles();
-      });
-      return
-    }
+      } else if (this.removeLocalFilesIndex?.length > 0 && event) {
+        this.removeLocalFiles(event);
+      } else if (this.removeFiles.length > 0) {
+        this.removeUploadedFiles();
+      }
+    };
 
-    if (this.removeLocalFilesIndex?.length > 0 && event) {
-      this.onDeleteConfirm(() => this.removeLocalFiles(event))
-      return
-    }
+    const OnReject = () => {
+      // Optional: logic for reject
+    };
 
-    if (this.removeFiles.length > 0) {
-      this.onDeleteConfirm(() => this.removeUploadedFiles())
-    }
+    confirmPopUpConfig = { ...confirmPopUpConfig, OnAccept, OnReject };
+
+    this.confirmPopUp.onDeleteConfirm(confirmPopUpConfig);
   }
 
   private uploadFilesToS3(formData: FormData, event: FileUploadHandlerEvent): void {
@@ -207,28 +212,30 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
     });
   }
 
-  private onDeleteConfirm(onAccept: () => void): void {
-    this.confirmationService.confirm({
-      header: 'Are you sure?',
-      message: 'Please confirm to proceed.',
-      accept: () => {
-        onAccept();
-        this.messageService.add({ severity: 'success', summary: 'Confirmed', detail: 'You have accepted' });
-      },
-      reject: () => {
-        this.messageService.add({ severity: 'info', summary: 'Rejected', detail: 'You have rejected' });
-      },
-    });
-  }
-
-  private removeLocalFiles(event: Event) {
+  private removeLocalFiles(event: Event): void {
     // Sort indices in descending order to avoid shifting issues
-    this.removeLocalFilesIndex.toSorted((a, b) => b - a).forEach(index => {
+    this.removeLocalFilesIndex.toSorted((a: number, b: number) => b - a).forEach((index: number) => {
       if (this.fileUpload && this.fileUpload.files.length > index) {
         this.fileUpload.remove(event, index)
       };
-      this.removeLocalFilesIndex = [];
     });
+    this.removeLocalFilesIndex = [];
+  }
+
+  private CreateMessageAndHeaderTitle(): Record<string, string> {
+    let message = '';
+    let header = '';
+    if (this.removeFiles.length > 0 && this.removeLocalFilesIndex?.length > 0) {
+      message = 'delete local and uploaded files?';
+      header = 'Are you sure?';
+    } else if (this.removeLocalFilesIndex?.length > 0) {
+      message = 'delete local files?';
+      header = 'Are you sure?';
+    } else if (this.removeFiles.length > 0) {
+      message = 'delete uploaded files?';
+      header = 'Are you sure?';
+    }
+    return { header, message }
   }
 }
 
