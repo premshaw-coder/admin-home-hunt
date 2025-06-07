@@ -24,7 +24,7 @@ declare let Razorpay: any;
   styleUrl: './subscription.component.scss'
 })
 export class SubscriptionComponent implements OnInit {
-  public loading = false;
+  public loadingStates: Record<number, boolean> = {};
   public subscriptionEndDate = '';
   public subscriptionPlans: Record<string, SubscriptionInfoDetails[]> = {};
   public subscriptionPlansData: SubscriptionInfoDetails[] = [];
@@ -99,7 +99,7 @@ export class SubscriptionComponent implements OnInit {
   }
 
   public buyRazorPay(amount: number): void {
-    this.loading = true
+    this.loadingStates[amount] = true;
     const payload: RazorPayOrderCreationPayload = {
       "amount": amount, "receipt": "sfbbs", "payment_capture": 1, "userId": this.userInfo.id ?? '',
     }
@@ -110,7 +110,7 @@ export class SubscriptionComponent implements OnInit {
       this.razorPayOptions.order_id = res['id'] ?? ''
       const rzp1 = new Razorpay(this.razorPayOptions);
       rzp1.open()
-      this.loading = false
+      this.loadingStates[amount] = false;
     })
   }
 
