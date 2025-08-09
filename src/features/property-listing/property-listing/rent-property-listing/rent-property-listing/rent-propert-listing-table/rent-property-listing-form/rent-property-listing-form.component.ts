@@ -33,6 +33,7 @@ export class RentPropertyListingFormComponent implements OnInit {
   private readonly furnishingStatusValues: PropertyListingForm[] = ApiStaticData.furnishingStatusValues;
   private readonly propertyFacingValues: PropertyListingForm[] = ApiStaticData.propertyFacingValues;
   private readonly propertyParkingValues: PropertyListingForm[] = ApiStaticData.propertyParkingValues;
+  private readonly provertyAvailability: PropertyListingForm[] = ApiStaticData.provertyAvailabilityValues;
   private readonly userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') ?? '{}')
   private isEditMode!: boolean;
   private rentPropertyData!: PropertyListing
@@ -62,14 +63,14 @@ export class RentPropertyListingFormComponent implements OnInit {
     { id: 13, control: 'propertyDescription', placeholder: 'Enter description' },
     { id: 14, control: 'propertyPostedBy', placeholder: 'Enter Owner name' },
     { id: 15, control: 'propertyCost', placeholder: 'Enter Cost' },
-    { id: 16, control: 'availability', placeholder: 'Enter availability' },
-    { id: 17, control: 'propertySecurityDeposit', placeholder: 'Enter security eposit' },
-    { id: 18, control: 'propertyCoveredArea', placeholder: 'covered area' },
-    { id: 19, control: 'propertTotalBathroom', placeholder: 'Enter total bathroom' },
-    { id: 20, control: 'propertyFloors', placeholder: 'Enter floors' },
+    { id: 16, control: 'propertySecurityDeposit', placeholder: 'Enter security eposit' },
+    { id: 17, control: 'propertyCoveredArea', placeholder: 'covered area' },
+    { id: 18, control: 'propertTotalBathroom', placeholder: 'Enter total bathroom' },
+    { id: 19, control: 'propertyFloors', placeholder: 'Enter floors' },
   ];
 
   public propertyDetailsFormSelectData = [
+    { id: 20, control: 'availability', placeholder: 'Enter availability', values: this.provertyAvailability },
     { id: 21, control: 'bhkType', placeholder: 'Enter bhk', values: this.bhktypeValues },
     { id: 22, control: 'furnishingStatus', placeholder: 'Enter furnishing', values: this.furnishingStatusValues },
     { id: 23, control: 'propertyFacing', placeholder: 'Enter Facing', values: this.propertyFacingValues },
@@ -168,7 +169,7 @@ export class RentPropertyListingFormComponent implements OnInit {
         propertyOwner: 'John Doe',
         propertyPostedBy: 'John Doe',
         propertyCost: '35000',
-        availability: 'Immediate',
+        availability: 0,
         bhkType: this.bhktypeValues[0],
         propertyType: this.propertypeValues[0],
         propertySecurityDeposit: '100000',
@@ -256,5 +257,4 @@ export class RentPropertyListingFormComponent implements OnInit {
       },
     });
   }
-
 }

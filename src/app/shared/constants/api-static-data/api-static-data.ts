@@ -35,4 +35,10 @@ export const ApiStaticData = {
     propertyParkingValues: [
         { name: '2wheeler', code: '2wheeler' }, { name: '4wheeler', code: '4wheeler' }, { name: 'both', code: 'both' }
     ] as PropertyListingForm[],
+    provertyAvailabilityValues: [
+        { name: 'Immediate', code: 0 },
+        { name: 'Within 30 days', code: 1 },
+        { name: 'Within 45 days', code: 2 },
+        { name: 'More than 45 days', code: 3 },
+    ] as PropertyListingForm[]
 }

@@ -51,7 +51,7 @@ export interface PropertyDetails {
     propertyOwner: string;
     propertyPostedBy: string;
     propertyCost: number;
-    availability: string;
+    availability: 0 | 1 | 2 | 3;
     bhkType: string;
     propertyType: string;
     propertySecurityDeposit: number;

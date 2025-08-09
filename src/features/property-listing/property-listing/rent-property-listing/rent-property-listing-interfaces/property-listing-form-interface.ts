@@ -1,4 +1,4 @@
 export interface PropertyListingForm {
     name: string;
-    code: string;
+    code: string | number;
 }
