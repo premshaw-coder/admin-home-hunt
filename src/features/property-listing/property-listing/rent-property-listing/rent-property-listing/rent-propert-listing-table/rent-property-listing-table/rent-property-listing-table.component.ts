@@ -109,7 +109,7 @@ export class RentPropertyListingTableComponent implements OnInit {
   }
 
   private onRegeneratedSignedUrlFilesUploadedToS3bucket(): void {
-    this.S3FilesService.refetchRentPropertTableData.asObservable().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res: boolean) => {
+    this.S3FilesService.refetchRentPropertyTableData.asObservable().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res: boolean) => {
       if (res) this.getAllRentPropertyListingByProperOwner()
     })
   }

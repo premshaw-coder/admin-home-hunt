@@ -28,7 +28,8 @@ export class PropertyListingComponent {
       { label: 'Lease property', value: 2, route: RoutesPaths.PropertyListing.lease },
     ];
     this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd), map(() => this.router.url)).pipe(takeUntilDestroyed(this.destroyRef))
+      filter(event => event instanceof NavigationEnd), map(() => this.router.url))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(url => {
         this.currentUrl = url.split('/').pop() ?? '';
       });

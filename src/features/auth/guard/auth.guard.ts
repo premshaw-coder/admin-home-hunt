@@ -3,7 +3,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { RoutesPaths } from '../../../app/shared/constants/application-routes/app-routes';
 import { SubscriptionStatusService } from '../../property-listing/services/subscription-status.service';
-import { map } from 'rxjs/internal/operators/map';
+import { map } from 'rxjs/operators';
 import { SubscriptionStatus } from '../../subscription/interface/subscription-status.interface';
 import { SubscriptionService } from '../../subscription/services/subscription.service';
 import { SUBSCRIPTION_STATUS } from '../../../app/shared/constants/subscription-status/subscription-status';

@@ -13,7 +13,7 @@ export const ApiEndPoints = {
     RentProperty: {
         addListing: `${BASE_PROPERTY_RENT}/add-house`,
         editListing: `${BASE_PROPERTY_RENT}/update-house-by-propertyOwner/`,
-        getAllPropertyListingByByOwner: `${BASE_PROPERTY_RENT}/get-all-house-by-propertyOwner/`,
+        getAllPropertyListingByOwner: `${BASE_PROPERTY_RENT}/get-all-house-by-propertyOwner/`,
         deleteS3Files: `${BASE_PROPERTY_RENT}/delete-files`,
         deleteListing: `${BASE_PROPERTY_RENT}/delete-house/`,
         regenerateS3FilesSignedUrl: `${BASE_PROPERTY_RENT}/re-generate-signed-url/`,

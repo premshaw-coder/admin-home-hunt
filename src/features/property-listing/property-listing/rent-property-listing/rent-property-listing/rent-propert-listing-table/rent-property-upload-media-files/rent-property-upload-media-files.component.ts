@@ -97,7 +97,7 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
           console.error('Error Deleting File:', err);
         },
         complete: () => {
-          this.S3FilesService.refetchRentPropertTableData.next(true);
+          this.S3FilesService.refetchRentPropertyTableData.next(true);
           this.filesToDelete = false;
         }
       });
@@ -185,7 +185,7 @@ export class RentPropertyUploadMediaFilesComponent implements OnInit {
             this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error Regenerating File', life: 3000 });
           },
           complete: () => {
-            this.S3FilesService.refetchRentPropertTableData.next(true);
+            this.S3FilesService.refetchRentPropertyTableData.next(true);
           }
         })
     }

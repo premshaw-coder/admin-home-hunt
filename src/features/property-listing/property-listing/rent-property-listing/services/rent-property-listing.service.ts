@@ -22,7 +22,7 @@ export class RentPropertyListingService {
   }
 
   public getAllRentPropertyListingByProperOwner(propertyOwnerUUID: string): Observable<PropertyListing[]> {
-    return this.httpService.get<PropertyListing[]>(environment.baseUrl + environment.apiVersion + ApiEndPoints.RentProperty.getAllPropertyListingByByOwner + propertyOwnerUUID);
+    return this.httpService.get<PropertyListing[]>(environment.baseUrl + environment.apiVersion + ApiEndPoints.RentProperty.getAllPropertyListingByOwner + propertyOwnerUUID);
   }
 
   public deleteRentPropertyListing(propertyOwnerId: string): Observable<PropertyDeleteResponse> {

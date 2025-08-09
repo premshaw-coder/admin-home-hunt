@@ -10,7 +10,7 @@ export const RoutesPaths = {
         base: BASE_AUTH,
         login: `${BASE_AUTH}/login`,
         signUp: `${BASE_AUTH}/sign-up`,
-        resetPassword: `${BASE_AUTH}/reset-pass word`,
+        resetPassword: `${BASE_AUTH}/reset-password`,
     },
 
     // Property Listing Routes

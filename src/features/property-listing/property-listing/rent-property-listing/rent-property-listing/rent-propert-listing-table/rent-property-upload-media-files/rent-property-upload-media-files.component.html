@@ -11,7 +11,7 @@
                     <p-button (onClick)="uploadEvent(uploadCallback)" icon="pi pi-cloud-upload" [rounded]="true"
                         [outlined]="true" severity="success" [disabled]="!files || files.length === 0" />
                     <p-button (onClick)="onRemoveFiles($event)" icon="pi pi-times" [rounded]="true" [outlined]="true"
-                        severity="danger" [disabled]="files.length === 0 && uploadedFilesToS3.length===0" />
+                        severity="danger" [disabled]="removeLocalFilesIndex.length === 0 && removeFiles.length===0" />
                 </div>
             </div>
         </ng-template>

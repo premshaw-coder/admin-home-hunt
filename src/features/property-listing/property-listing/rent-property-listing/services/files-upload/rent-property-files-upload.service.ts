@@ -12,7 +12,7 @@ import { PropertyListingDeleteFilesApiResponse } from '../../rent-property-listi
 })
 export class RentPropertyFilesUploadService {
 
-  public refetchRentPropertTableData: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public refetchRentPropertyTableData: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   private readonly httpService = inject(HttpClient)
 
