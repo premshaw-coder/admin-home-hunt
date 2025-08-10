@@ -99,6 +99,7 @@ describe('SignUpComponent', () => {
       name: 'John Doe', email: 'prem@gmail.com', password: 'password123', phoneNumber: 1234567890,
     };
     const mockAuthApiResponse: AuthApiResponse = {
+      id: "1", // Added missing 'id' property
       name: "John Doe",
       email: "john.doe@example.com",
       auth_type: "email",

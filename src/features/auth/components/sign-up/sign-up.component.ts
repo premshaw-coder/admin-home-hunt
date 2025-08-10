@@ -18,14 +18,32 @@ import { ToastModule } from 'primeng/toast';
   styleUrl: './sign-up.component.scss'
 })
 export class SignUpComponent implements OnInit {
-  signUpForm!: FormGroup<AuthFormControl>
-
-  private authService = inject(AuthService)
-  private commonService = inject(CommonToastService)
-  private destroyRef = inject(DestroyRef)
+  public signUpForm!: FormGroup<AuthFormControl>
+  private readonly authService = inject(AuthService)
+  private readonly commonService = inject(CommonToastService)
+  private readonly destroyRef = inject(DestroyRef)
 
   ngOnInit(): void {
     this.setForm()
+  }
+
+  public onSubmit(signUpFormData: AuthFormData): void {
+    if (this.isFormInValid()) {
+      return
+    }
+    signUpFormData = { ...signUpFormData, user_type: 'Property-Owner' }
+    this.authService.signUpWithEmailAndPassword(signUpFormData)
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: () => {
+          this.commonService.successToast('User Registered Successfully')
+        },
+        error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
+          this.commonService.errorToast(err.error.errMsg, err.error?.data?.message)
+        },
+        complete: () => {
+          this.signUpForm.reset()
+        },
+      })
   }
 
   private setForm(): void {
@@ -36,25 +54,6 @@ export class SignUpComponent implements OnInit {
       password: new FormControl('', [Validators.minLength(8), Validators.maxLength(20),
       Validators.required]),
     })
-  }
-
-  onSubmit(signUpFormData: AuthFormData): void {
-    if (this.isFormInValid()) {
-      return
-    }
-    signUpFormData = { ...signUpFormData, user_type: 'Property-Owner' }
-    this.authService.signUpWithEmailAndPassword(signUpFormData)
-      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: async () => {
-          this.commonService.successToast('User Registered Successfully')
-        },
-        error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
-          this.commonService.errorToast(err.error.errMsg, err.error?.data?.message)
-        },
-        complete: () => {
-          this.signUpForm.reset()
-        },
-      })
   }
 
   private isFormInValid(): boolean {

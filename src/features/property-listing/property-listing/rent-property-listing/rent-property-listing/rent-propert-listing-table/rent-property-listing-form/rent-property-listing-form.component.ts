@@ -4,7 +4,7 @@ import { ButtonModule } from 'primeng/button';
 import { StepperModule } from 'primeng/stepper';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { ApiStaticData } from '../../../../../../../app/shared/api-static-data/api-static-data';
+import { ApiStaticData } from '../../../../../../../app/shared/constants/api-static-data/api-static-data';
 import { SelectModule } from 'primeng/select';
 import { NgClass } from '@angular/common';
 import { RentPropertyListingService } from '../../../services/rent-property-listing.service';
@@ -26,22 +26,25 @@ import { MessageService } from 'primeng/api';
   styleUrl: './rent-property-listing-form.component.scss',
 })
 export class RentPropertyListingFormComponent implements OnInit {
-  RentPropertyListingForm!: FormGroup;
-  private bhktypeValues: PropertyListingForm[] = ApiStaticData.bhktypeValues;
-  private propertypeValues: PropertyListingForm[] = ApiStaticData.propertyTypeValues;
-  private propertyPreferredTenantsValues: PropertyListingForm[] = ApiStaticData.propertyPreferredTenantsValues;
-  private furnishingStatusValues: PropertyListingForm[] = ApiStaticData.furnishingStatusValues;
-  private propertyFacingValues: PropertyListingForm[] = ApiStaticData.propertyFacingValues;
-  private propertyParkingValues: PropertyListingForm[] = ApiStaticData.propertyParkingValues;
-  private userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') || '{}')
+  public RentPropertyListingForm!: FormGroup;
+  private readonly bhktypeValues: PropertyListingForm[] = ApiStaticData.bhktypeValues;
+  private readonly availabilityValues: PropertyListingForm[] = ApiStaticData.availabilityValues;
+  private readonly bathroomValues: PropertyListingForm[] = ApiStaticData.bathroomValues;
+  private readonly floorValues: PropertyListingForm[] = ApiStaticData.floorValues;
+  private readonly propertypeValues: PropertyListingForm[] = ApiStaticData.propertyTypeValues;
+  private readonly propertyPreferredTenantsValues: PropertyListingForm[] = ApiStaticData.propertyPreferredTenantsValues;
+  private readonly furnishingStatusValues: PropertyListingForm[] = ApiStaticData.furnishingStatusValues;
+  private readonly propertyFacingValues: PropertyListingForm[] = ApiStaticData.propertyFacingValues;
+  private readonly propertyParkingValues: PropertyListingForm[] = ApiStaticData.propertyParkingValues;
+  private readonly userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') ?? '{}')
   private isEditMode!: boolean;
   private rentPropertyData!: PropertyListing
 
-  private messageService = inject(MessageService);
-  private rentPropertyListingService = inject(RentPropertyListingService)
-  private destroyRef = inject(DestroyRef)
-  public dialogConfig = inject(DynamicDialogConfig)
-  public dialogRef = inject(DynamicDialogRef)
+  public readonly dialogConfig = inject(DynamicDialogConfig)
+  public readonly dialogRef = inject(DynamicDialogRef)
+  private readonly messageService = inject(MessageService);
+  private readonly rentPropertyListingService = inject(RentPropertyListingService)
+  private readonly destroyRef = inject(DestroyRef)
 
   public propertyFullAddressFormData = [
     { id: 1, control: 'propertyCityName', placeholder: 'Enter city' },
@@ -62,11 +65,8 @@ export class RentPropertyListingFormComponent implements OnInit {
     { id: 13, control: 'propertyDescription', placeholder: 'Enter description' },
     { id: 14, control: 'propertyPostedBy', placeholder: 'Enter Owner name' },
     { id: 15, control: 'propertyCost', placeholder: 'Enter Cost' },
-    { id: 16, control: 'availability', placeholder: 'Enter availability' },
     { id: 17, control: 'propertySecurityDeposit', placeholder: 'Enter security eposit' },
     { id: 18, control: 'propertyCoveredArea', placeholder: 'covered area' },
-    { id: 19, control: 'propertTotalBathroom', placeholder: 'Enter total bathroom' },
-    { id: 20, control: 'propertyFloors', placeholder: 'Enter floors' },
   ];
 
   public propertyDetailsFormSelectData = [
@@ -76,17 +76,128 @@ export class RentPropertyListingFormComponent implements OnInit {
     { id: 24, control: 'propertyParking', placeholder: 'Enter Parking', values: this.propertyParkingValues },
     { id: 25, control: 'propertyType', placeholder: 'Enter Type', values: this.propertypeValues },
     { id: 26, control: 'propertyPreferredTenants', placeholder: 'Enter preferred tenants', values: this.propertyPreferredTenantsValues },
+    { id: 19, control: 'propertTotalBathroom', placeholder: 'Enter total bathroom', values: this.bathroomValues },
+    { id: 20, control: 'propertyFloors', placeholder: 'Enter floors', values: this.floorValues },
+    { id: 16, control: 'availability', placeholder: 'Enter availability', values: this.availabilityValues },
   ]
 
   ngOnInit() {
     this.initiliseForm()
     this.testFormData()
-    this.isEditMode = this.dialogConfig?.data?.edit || false;
+    this.isEditMode = this.dialogConfig?.data?.edit ?? false;
     this.rentPropertyData = this.dialogConfig?.data?.propertyRentListData;
     this.patchFormData()
   }
 
-  initiliseForm() {
+  public onSubmit(): void {
+    if (this.RentPropertyListingForm.invalid) return;
+    else if (!this.isEditMode) {
+      this.createRentPropertyListing(this.createPaylaod())
+      return;
+    }
+    else this.editRentPropertyListing(this.createPaylaod())
+  }
+
+  private editRentPropertyListing(formData: PropertyListing): void {
+    this.rentPropertyListingService.editRentPropertyListing(formData, this.rentPropertyData?._id ?? '').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.messageService.add({ severity: 'info', summary: 'Success', detail: 'Property listing edited sucessfully', life: 3000 });
+      },
+      error: (err: Error) => {
+        console.error('Error occurred while editing rent property listing:', err);
+      },
+      complete: () => {
+        this.RentPropertyListingForm.reset()
+        this.dialogRef.close({ action: 'submit', data: 'Edit rent listing' });
+      },
+    });
+  }
+
+  private createPaylaod(): PropertyListing {
+    const propertyDetailFormData = this.RentPropertyListingForm.get('propertyDetails')
+    const formData: PropertyListing = {
+      ...this.RentPropertyListingForm.value, propertyDetails: {
+        ...propertyDetailFormData?.value,
+        bhkType: this.getSelectedValueAsString('propertyDetails', 'bhkType'),
+        propertyPreferredTenants: this.getSelectedValueAsString('propertyDetails', 'propertyPreferredTenants'),
+        furnishingStatus: this.getSelectedValueAsString('propertyDetails', 'furnishingStatus'),
+        propertyFacing: this.getSelectedValueAsString('propertyDetails', 'propertyFacing'),
+        propertyParking: this.getSelectedValueAsString('propertyDetails', 'propertyParking'),
+        propertyType: this.getSelectedValueAsString('propertyDetails', 'propertyType'),
+        propertyCoveredArea: +propertyDetailFormData?.get('propertyCoveredArea')?.value,
+        propertyOwner: this.userInfo?.uuid,
+        propertyPostedBy: this.userInfo?.name
+      }
+    }
+    return formData
+  }
+
+  private patchFormData(): void {
+    // Patching the form with the provided data
+    const rentPropertyDetailsData: PropertyDetails = this.rentPropertyData?.propertyDetails
+    this.RentPropertyListingForm.patchValue(this.rentPropertyData);
+    this.patchValueForSelectDropdownData('bhkType', this.bhktypeValues, rentPropertyDetailsData?.bhkType)
+    this.patchValueForSelectDropdownData('furnishingStatus', this.furnishingStatusValues, rentPropertyDetailsData?.furnishingStatus)
+    this.patchValueForSelectDropdownData('propertyFacing', this.propertyFacingValues, rentPropertyDetailsData?.propertyFacing)
+    this.patchValueForSelectDropdownData('propertyParking', this.propertyParkingValues, rentPropertyDetailsData?.propertyParking)
+    this.patchValueForSelectDropdownData('propertyType', this.propertypeValues, rentPropertyDetailsData?.propertyType)
+    this.patchValueForSelectDropdownData('propertyPreferredTenants', this.propertyPreferredTenantsValues, rentPropertyDetailsData?.propertyPreferredTenants)
+  }
+
+  private patchValueForSelectDropdownData(FormControlName: string, selectOptionData: PropertyListingForm[], selectedData: string): void {
+    const selectedDropdownFormData = selectOptionData.find((data: PropertyListingForm) => data.name === selectedData)
+    this.RentPropertyListingForm.get('propertyDetails')?.get(FormControlName)?.patchValue(selectedDropdownFormData);
+  }
+
+  private testFormData() {
+    // Assuming these are the values to be patched
+    const propertyData = {
+      propertyFullAddress: {
+        propertyCityName: 'Bengaluru',
+        houseNumber: '123',
+        street: 'Main Street',
+        area: 'Koramangala',
+        city: 'Bengaluru',
+        state: 'Karnataka',
+        country: 'India',
+        pincode: '560034',
+        landmark: 'Near Forum Mall',
+        latitude: '12.9352',
+        longitude: '77.6245'
+      },
+      propertyDetails: {
+        propertyName: 'Cozy Apartment',
+        propertyDescription: 'A cozy 2BHK apartment in the heart of the city',
+        propertyOwner: 'John Doe',
+        propertyPostedBy: 'John Doe',
+        propertyCost: '35000',
+        availability: this.availabilityValues[0],
+        bhkType: this.bhktypeValues[0],
+        propertyType: this.propertypeValues[0],
+        propertySecurityDeposit: '100000',
+        propertyPostedOnDate: '2025-02-26',
+        propertyCoveredArea: '1200',
+        propertyPreferredTenants: this.propertyPreferredTenantsValues[0],
+        furnishingStatus: this.furnishingStatusValues[0],
+        propertyFacing: this.propertyFacingValues[0],
+        propertTotalBathroom: this.bathroomValues[0],
+        propertyParking: this.propertyParkingValues[0],
+        propertyFloors: this.floorValues[0]
+      },
+      propertyAmnities: {
+        waterSupply: true,
+        attachedBathroom: true,
+        security: true,
+        lift: true
+      }
+    };
+
+    // Patching the form with the provided data
+    this.RentPropertyListingForm.patchValue(propertyData);
+
+  }
+
+  private initiliseForm(): void {
     this.RentPropertyListingForm = new FormGroup({
       propertyFullAddress: new FormGroup({
         propertyCityName: new FormControl('', Validators.required),
@@ -129,69 +240,12 @@ export class RentPropertyListingFormComponent implements OnInit {
     });
   }
 
-  public onSubmit(): void {
-    if (this.RentPropertyListingForm.invalid) return;
-    else if (!this.isEditMode) {
-      this.createRentPropertyListing(this.createPaylaod())
-      return;
-    }
-    else this.editRentPropertyListing(this.createPaylaod())
-  }
-
-  private testFormData() {
-    // Assuming these are the values to be patched
-    const propertyData = {
-      propertyFullAddress: {
-        propertyCityName: 'Bengaluru',
-        houseNumber: '123',
-        street: 'Main Street',
-        area: 'Koramangala',
-        city: 'Bengaluru',
-        state: 'Karnataka',
-        country: 'India',
-        pincode: '560034',
-        landmark: 'Near Forum Mall',
-        latitude: '12.9352',
-        longitude: '77.6245'
-      },
-      propertyDetails: {
-        propertyName: 'Cozy Apartment',
-        propertyDescription: 'A cozy 2BHK apartment in the heart of the city',
-        propertyOwner: 'John Doe',
-        propertyPostedBy: 'John Doe',
-        propertyCost: '35000',
-        availability: 'Immediate',
-        bhkType: this.bhktypeValues[0],
-        propertyType: this.propertypeValues[0],
-        propertySecurityDeposit: '100000',
-        propertyPostedOnDate: '2025-02-26',
-        propertyCoveredArea: '1200',
-        propertyPreferredTenants: this.propertyPreferredTenantsValues[0],
-        furnishingStatus: this.furnishingStatusValues[0],
-        propertyFacing: this.propertyFacingValues[0],
-        propertTotalBathroom: '2',
-        propertyParking: this.propertyParkingValues[0],
-        propertyFloors: '3'
-      },
-      propertyAmnities: {
-        waterSupply: true,
-        attachedBathroom: true,
-        security: true,
-        lift: true
-      }
-    };
-
-    // Patching the form with the provided data
-    this.RentPropertyListingForm.patchValue(propertyData);
-
-  }
-
-  private getSelectedValueAsString(formGroupName: string, FormControlName: string) {
+  private getSelectedValueAsString(formGroupName: string, FormControlName: string): string {
     const selectedValue = this.RentPropertyListingForm.get(formGroupName)?.get(FormControlName)?.value ?? {}
-    return selectedValue?.['name'] || "";
+    return selectedValue?.['name'] ?? "";
   }
 
-  private createRentPropertyListing(formData: PropertyListing) {
+  private createRentPropertyListing(formData: PropertyListing): void {
     this.rentPropertyListingService.createRentPropertyListing(formData).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.messageService.add({ severity: 'info', summary: 'Success', detail: 'Property listing created sucessfully', life: 3000 });
@@ -204,57 +258,6 @@ export class RentPropertyListingFormComponent implements OnInit {
         this.dialogRef.close({ action: 'submit', data: 'Create rent listing' });
       },
     });
-  }
-
-  editRentPropertyListing(formData: PropertyListing) {
-    this.rentPropertyListingService.editRentPropertyListing(formData, this.rentPropertyData?._id || '').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
-        this.messageService.add({ severity: 'info', summary: 'Success', detail: 'Property listing edited sucessfully', life: 3000 });
-      },
-      error: (err: Error) => {
-        console.error('Error occurred while editing rent property listing:', err);
-      },
-      complete: () => {
-        this.RentPropertyListingForm.reset()
-        this.dialogRef.close({ action: 'submit', data: 'Edit rent listing' });
-      },
-    });
-  }
-
-  createPaylaod(): PropertyListing {
-    const propertyDetailFormData = this.RentPropertyListingForm.get('propertyDetails')
-    const formData: PropertyListing = {
-      ...this.RentPropertyListingForm.value, propertyDetails: {
-        ...propertyDetailFormData?.value,
-        bhkType: this.getSelectedValueAsString('propertyDetails', 'bhkType'),
-        propertyPreferredTenants: this.getSelectedValueAsString('propertyDetails', 'propertyPreferredTenants'),
-        furnishingStatus: this.getSelectedValueAsString('propertyDetails', 'furnishingStatus'),
-        propertyFacing: this.getSelectedValueAsString('propertyDetails', 'propertyFacing'),
-        propertyParking: this.getSelectedValueAsString('propertyDetails', 'propertyParking'),
-        propertyType: this.getSelectedValueAsString('propertyDetails', 'propertyType'),
-        propertyCoveredArea: +propertyDetailFormData?.get('propertyCoveredArea')?.value,
-        propertyOwner: this.userInfo?.uuid,
-        propertyPostedBy: this.userInfo?.name
-      }
-    }
-    return formData
-  }
-
-  patchFormData() {
-    // Patching the form with the provided data
-    const rentPropertyDetailsData: PropertyDetails = this.rentPropertyData?.propertyDetails
-    this.RentPropertyListingForm.patchValue(this.rentPropertyData);
-    this.patchValueForSelectDropdownData('bhkType', this.bhktypeValues, rentPropertyDetailsData?.bhkType)
-    this.patchValueForSelectDropdownData('furnishingStatus', this.furnishingStatusValues, rentPropertyDetailsData?.furnishingStatus)
-    this.patchValueForSelectDropdownData('propertyFacing', this.propertyFacingValues, rentPropertyDetailsData?.propertyFacing)
-    this.patchValueForSelectDropdownData('propertyParking', this.propertyParkingValues, rentPropertyDetailsData?.propertyParking)
-    this.patchValueForSelectDropdownData('propertyType', this.propertypeValues, rentPropertyDetailsData?.propertyType)
-    this.patchValueForSelectDropdownData('propertyPreferredTenants', this.propertyPreferredTenantsValues, rentPropertyDetailsData?.propertyPreferredTenants)
-  }
-
-  patchValueForSelectDropdownData(FormControlName: string, selectOptionData: PropertyListingForm[], selectedData: string) {
-    const selectedDropdownFormData = selectOptionData.find((data: PropertyListingForm) => data.name === selectedData)
-    this.RentPropertyListingForm.get('propertyDetails')?.get(FormControlName)?.patchValue(selectedDropdownFormData);
   }
 
 }

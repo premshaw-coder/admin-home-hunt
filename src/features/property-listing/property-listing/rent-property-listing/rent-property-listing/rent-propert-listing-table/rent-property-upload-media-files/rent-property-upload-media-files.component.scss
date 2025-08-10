@@ -1,0 +1,12 @@
+.image-container {
+    position: relative;
+    width: 280px;
+    height: 140px;
+    overflow: hidden;
+
+    div {
+        position: relative;
+        left: 260px;
+        z-index: 5555;
+    }
+}
