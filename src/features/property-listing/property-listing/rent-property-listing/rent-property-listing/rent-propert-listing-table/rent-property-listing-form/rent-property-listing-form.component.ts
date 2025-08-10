@@ -200,49 +200,48 @@ export class RentPropertyListingFormComponent implements OnInit {
   private initiliseForm(): void {
     this.RentPropertyListingForm = new FormGroup({
       propertyFullAddress: new FormGroup({
-        propertyCityName: new FormControl('', Validators.required),
-        houseNumber: new FormControl('', Validators.required),
-        street: new FormControl('', Validators.required),
-        area: new FormControl('', Validators.required),
-        city: new FormControl('', Validators.required),
-        state: new FormControl('', Validators.required),
-        country: new FormControl('', Validators.required),
-        pincode: new FormControl('', Validators.required),
-        landmark: new FormControl('', Validators.required),
-        latitude: new FormControl('', Validators.required),
-        longitude: new FormControl('', Validators.required),
+        propertyCityName: new FormControl(null, Validators.required),
+        houseNumber: new FormControl(null, Validators.required),
+        street: new FormControl(null, Validators.required),
+        area: new FormControl(null, Validators.required),
+        city: new FormControl(null, Validators.required),
+        state: new FormControl(null, Validators.required),
+        country: new FormControl(null, Validators.required),
+        pincode: new FormControl(null, Validators.required),
+        landmark: new FormControl(null, Validators.required),
+        latitude: new FormControl(null, Validators.required),
+        longitude: new FormControl(null, Validators.required),
       }),
       propertyDetails: new FormGroup({
-        propertyName: new FormControl('', Validators.required),
-        propertyDescription: new FormControl('', Validators.required),
-        propertyOwner: new FormControl('', Validators.required),
-        propertyPostedBy: new FormControl('', Validators.required),
-        propertyCost: new FormControl('', Validators.required),
-        availability: new FormControl('', Validators.required),
-        bhkType: new FormControl('', Validators.required),
-        propertyType: new FormControl('', Validators.required),
-        propertySecurityDeposit: new FormControl('', Validators.required),
-        propertyPostedOnDate: new FormControl('', Validators.required),
-        propertyCoveredArea: new FormControl('', Validators.required),
-        propertyPreferredTenants: new FormControl('', Validators.required),
-        furnishingStatus: new FormControl('', Validators.required),
-        propertyFacing: new FormControl('', Validators.required),
-        propertTotalBathroom: new FormControl('', Validators.required),
-        propertyParking: new FormControl('', Validators.required),
-        propertyFloors: new FormControl('', Validators.required),
+        propertyName: new FormControl(null, Validators.required),
+        propertyDescription: new FormControl(null, Validators.required),
+        propertyOwner: new FormControl(null, Validators.required),
+        propertyPostedBy: new FormControl(null, Validators.required),
+        propertyCost: new FormControl(null, Validators.required),
+        availability: new FormControl(null, Validators.required),
+        bhkType: new FormControl(null, Validators.required),
+        propertyType: new FormControl(null, Validators.required),
+        propertySecurityDeposit: new FormControl(null, Validators.required),
+        propertyPostedOnDate: new FormControl(null, Validators.required),
+        propertyCoveredArea: new FormControl(null, Validators.required),
+        propertyPreferredTenants: new FormControl(null, Validators.required),
+        furnishingStatus: new FormControl(null, Validators.required),
+        propertyFacing: new FormControl(null, Validators.required),
+        propertTotalBathroom: new FormControl(null, Validators.required),
+        propertyParking: new FormControl(null, Validators.required),
+        propertyFloors: new FormControl(null, Validators.required),
       }),
       propertyAmnities: new FormGroup({
-        waterSupply: new FormControl('', Validators.required),
-        attachedBathroom: new FormControl('', Validators.required),
-        security: new FormControl('', Validators.required),
-        lift: new FormControl('', Validators.required)
+        waterSupply: new FormControl(null, Validators.required),
+        attachedBathroom: new FormControl(null, Validators.required),
+        security: new FormControl(null, Validators.required),
+        lift: new FormControl(null, Validators.required)
       }),
     });
   }
 
   private getSelectedValueAsString(formGroupName: string, FormControlName: string): string {
-    const selectedValue = this.RentPropertyListingForm.get(formGroupName)?.get(FormControlName)?.value ?? {}
-    return selectedValue?.['name'] ?? "";
+    return this.RentPropertyListingForm.get(formGroupName)?.get(FormControlName)?.value ?? "";
   }
 
   private createRentPropertyListing(formData: PropertyListing): void {
