@@ -39,8 +39,10 @@
                             propertyDetailsFormSelect.id) {
                             <div>
                                 <p-select appendTo="body" [formControlName]="propertyDetailsFormSelect.control"
-                                    [options]="propertyDetailsFormSelect.values" optionLabel="name"
-                                    [placeholder]="propertyDetailsFormSelect.placeholder" class="w-full md:w-56" />
+                                    [options]="propertyDetailsFormSelect.values" optionLabel="name" optionValue="code"
+                                    [placeholder]="propertyDetailsFormSelect.placeholder" class="w-full md:w-56">
+                                </p-select>
+
                             </div>
                             }
                         </div>

@@ -28,6 +28,9 @@ import { MessageService } from 'primeng/api';
 export class RentPropertyListingFormComponent implements OnInit {
   public RentPropertyListingForm!: FormGroup;
   private readonly bhktypeValues: PropertyListingForm[] = ApiStaticData.bhktypeValues;
+  private readonly availabilityValues: PropertyListingForm[] = ApiStaticData.availabilityValues;
+  private readonly bathroomValues: PropertyListingForm[] = ApiStaticData.bathroomValues;
+  private readonly floorValues: PropertyListingForm[] = ApiStaticData.floorValues;
   private readonly propertypeValues: PropertyListingForm[] = ApiStaticData.propertyTypeValues;
   private readonly propertyPreferredTenantsValues: PropertyListingForm[] = ApiStaticData.propertyPreferredTenantsValues;
   private readonly furnishingStatusValues: PropertyListingForm[] = ApiStaticData.furnishingStatusValues;
@@ -62,11 +65,8 @@ export class RentPropertyListingFormComponent implements OnInit {
     { id: 13, control: 'propertyDescription', placeholder: 'Enter description' },
     { id: 14, control: 'propertyPostedBy', placeholder: 'Enter Owner name' },
     { id: 15, control: 'propertyCost', placeholder: 'Enter Cost' },
-    { id: 16, control: 'availability', placeholder: 'Enter availability' },
     { id: 17, control: 'propertySecurityDeposit', placeholder: 'Enter security eposit' },
     { id: 18, control: 'propertyCoveredArea', placeholder: 'covered area' },
-    { id: 19, control: 'propertTotalBathroom', placeholder: 'Enter total bathroom' },
-    { id: 20, control: 'propertyFloors', placeholder: 'Enter floors' },
   ];
 
   public propertyDetailsFormSelectData = [
@@ -76,6 +76,9 @@ export class RentPropertyListingFormComponent implements OnInit {
     { id: 24, control: 'propertyParking', placeholder: 'Enter Parking', values: this.propertyParkingValues },
     { id: 25, control: 'propertyType', placeholder: 'Enter Type', values: this.propertypeValues },
     { id: 26, control: 'propertyPreferredTenants', placeholder: 'Enter preferred tenants', values: this.propertyPreferredTenantsValues },
+    { id: 19, control: 'propertTotalBathroom', placeholder: 'Enter total bathroom', values: this.bathroomValues },
+    { id: 20, control: 'propertyFloors', placeholder: 'Enter floors', values: this.floorValues },
+    { id: 16, control: 'availability', placeholder: 'Enter availability', values: this.availabilityValues },
   ]
 
   ngOnInit() {
@@ -168,7 +171,7 @@ export class RentPropertyListingFormComponent implements OnInit {
         propertyOwner: 'John Doe',
         propertyPostedBy: 'John Doe',
         propertyCost: '35000',
-        availability: 'Immediate',
+        availability: this.availabilityValues[0],
         bhkType: this.bhktypeValues[0],
         propertyType: this.propertypeValues[0],
         propertySecurityDeposit: '100000',
@@ -177,9 +180,9 @@ export class RentPropertyListingFormComponent implements OnInit {
         propertyPreferredTenants: this.propertyPreferredTenantsValues[0],
         furnishingStatus: this.furnishingStatusValues[0],
         propertyFacing: this.propertyFacingValues[0],
-        propertTotalBathroom: '2',
+        propertTotalBathroom: this.bathroomValues[0],
         propertyParking: this.propertyParkingValues[0],
-        propertyFloors: '3'
+        propertyFloors: this.floorValues[0]
       },
       propertyAmnities: {
         waterSupply: true,

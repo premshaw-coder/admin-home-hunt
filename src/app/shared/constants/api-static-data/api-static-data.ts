@@ -1,37 +1,69 @@
 import { PropertyListingForm } from "../../../../features/property-listing/property-listing/rent-property-listing/rent-property-listing-interfaces/property-listing-form-interface";
 export const ApiStaticData = {
     bhktypeValues: [
-        { name: '1BHK', code: '1BHK' },
-        { name: '2BHK', code: '2BHK' },
-        { name: '3BHK', code: '3BHK' },
-        { name: '4BHK', code: '4BHK' },
-        { name: '5BHK', code: '5BHK' }
+        { name: '1 BHK', code: '1 BHK' },
+        { name: '2 BHK', code: '2 BHK' },
+        { name: '3 BHK', code: '3 BHK' },
+        { name: '4 BHK', code: '4 BHK' },
+        { name: '4 BHK+', code: '4 BHK+' }
     ] as PropertyListingForm[],
+
+    availabilityValues: [
+        { name: 'Immediate', code: 'Immediate' },
+        { name: 'Within 30 Days', code: 'Within 30 Days' },
+        { name: 'Within 45 days', code: 'Within 45 days' },
+        { name: 'More than 45 days', code: 'More than 45 days' },
+
+    ] as PropertyListingForm[],
+
+    bathroomValues: [
+        { name: '1', code: '1' },
+        { name: '2', code: '2' },
+        { name: '3', code: '3' },
+        { name: '4', code: '4' },
+        { name: '4+', code: '4+' },
+
+    ] as PropertyListingForm[],
+
+    floorValues: [
+        { name: 'Ground', code: 'Ground' },
+        { name: '1-5', code: '1-5' },
+        { name: '6-10', code: '6-10' },
+        { name: '11-15', code: '11-15' },
+        { name: '15+', code: '15+' },
+
+    ] as PropertyListingForm[],
+
     propertyTypeValues: [
         { name: 'Flats', code: 'Flats' },
         { name: 'Apartment', code: 'Apartment' },
         { name: 'House', code: 'House' },
         { name: 'Villa', code: 'Villa' },
-        { name: 'Commercial', code: 'Commercial' }
+        { name: 'Independent House', code: 'Independent House' },
+        { name: 'Farm House', code: 'Farm House' },
     ] as PropertyListingForm[],
+
     propertyPreferredTenantsValues: [
-        { name: 'family', code: 'family' }, { name: 'bachelors', code: 'bachelors' }
+        { name: 'Family', code: 'Family' }, { name: 'Bachelors', code: 'Bachelors' }
     ] as PropertyListingForm[],
+
     furnishingStatusValues: [
-        { name: 'furnished', code: 'furnished' }, { name: 'semi-furnished', code: 'semi-furnished' },
-        { name: 'unfurnished', code: 'unfurnished' }
+        { name: 'Full-furnished', code: 'Full-furnished' }, { name: 'Semi-furnished', code: 'Semi-furnished' },
+        { name: 'Un-furnished', code: 'Un-furnished' }
     ] as PropertyListingForm[],
+
     propertyFacingValues: [
-        { name: 'east', code: 'east' },
-        { name: 'west', code: 'west' },
-        { name: 'north', code: 'north' },
-        { name: 'south', code: 'south' },
-        { name: 'north - east', code: 'north - east' },
-        { name: 'north - west', code: 'north - west' },
-        { name: 'south - east', code: 'south - east' },
-        { name: 'south - west', code: 'south - west' }
+        { name: 'East', code: 'East' },
+        { name: 'West', code: 'West' },
+        { name: 'North', code: 'North' },
+        { name: 'South', code: 'South' },
+        { name: 'North - East', code: 'North - East' },
+        { name: 'North - West', code: 'North - West' },
+        { name: 'South - East', code: 'South - East' },
+        { name: 'South - West', code: 'South - West' }
     ] as PropertyListingForm[],
+
     propertyParkingValues: [
-        { name: '2wheeler', code: '2wheeler' }, { name: '4wheeler', code: '4wheeler' }, { name: 'both', code: 'both' }
+        { name: '2wheeler', code: '2wheeler' }, { name: '4wheeler', code: '4wheeler' }
     ] as PropertyListingForm[],
 }
