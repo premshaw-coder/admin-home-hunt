@@ -47,13 +47,12 @@ export class RentPropertyListingFormComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef)
 
   public propertyFullAddressFormData = [
-    { id: 1, control: 'propertyCityName', placeholder: 'Enter city' },
-    { id: 2, control: 'houseNumber', placeholder: 'Enter house number' },
+    { id: 7, control: 'country', placeholder: 'Enter country' },
+    { id: 6, control: 'state', placeholder: 'Enter state' },
+    { id: 5, control: 'city', placeholder: 'Enter city' },
     { id: 3, control: 'street', placeholder: 'Enter street' },
     { id: 4, control: 'area', placeholder: 'Enter area' },
-    { id: 5, control: 'city', placeholder: 'Enter city' },
-    { id: 6, control: 'state', placeholder: 'Enter state' },
-    { id: 7, control: 'country', placeholder: 'Enter country' },
+    { id: 2, control: 'houseNumber', placeholder: 'Enter house number' },
     { id: 8, control: 'pincode', placeholder: 'Enter pincode' },
     { id: 9, control: 'landmark', placeholder: 'Enter landmark' },
     { id: 10, control: 'latitude', placeholder: 'Enter latitude' },
@@ -76,7 +75,7 @@ export class RentPropertyListingFormComponent implements OnInit {
     { id: 24, control: 'propertyParking', placeholder: 'Enter Parking', values: this.propertyParkingValues },
     { id: 25, control: 'propertyType', placeholder: 'Enter Type', values: this.propertypeValues },
     { id: 26, control: 'propertyPreferredTenants', placeholder: 'Enter preferred tenants', values: this.propertyPreferredTenantsValues },
-    { id: 19, control: 'propertTotalBathroom', placeholder: 'Enter total bathroom', values: this.bathroomValues },
+    { id: 19, control: 'propertyTotalBathroom', placeholder: 'Enter total bathroom', values: this.bathroomValues },
     { id: 20, control: 'propertyFloors', placeholder: 'Enter floors', values: this.floorValues },
     { id: 16, control: 'availability', placeholder: 'Enter availability', values: this.availabilityValues },
   ]
@@ -153,7 +152,6 @@ export class RentPropertyListingFormComponent implements OnInit {
     // Assuming these are the values to be patched
     const propertyData = {
       propertyFullAddress: {
-        propertyCityName: 'Bengaluru',
         houseNumber: '123',
         street: 'Main Street',
         area: 'Koramangala',
@@ -180,7 +178,7 @@ export class RentPropertyListingFormComponent implements OnInit {
         propertyPreferredTenants: this.propertyPreferredTenantsValues[0],
         furnishingStatus: this.furnishingStatusValues[0],
         propertyFacing: this.propertyFacingValues[0],
-        propertTotalBathroom: this.bathroomValues[0],
+        propertyTotalBathroom: this.bathroomValues[0],
         propertyParking: this.propertyParkingValues[0],
         propertyFloors: this.floorValues[0]
       },
@@ -200,7 +198,6 @@ export class RentPropertyListingFormComponent implements OnInit {
   private initiliseForm(): void {
     this.RentPropertyListingForm = new FormGroup({
       propertyFullAddress: new FormGroup({
-        propertyCityName: new FormControl(null, Validators.required),
         houseNumber: new FormControl(null, Validators.required),
         street: new FormControl(null, Validators.required),
         area: new FormControl(null, Validators.required),
@@ -227,7 +224,7 @@ export class RentPropertyListingFormComponent implements OnInit {
         propertyPreferredTenants: new FormControl(null, Validators.required),
         furnishingStatus: new FormControl(null, Validators.required),
         propertyFacing: new FormControl(null, Validators.required),
-        propertTotalBathroom: new FormControl(null, Validators.required),
+        propertyTotalBathroom: new FormControl(null, Validators.required),
         propertyParking: new FormControl(null, Validators.required),
         propertyFloors: new FormControl(null, Validators.required),
       }),

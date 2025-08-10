@@ -79,7 +79,7 @@ export class RentPropertyListingTableComponent implements OnInit {
   ngOnInit(): void {
     this.getAllRentPropertyListingByProperOwner()
     this.cols = [
-      { field: 'propertyFullAddress.propertyCityName', header: 'Property Full Address', propertyName: 'propertyCityName' },
+      { field: 'propertyFullAddress.city', header: 'City', propertyName: 'city' },
       { field: 'propertyDetails.propertyName', header: 'Property Name', propertyName: 'propertyName' },
       { field: 'propertyDetails.availability', header: 'Availability', propertyName: 'availability' },
       { field: 'propertyDetails.propertyCost', header: 'Property Cost', propertyName: 'propertyCost' },
