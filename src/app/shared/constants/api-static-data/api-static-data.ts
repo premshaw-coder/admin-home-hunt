@@ -66,4 +66,15 @@ export const ApiStaticData = {
     propertyParkingValues: [
         { name: '2wheeler', code: '2wheeler' }, { name: '4wheeler', code: '4wheeler' }
     ] as PropertyListingForm[],
+
+    amenitiesValues: [
+        { name: 'Water Supply', code: 'Water Supply' },
+        { name: 'Attached Bathroom', code: 'Attached Bathroom' },
+        { name: 'Security', code: 'Security' },
+        { name: 'Lift', code: 'Lift' },
+        { name: 'Power Back Up', code: 'Power Back Up' },
+        { name: 'Park', code: 'Park' },
+        { name: 'Kids Play Area', code: 'Kids Play Area' },
+        { name: 'Swimming Pool', code: 'Swimming Pool' }
+    ] as PropertyListingForm[]
 }

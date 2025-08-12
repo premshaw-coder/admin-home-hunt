@@ -12,14 +12,15 @@ import { HttpClient } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { AuthApiResponse } from '../../../../../../auth/interfaces/auth/auth-login.interface';
-import { PropertyDetails, PropertyListing } from '../../../rent-property-listing-interfaces/property-listing-interface';
+import { PropertyListing } from '../../../rent-property-listing-interfaces/property-listing-interface';
 import { PropertyListingForm } from '../../../rent-property-listing-interfaces/property-listing-form-interface';
 import { MessageService } from 'primeng/api';
+import { MultiSelectModule } from 'primeng/multiselect';
 
 @Component({
   selector: 'app-rent-property-listing-form',
   imports: [StepperModule, ButtonModule, FormsModule, ReactiveFormsModule, InputTextModule,
-    ToggleSwitchModule, SelectModule, NgClass
+    ToggleSwitchModule, SelectModule, MultiSelectModule,NgClass
   ],
   providers: [RentPropertyListingService, HttpClient],
   templateUrl: './rent-property-listing-form.component.html',
@@ -36,6 +37,7 @@ export class RentPropertyListingFormComponent implements OnInit {
   private readonly furnishingStatusValues: PropertyListingForm[] = ApiStaticData.furnishingStatusValues;
   private readonly propertyFacingValues: PropertyListingForm[] = ApiStaticData.propertyFacingValues;
   private readonly propertyParkingValues: PropertyListingForm[] = ApiStaticData.propertyParkingValues;
+  public readonly propertyAmenitiesValues: PropertyListingForm[] = ApiStaticData.amenitiesValues;
   private readonly userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') ?? '{}')
   private isEditMode!: boolean;
   private rentPropertyData!: PropertyListing
@@ -133,20 +135,17 @@ export class RentPropertyListingFormComponent implements OnInit {
 
   private patchFormData(): void {
     // Patching the form with the provided data
-    const rentPropertyDetailsData: PropertyDetails = this.rentPropertyData?.propertyDetails
+    // const rentPropertyDetailsData: PropertyDetails = this.rentPropertyData?.propertyDetails
     this.RentPropertyListingForm.patchValue(this.rentPropertyData);
-    this.patchValueForSelectDropdownData('bhkType', this.bhktypeValues, rentPropertyDetailsData?.bhkType)
-    this.patchValueForSelectDropdownData('furnishingStatus', this.furnishingStatusValues, rentPropertyDetailsData?.furnishingStatus)
-    this.patchValueForSelectDropdownData('propertyFacing', this.propertyFacingValues, rentPropertyDetailsData?.propertyFacing)
-    this.patchValueForSelectDropdownData('propertyParking', this.propertyParkingValues, rentPropertyDetailsData?.propertyParking)
-    this.patchValueForSelectDropdownData('propertyType', this.propertypeValues, rentPropertyDetailsData?.propertyType)
-    this.patchValueForSelectDropdownData('propertyPreferredTenants', this.propertyPreferredTenantsValues, rentPropertyDetailsData?.propertyPreferredTenants)
+    // this.patchValueForSelectDropdownData('bhkType', this.bhktypeValues, rentPropertyDetailsData?.bhkType)
+    // this.patchValueForSelectDropdownData('furnishingStatus', this.furnishingStatusValues, rentPropertyDetailsData?.furnishingStatus)
+    // this.patchValueForSelectDropdownData('propertyFacing', this.propertyFacingValues, rentPropertyDetailsData?.propertyFacing)
+    // this.patchValueForSelectDropdownData('propertyParking', this.propertyParkingValues, rentPropertyDetailsData?.propertyParking)
+    // this.patchValueForSelectDropdownData('propertyType', this.propertypeValues, rentPropertyDetailsData?.propertyType)
+    // this.patchValueForSelectDropdownData('propertyPreferredTenants', this.propertyPreferredTenantsValues, rentPropertyDetailsData?.propertyPreferredTenants)
   }
 
-  private patchValueForSelectDropdownData(FormControlName: string, selectOptionData: PropertyListingForm[], selectedData: string): void {
-    const selectedDropdownFormData = selectOptionData.find((data: PropertyListingForm) => data.name === selectedData)
-    this.RentPropertyListingForm.get('propertyDetails')?.get(FormControlName)?.patchValue(selectedDropdownFormData);
-  }
+ 
 
   private testFormData() {
     // Assuming these are the values to be patched
@@ -227,12 +226,10 @@ export class RentPropertyListingFormComponent implements OnInit {
         propertyTotalBathroom: new FormControl(null, Validators.required),
         propertyParking: new FormControl(null, Validators.required),
         propertyFloors: new FormControl(null, Validators.required),
+        propertyYouTubeLink: new FormControl(null)
       }),
       propertyAmnities: new FormGroup({
-        waterSupply: new FormControl(null, Validators.required),
-        attachedBathroom: new FormControl(null, Validators.required),
-        security: new FormControl(null, Validators.required),
-        lift: new FormControl(null, Validators.required)
+        amnities: new FormControl(null, Validators.required),
       }),
     });
   }

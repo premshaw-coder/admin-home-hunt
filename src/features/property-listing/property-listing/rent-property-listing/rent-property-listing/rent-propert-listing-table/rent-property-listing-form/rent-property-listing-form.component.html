@@ -2,7 +2,7 @@
     <form [formGroup]="RentPropertyListingForm">
         <p-stepper [value]="1" [linear]="true">
             <p-step-item [value]="1">
-                <p-step>Header I</p-step>
+                <p-step>Property Address</p-step>
                 <p-step-panel>
                     <ng-template #content let-activateCallback="activateCallback">
                         <div formGroupName="propertyFullAddress" class="flex_row flex-wrap flex_gap">
@@ -25,7 +25,7 @@
             </p-step-item>
 
             <p-step-item [value]="2">
-                <p-step>Header II</p-step>
+                <p-step>Property Details</p-step>
                 <p-step-panel>
                     <ng-template #content let-activateCallback="activateCallback">
                         <div formGroupName="propertyDetails" class="flex_row flex-wrap flex_gap">
@@ -42,7 +42,6 @@
                                     [options]="propertyDetailsFormSelect.values" optionLabel="name" optionValue="code"
                                     [placeholder]="propertyDetailsFormSelect.placeholder" class="w-full md:w-56">
                                 </p-select>
-
                             </div>
                             }
                         </div>
@@ -57,41 +56,18 @@
             </p-step-item>
 
             <p-step-item [value]="3">
-                <p-step>Header III</p-step>
+                <p-step>Property Amenities & Others</p-step>
                 <p-step-panel>
                     <ng-template #content let-activateCallback="activateCallback">
-                        <div formGroupName="propertyAmnities" class="">
-                            <div class="flex_row flex-wrap flex_justify_between">
-                                <div>
-                                    Water Supply Available
-                                </div>
-                                <div>
-                                    <p-toggleswitch formControlName="waterSupply" />
-                                </div>
+                        <div class="flex_row flex-wrap gap-x-8">
+                            <div formGroupName="propertyAmnities">
+                                <p-multiselect formControlName="amnities" appendTo="body"
+                                    [options]="propertyAmenitiesValues" placeholder="Select Amnities" optionLabel="name"
+                                    optionValue="code" display="chip" class="w-full md:w-96" />
                             </div>
-                            <div class="flex_row flex-wrap flex_justify_between">
-                                <div>
-                                    Attached bathroom available
-                                </div>
-                                <div>
-                                    <p-toggleswitch formControlName="attachedBathroom" />
-                                </div>
-                            </div>
-                            <div class="flex_row flex-wrap flex_justify_between">
-                                <div>
-                                    Gated Society
-                                </div>
-                                <div>
-                                    <p-toggleswitch formControlName="security" />
-                                </div>
-                            </div>
-                            <div class="flex_row flex-wrap flex_justify_between">
-                                <div>
-                                    Lift Available
-                                </div>
-                                <div>
-                                    <p-toggleswitch formControlName="lift" />
-                                </div>
+                            <div formGroupName="propertyDetails">
+                                <input placeholder="Enter YouTube Link" type="text" pInputText
+                                    formControlName="propertyYouTubeLink" class="w-full md:w-96" />
                             </div>
                         </div>
                         <div class="py-6">
