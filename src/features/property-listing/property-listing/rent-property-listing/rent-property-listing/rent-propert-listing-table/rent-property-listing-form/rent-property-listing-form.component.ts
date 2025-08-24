@@ -20,7 +20,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 @Component({
   selector: 'app-rent-property-listing-form',
   imports: [StepperModule, ButtonModule, FormsModule, ReactiveFormsModule, InputTextModule,
-    ToggleSwitchModule, SelectModule, MultiSelectModule,NgClass
+    ToggleSwitchModule, SelectModule, MultiSelectModule, NgClass
   ],
   providers: [RentPropertyListingService, HttpClient],
   templateUrl: './rent-property-listing-form.component.html',
@@ -49,38 +49,62 @@ export class RentPropertyListingFormComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef)
 
   public propertyFullAddressFormData = [
-    { id: 7, control: 'country', placeholder: 'Enter country' },
-    { id: 6, control: 'state', placeholder: 'Enter state' },
-    { id: 5, control: 'city', placeholder: 'Enter city' },
-    { id: 3, control: 'street', placeholder: 'Enter street' },
-    { id: 4, control: 'area', placeholder: 'Enter area' },
-    { id: 2, control: 'houseNumber', placeholder: 'Enter house number' },
-    { id: 8, control: 'pincode', placeholder: 'Enter pincode' },
-    { id: 9, control: 'landmark', placeholder: 'Enter landmark' },
-    { id: 10, control: 'latitude', placeholder: 'Enter latitude' },
-    { id: 11, control: 'longitude', placeholder: 'Enter longitude' },
+    { id: 1, control: 'country', placeholder: 'Enter country' },
+    { id: 2, control: 'state', placeholder: 'Enter state' },
+    { id: 3, control: 'city', placeholder: 'Enter city' },
+    { id: 4, control: 'street', placeholder: 'Enter street' },
+    { id: 5, control: 'area', placeholder: 'Enter area' },
+    { id: 6, control: 'houseNumber', placeholder: 'Enter house number' },
+    { id: 7, control: 'pincode', placeholder: 'Enter pincode' },
+    { id: 8, control: 'landmark', placeholder: 'Enter landmark' },
+    { id: 9, control: 'latitude', placeholder: 'Enter latitude' },
+    { id: 10, control: 'longitude', placeholder: 'Enter longitude' },
   ];
 
   public propertyDetailsFormInputData = [
-    { id: 12, control: 'propertyName', placeholder: 'Enter property' },
-    { id: 13, control: 'propertyDescription', placeholder: 'Enter description' },
-    { id: 14, control: 'propertyPostedBy', placeholder: 'Enter Owner name' },
-    { id: 15, control: 'propertyCost', placeholder: 'Enter Cost' },
-    { id: 17, control: 'propertySecurityDeposit', placeholder: 'Enter security eposit' },
-    { id: 18, control: 'propertyCoveredArea', placeholder: 'covered area' },
+    { id: 11, control: 'propertyName', placeholder: 'Enter property' },
+    { id: 12, control: 'propertyDescription', placeholder: 'Enter description' },
+    { id: 13, control: 'propertyPostedBy', placeholder: 'Enter Owner name' },
+    { id: 14, control: 'propertyCost', placeholder: 'Enter Cost' },
+    { id: 15, control: 'propertySecurityDeposit', placeholder: 'Enter security eposit' },
+    { id: 16, control: 'propertyCoveredArea', placeholder: 'covered area' },
   ];
 
   public propertyDetailsFormSelectData = [
-    { id: 21, control: 'bhkType', placeholder: 'Enter bhk', values: this.bhktypeValues },
-    { id: 22, control: 'furnishingStatus', placeholder: 'Enter furnishing', values: this.furnishingStatusValues },
-    { id: 23, control: 'propertyFacing', placeholder: 'Enter Facing', values: this.propertyFacingValues },
-    { id: 24, control: 'propertyParking', placeholder: 'Enter Parking', values: this.propertyParkingValues },
-    { id: 25, control: 'propertyType', placeholder: 'Enter Type', values: this.propertypeValues },
-    { id: 26, control: 'propertyPreferredTenants', placeholder: 'Enter preferred tenants', values: this.propertyPreferredTenantsValues },
-    { id: 19, control: 'propertyTotalBathroom', placeholder: 'Enter total bathroom', values: this.bathroomValues },
-    { id: 20, control: 'propertyFloors', placeholder: 'Enter floors', values: this.floorValues },
-    { id: 16, control: 'availability', placeholder: 'Enter availability', values: this.availabilityValues },
+    { id: 17, control: 'bhkType', placeholder: 'Enter bhk', values: this.bhktypeValues },
+    { id: 18, control: 'furnishingStatus', placeholder: 'Enter furnishing', values: this.furnishingStatusValues },
+    { id: 19, control: 'propertyFacing', placeholder: 'Enter Facing', values: this.propertyFacingValues },
+    { id: 20, control: 'propertyParking', placeholder: 'Enter Parking', values: this.propertyParkingValues },
+    { id: 21, control: 'propertyType', placeholder: 'Enter Type', values: this.propertypeValues },
+    { id: 22, control: 'propertyPreferredTenants', placeholder: 'Enter preferred tenants', values: this.propertyPreferredTenantsValues },
+    { id: 23, control: 'propertyTotalBathroom', placeholder: 'Enter total bathroom', values: this.bathroomValues },
+    { id: 24, control: 'propertyFloors', placeholder: 'Enter floors', values: this.floorValues },
+    { id: 25, control: 'availability', placeholder: 'Enter availability', values: this.availabilityValues },
   ]
+
+  public propertyVisitingFormSelectData = [
+    { id: 26, control: 'visitingStartTime', placeholder: 'Visiting Start Time', values: this.getVisitingTime(8, 22) },
+    { id: 27, control: 'visitingEndTime', placeholder: 'Visiting End Time', values: this.getVisitingTime(9, 23) }
+  ]
+
+  private getVisitingTime(startTime: number, endTime: number) {
+    startTime = startTime * 60;
+    endTime = endTime * 60;
+    let data: PropertyListingForm[] = [];
+    do {
+      let t = (Math.floor(startTime / 60) % 12 || 12) + ':' + (startTime % 60).toString().padEnd(2, '0') + (Math.floor(startTime / 60) < 12 ? " AM" : " PM");
+      data.push({ name: t, code: startTime })
+      startTime += 60;
+    } while (startTime <= endTime);
+    return data;
+  }
+
+  public getTime(startTime: string) {
+    if (startTime == 'visitingStartTime') {
+      this.propertyVisitingFormSelectData[1].values = this.getVisitingTime((this.RentPropertyListingForm.get('propertyDetails.visitingStartTime')?.value / 60 || 8) + 1, 23)
+    } else
+      this.propertyVisitingFormSelectData[0].values = this.getVisitingTime(8, (this.RentPropertyListingForm.get('propertyDetails.visitingEndTime')?.value / 60 || 23) - 1)
+  }
 
   ngOnInit() {
     this.initiliseForm()
@@ -145,7 +169,17 @@ export class RentPropertyListingFormComponent implements OnInit {
     // this.patchValueForSelectDropdownData('propertyPreferredTenants', this.propertyPreferredTenantsValues, rentPropertyDetailsData?.propertyPreferredTenants)
   }
 
- 
+  public updateValidator(isUpdate: boolean) {
+    if (isUpdate) {
+      this.RentPropertyListingForm.get('propertyDetails.visitingStartTime')?.setValidators(Validators.required);
+      this.RentPropertyListingForm.get('propertyDetails.visitingEndTime')?.setValidators(Validators.required);
+    }
+    else {
+      this.RentPropertyListingForm.get('propertyDetails.visitingStartTime')?.removeValidators(Validators.required);
+      this.RentPropertyListingForm.get('propertyDetails.visitingEndTime')?.removeValidators(Validators.required);
+    }
+    this.RentPropertyListingForm.get('propertyDetails')?.updateValueAndValidity();
+  }
 
   private testFormData() {
     // Assuming these are the values to be patched
@@ -226,7 +260,9 @@ export class RentPropertyListingFormComponent implements OnInit {
         propertyTotalBathroom: new FormControl(null, Validators.required),
         propertyParking: new FormControl(null, Validators.required),
         propertyFloors: new FormControl(null, Validators.required),
-        propertyYouTubeLink: new FormControl(null)
+        propertyYouTubeLink: new FormControl(null),
+        visitingStartTime: new FormControl(null),
+        visitingEndTime: new FormControl(null),
       }),
       propertyAmnities: new FormGroup({
         amnities: new FormControl(null, Validators.required),
