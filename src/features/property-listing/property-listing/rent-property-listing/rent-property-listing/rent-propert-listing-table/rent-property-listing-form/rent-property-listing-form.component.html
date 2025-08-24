@@ -15,6 +15,10 @@
                                     [ngClass]="{'ng-invalid ng-dirty': formControl?.touched && formControl?.invalid}" />
                             </div>
                             }
+                            <button pButton icon="pi pi-map-marker" [severity]="severity" [label]="accuracyLabel"
+                                (click)="locateMe(); accuracyLabel = 'Locating'"
+                                [disabled]="accuracy < 200 || accuracyLabel == 'Locating'">
+                            </button>
                         </div>
                         <div class="py-6" style="margin: 24px 0px 0px 0px;">
                             <p-button [disabled]="RentPropertyListingForm.get('propertyFullAddress')?.invalid"

@@ -1,6 +1,6 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
+import { Button, ButtonModule } from 'primeng/button';
 import { StepperModule } from 'primeng/stepper';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
@@ -56,9 +56,7 @@ export class RentPropertyListingFormComponent implements OnInit {
     { id: 5, control: 'area', placeholder: 'Enter area' },
     { id: 6, control: 'houseNumber', placeholder: 'Enter house number' },
     { id: 7, control: 'pincode', placeholder: 'Enter pincode' },
-    { id: 8, control: 'landmark', placeholder: 'Enter landmark' },
-    { id: 9, control: 'latitude', placeholder: 'Enter latitude' },
-    { id: 10, control: 'longitude', placeholder: 'Enter longitude' },
+    { id: 8, control: 'landmark', placeholder: 'Enter landmark' }
   ];
 
   public propertyDetailsFormInputData = [
@@ -90,10 +88,10 @@ export class RentPropertyListingFormComponent implements OnInit {
   private getVisitingTime(startTime: number, endTime: number) {
     startTime = startTime * 60;
     endTime = endTime * 60;
-    let data: PropertyListingForm[] = [];
+    const data: PropertyListingForm[] = [];
     do {
-      let t = (Math.floor(startTime / 60) % 12 || 12) + ':' + (startTime % 60).toString().padEnd(2, '0') + (Math.floor(startTime / 60) < 12 ? " AM" : " PM");
-      data.push({ name: t, code: startTime })
+      const time = (Math.floor(startTime / 60) % 12 || 12) + ':' + (startTime % 60).toString().padEnd(2, '0') + (Math.floor(startTime / 60) < 12 ? " AM" : " PM");
+      data.push({ name: time, code: startTime })
       startTime += 60;
     } while (startTime <= endTime);
     return data;
@@ -289,4 +287,52 @@ export class RentPropertyListingFormComponent implements OnInit {
     });
   }
 
+  accuracy = 400;
+  accuracyLabel: any = 'Locate Me';
+  severity: any = 'secondary';
+  public locateMe(counter: number = 0): void {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          let accuracyLabel = 'Locating';
+          let severity = 'secondary';
+          if (position.coords.accuracy < 200) {
+            severity = 'info';
+            if (this.accuracy > position.coords.accuracy) {
+              this.accuracy = position.coords.accuracy;
+              this.RentPropertyListingForm.get('propertyFullAddress.latitude')?.setValue(position.coords.latitude);
+              this.RentPropertyListingForm.get('propertyFullAddress.longitude')?.setValue(position.coords.longitude);
+            }
+            //will try till till accuracy 20 but store this info
+            if (position.coords.accuracy > 20 && counter < 10)
+              setTimeout(() => {
+                counter++;
+                this.locateMe(counter);
+              }, 2000);
+            if (position.coords.accuracy > 20) severity = 'success';
+            accuracyLabel = 'Located';
+          } else {
+            if (counter < 10)
+              setTimeout(() => {
+                counter++;
+                this.locateMe(counter);
+              }, 2000);
+            else {
+              accuracyLabel = 'Retry';
+              severity = 'danger';
+            }
+          }
+          this.severity = severity;
+          this.accuracyLabel = accuracyLabel;
+        },
+        error => {
+          console.error('Error getting location:', error);
+        }, {
+        enableHighAccuracy: true
+      }
+      );
+    } else {
+      console.error('Geolocation is not supported by this browser.');
+    }
+  }
 }
