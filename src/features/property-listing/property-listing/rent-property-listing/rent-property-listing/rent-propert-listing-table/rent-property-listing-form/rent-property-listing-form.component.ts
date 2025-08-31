@@ -1,6 +1,6 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Button, ButtonModule } from 'primeng/button';
+import { ButtonModule } from 'primeng/button';
 import { StepperModule } from 'primeng/stepper';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
@@ -16,11 +16,13 @@ import { PropertyListing } from '../../../rent-property-listing-interfaces/prope
 import { PropertyListingForm } from '../../../rent-property-listing-interfaces/property-listing-form-interface';
 import { MessageService } from 'primeng/api';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ButtonSeverity } from '../../../../../../../app/shared/types/buttonSeverity.type';
 
 @Component({
   selector: 'app-rent-property-listing-form',
   imports: [StepperModule, ButtonModule, FormsModule, ReactiveFormsModule, InputTextModule,
-    ToggleSwitchModule, SelectModule, MultiSelectModule, NgClass
+    ToggleSwitchModule, SelectModule, MultiSelectModule, NgClass, ProgressSpinnerModule
   ],
   providers: [RentPropertyListingService, HttpClient],
   templateUrl: './rent-property-listing-form.component.html',
@@ -85,7 +87,7 @@ export class RentPropertyListingFormComponent implements OnInit {
     { id: 27, control: 'visitingEndTime', placeholder: 'Visiting End Time', values: this.getVisitingTime(9, 23) }
   ]
 
-  private getVisitingTime(startTime: number, endTime: number) {
+  private getVisitingTime(startTime: number, endTime: number): PropertyListingForm[] {
     startTime = startTime * 60;
     endTime = endTime * 60;
     const data: PropertyListingForm[] = [];
@@ -97,7 +99,7 @@ export class RentPropertyListingFormComponent implements OnInit {
     return data;
   }
 
-  public getTime(startTime: string) {
+  public getTime(startTime: string): void {
     if (startTime == 'visitingStartTime') {
       this.propertyVisitingFormSelectData[1].values = this.getVisitingTime((this.RentPropertyListingForm.get('propertyDetails.visitingStartTime')?.value / 60 || 8) + 1, 23)
     } else
@@ -167,7 +169,7 @@ export class RentPropertyListingFormComponent implements OnInit {
     // this.patchValueForSelectDropdownData('propertyPreferredTenants', this.propertyPreferredTenantsValues, rentPropertyDetailsData?.propertyPreferredTenants)
   }
 
-  public updateValidator(isUpdate: boolean) {
+  public updateValidator(isUpdate: boolean): void {
     if (isUpdate) {
       this.RentPropertyListingForm.get('propertyDetails.visitingStartTime')?.setValidators(Validators.required);
       this.RentPropertyListingForm.get('propertyDetails.visitingEndTime')?.setValidators(Validators.required);
@@ -179,7 +181,7 @@ export class RentPropertyListingFormComponent implements OnInit {
     this.RentPropertyListingForm.get('propertyDetails')?.updateValueAndValidity();
   }
 
-  private testFormData() {
+  private testFormData(): void {
     // Assuming these are the values to be patched
     const propertyData = {
       propertyFullAddress: {
@@ -288,14 +290,14 @@ export class RentPropertyListingFormComponent implements OnInit {
   }
 
   accuracy = 400;
-  accuracyLabel: any = 'Locate Me';
-  severity: any = 'secondary';
+  accuracyLabel = 'Locate Me';
+  severity: ButtonSeverity = 'secondary';
   public locateMe(counter: number = 0): void {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         position => {
           let accuracyLabel = 'Locating';
-          let severity = 'secondary';
+          let severity: ButtonSeverity = 'secondary';
           if (position.coords.accuracy < 200) {
             severity = 'info';
             if (this.accuracy > position.coords.accuracy) {

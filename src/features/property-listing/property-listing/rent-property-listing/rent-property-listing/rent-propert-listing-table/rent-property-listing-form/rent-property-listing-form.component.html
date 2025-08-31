@@ -15,9 +15,22 @@
                                     [ngClass]="{'ng-invalid ng-dirty': formControl?.touched && formControl?.invalid}" />
                             </div>
                             }
-                            <button pButton icon="pi pi-map-marker" [severity]="severity" [label]="accuracyLabel"
+                            <button pButton
+                                [icon]="accuracyLabel == 'Locating' ? 'pi pi-spinner-dotted' : 'pi pi-map-marker'"
+                                [severity]="severity" [label]="accuracyLabel"
                                 (click)="locateMe(); accuracyLabel = 'Locating'"
                                 [disabled]="accuracy < 200 || accuracyLabel == 'Locating'">
+                                <ng-template pTemplate="content">
+                                    <!-- <ng-container *ngIf="isLoading; else normalIcon"> -->
+                                    <p-progressSpinner styleClass="button-spinner" strokeWidth="4"
+                                        animationDuration=".5s"></p-progressSpinner>
+                                    <!-- </ng-container> -->
+                                    <!-- <ng-template #normalIcon>
+                                        <span class="pi pi-check"></span>
+                                    </ng-template> -->
+                                    <span class="ml-2">Submit</span>
+                                </ng-template>
+
                             </button>
                         </div>
                         <div class="py-6" style="margin: 24px 0px 0px 0px;">
