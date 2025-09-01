@@ -13,7 +13,7 @@ export const MyHttpInterceptor: HttpInterceptorFn = (
   const router = inject(Router);
   const subscriptionService = inject(SubscriptionService)
   const userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') ?? '{}')
-  const access_token = userInfo.token
+  const access_token = userInfo.token?.accessToken
   let cloned = req;
   if (access_token) {
     cloned = req.clone({

@@ -45,7 +45,7 @@ export class LoginComponent implements OnInit {
 
       },
       error: (err: { error: { errMsg: string; data: { message: string | undefined; }; }; }) => {
-        this.commonService.errorToast(err.error.errMsg, err.error?.data?.message)
+        this.commonService.errorToast(err.error?.errMsg, err.error?.data?.message)
       },
       complete: () => {
         this.loginForm.reset()
