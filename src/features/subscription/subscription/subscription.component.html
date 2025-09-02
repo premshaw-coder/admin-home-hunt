@@ -25,15 +25,15 @@
             @for (subscriptionPlanData of subscriptionPlansData; track $index) {
             <div class="flex flex-1 flex-col gap-4 rounded-lg border border-solid border-[#dbe0e6] bg-white p-6">
                 <div class="flex flex-col gap-1">
-                    <h1 class="text-[#111418] text-base font-bold leading-tight">{{subscriptionPlanData.title}}</h1>
+                    <h1 class="text-[#111418] text-base font-bold leading-tight">{{subscriptionPlanData?.subscriptionCategory}}</h1>
                     <p class="flex items-baseline gap-1 text-[#111418]">
                         <span
-                            class="text-[#111418] text-4xl font-black leading-tight tracking-[-0.033em]">${{subscriptionPlanData.amount}}</span>
+                            class="text-[#111418] text-4xl font-black leading-tight tracking-[-0.033em]">${{subscriptionPlanData?.price}}</span>
                         <span
-                            class="text-[#111418] text-base font-bold leading-tight">/{{subscriptionPlanData?.duration}}</span>
+                            class="text-[#111418] text-base font-bold leading-tight">/{{subscriptionPlanData?.billingCycle}}</span>
                     </p>
                 </div>
-                @for (feature of subscriptionPlanData.features; track $index) {
+                @for (feature of subscriptionPlanData?.features; track $index) {
                 <div class="flex flex-col gap-2">
                     <div class="text-[13px] font-normal leading-normal flex gap-3 text-[#111418]">
                         <div class="text-[#111418]" data-icon="Check" data-size="20px" data-weight="regular">
@@ -43,8 +43,8 @@
                     </div>
                 </div>
                 }
-                <p-button styleClass="w-full cursor-pointer" label="Choose plan" [loading]="loadingStates[subscriptionPlanData.amount]"
-                    (onClick)="buyRazorPay(subscriptionPlanData.amount)" />
+                <p-button styleClass="w-full cursor-pointer" label="Choose plan" [loading]="loadingStates[subscriptionPlanData?.price || 0]"
+                    (onClick)="buyRazorPay(subscriptionPlanData?.price || 0, subscriptionPlanData)" />
             </div>
             }
         </div>

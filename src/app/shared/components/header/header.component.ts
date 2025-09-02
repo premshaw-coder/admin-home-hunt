@@ -10,6 +10,7 @@ import { Toolbar } from 'primeng/toolbar';
 import { RoutesPaths } from '../../constants/application-routes/app-routes';
 import { SubscriptionStatusService } from '../../../../features/property-listing/services/subscription-status.service';
 import { skip, take } from 'rxjs/operators';
+import { AuthApiResponse } from '../../../../features/auth/interfaces/auth/auth-login.interface';
 
 @Component({
   selector: 'app-header',
@@ -21,6 +22,8 @@ export class HeaderComponent implements OnInit {
   items: MenuItem[] | undefined;
   private readonly router = inject(Router)
   private readonly subscriptionStatusService = inject(SubscriptionStatusService)
+  private readonly userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') ?? '{}')
+
 
   ngOnInit() {
     this.items = [
@@ -28,11 +31,11 @@ export class HeaderComponent implements OnInit {
         label: 'User Info',
         items: [
           {
-            label: 'Prem Shaw',
+            label: this.userInfo?.name ?? '',
             icon: 'pi pi-user'
           },
           {
-            label: 'premranjanshaw@gmail.com',
+            label: this.userInfo?.email ?? '',
             icon: 'pi pi-envelope'
           }
         ]

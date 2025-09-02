@@ -10,6 +10,8 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { ToastModule } from 'primeng/toast';
+import { Router } from '@angular/router';
+import { RoutesPaths } from '../../../../app/shared/constants/application-routes/app-routes';
 
 @Component({
   selector: 'app-sign-up',
@@ -22,6 +24,7 @@ export class SignUpComponent implements OnInit {
   private readonly authService = inject(AuthService)
   private readonly commonService = inject(CommonToastService)
   private readonly destroyRef = inject(DestroyRef)
+  private readonly router = inject(Router)
 
   ngOnInit(): void {
     this.setForm()
@@ -41,7 +44,8 @@ export class SignUpComponent implements OnInit {
           this.commonService.errorToast(err.error.errMsg, err.error?.data?.message)
         },
         complete: () => {
-          this.signUpForm.reset()
+          this.signUpForm.reset();
+          this.router.navigate([RoutesPaths.BasePath + RoutesPaths.Auth.login])
         },
       })
   }

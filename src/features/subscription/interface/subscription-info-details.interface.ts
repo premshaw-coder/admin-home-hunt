@@ -1,8 +1,8 @@
 export interface SubscriptionInfoDetails {
-    id: number,
-    tier:string,
-    duration: string,
-    amount: number,
-    title: string,
+    _id: string,
+    planName: string,
+    billingCycle: string,
+    price: number,
+    subscriptionCategory: string,
     features: string[]
 }

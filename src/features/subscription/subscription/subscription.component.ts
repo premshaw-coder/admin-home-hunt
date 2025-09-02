@@ -13,7 +13,6 @@ import { RazorpayPaymentService } from '../services/razorpay-payment.service';
 import { SubscriptionStatus } from '../interface/subscription-status.interface';
 import { SubscriptionInfoDetails } from '../interface/subscription-info-details.interface';
 import { SubscriptionPlanService } from '../services/subscription-plan.service';
-import { ApiStaticData } from '../constants/subscription-plans.constants';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Razorpay: any;
 
@@ -28,7 +27,11 @@ export class SubscriptionComponent implements OnInit {
   public subscriptionEndDate = '';
   public subscriptionPlans: Record<string, SubscriptionInfoDetails[]> = {};
   public subscriptionPlansData: SubscriptionInfoDetails[] = [];
-  public subscriptionPlanDurations: string[] = ApiStaticData.subscriptionPlanDuration
+  public subscriptionPlanDurations: string[] = [];
+  private subscriptionCategories: string[] = [];
+  private subscriptionDetails: Partial<SubscriptionInfoDetails> = {};
+  private readonly customSubscriptionCategoryOrder = ["free", "basic", "pro", "premium"];
+  private readonly customSubscriptionPlanDuration = ["monthly", "quarterly", "half-yearly", "yearly"]
 
   private readonly userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') ?? '{}')
   private readonly router = inject(Router)
@@ -48,12 +51,21 @@ export class SubscriptionComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (res: SubscriptionInfoDetails[]) => {
-        this.subscriptionPlans = Object.groupBy(res, ({ duration }) => duration) as Record<string, SubscriptionInfoDetails[]>;
+        res.forEach((plan: SubscriptionInfoDetails) => {
+          if (!this.subscriptionCategories.includes(plan.subscriptionCategory))
+            this.subscriptionCategories.push(plan.subscriptionCategory)
+          if (!this.subscriptionPlanDurations.includes(plan.billingCycle))
+            this.subscriptionPlanDurations.push(plan.billingCycle)
+        })
+        this.subscriptionPlanDurations = this.subscriptionPlanDurations.sort((a, b) => {
+          return this.customSubscriptionPlanDuration.indexOf(a) - this.customSubscriptionPlanDuration.indexOf(b);
+        });
+        this.subscriptionPlans = Object.groupBy(res, ({ billingCycle }) => billingCycle) as Record<string, SubscriptionInfoDetails[]>;
         const sortedSubscriptionPlansByDuration: [string, SubscriptionInfoDetails[]][] = this.subscriptionPlanDurations
-          .map((duration: string) => {
-            const subscriptionPlans = this.subscriptionPlans[duration.trim()];
+          .map((billingCycle: string) => {
+            const subscriptionPlans = this.subscriptionPlans[billingCycle.trim()];
             const sortedSubscriptionPlansByTile = this.getSortedSubscriptionPlansByTile(subscriptionPlans);
-            return [duration, sortedSubscriptionPlansByTile];
+            return [billingCycle, sortedSubscriptionPlansByTile];
           })
           .filter(([, value]) => Array.isArray(value) && value.length > 0) as [string, SubscriptionInfoDetails[]][];
         this.subscriptionPlans = Object.fromEntries(sortedSubscriptionPlansByDuration);
@@ -74,6 +86,7 @@ export class SubscriptionComponent implements OnInit {
       try {
         /* This block of code is handling the process after a successful payment verification using
         Razorpay. Here's a breakdown of what each step is doing: */
+        res={...res, billingCycle: this.subscriptionDetails.billingCycle, subscriptionCategory: this.subscriptionDetails.subscriptionCategory}
         this.razorpayPaymentService.verifyRazorpayPayment(res).pipe(
           switchMap(() => this.authService.regenerateJwtToken(this.userInfo.id ?? '')),
           tap((tokenResponse) => {
@@ -98,7 +111,9 @@ export class SubscriptionComponent implements OnInit {
     }
   }
 
-  public buyRazorPay(amount: number): void {
+  public buyRazorPay(amount: number, subscriptionDetails: SubscriptionInfoDetails): void {
+    this.subscriptionDetails = subscriptionDetails;
+    console.log('subscriptionDetails', this.subscriptionDetails)
     this.loadingStates[amount] = true;
     const payload: RazorPayOrderCreationPayload = {
       "amount": amount, "receipt": "sfbbs", "payment_capture": 1, "userId": this.userInfo.id ?? '',
@@ -115,14 +130,16 @@ export class SubscriptionComponent implements OnInit {
   }
 
   public chooseDuration(subscriptionPlanDuration: string): void {
-    this.subscriptionPlansData = structuredClone(this.subscriptionPlans[subscriptionPlanDuration])
+    this.subscriptionPlansData = structuredClone(this.subscriptionPlans[subscriptionPlanDuration]);
   }
 
   private getSortedSubscriptionPlansByTile(subscriptionPlans: SubscriptionInfoDetails[]): SubscriptionInfoDetails[] {
-    return ApiStaticData?.subscriptionCategories?.map((category: string) => {
+    return this.subscriptionCategories.sort((a, b) => {
+      return this.customSubscriptionCategoryOrder.indexOf(a) - this.customSubscriptionCategoryOrder.indexOf(b);
+    }).map((category: string) => {
       const subscriptionPlansIndex = subscriptionPlans
-        .findIndex((subscriptionPlan: SubscriptionInfoDetails) => subscriptionPlan.title === category);
+        .findIndex((subscriptionPlan: SubscriptionInfoDetails) => subscriptionPlan.subscriptionCategory === category);
       return subscriptionPlans[subscriptionPlansIndex];
-    });
+    }).filter(Boolean) as SubscriptionInfoDetails[];
   }
 }

@@ -8,7 +8,6 @@ import { AuthApiResponse } from '../../auth/interfaces/auth/auth-login.interface
   providedIn: 'root'
 })
 export class SubscriptionStatusService {
-  private readonly userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') ?? '{}')
   private readonly subscriptionService = inject(SubscriptionService);
   private readonly refreshTrigger$ = new Subject<void>();
 
@@ -17,9 +16,10 @@ export class SubscriptionStatusService {
     // Start with an immediate call (auto-fetch)
     startWith(void 0),
     switchMap(() =>
-      defer(() =>
-        this.subscriptionService.subscriptionStatus(this.userInfo?.id ?? '')
-      )
+      defer(() => {
+        const userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') ?? '{}');
+        return this.subscriptionService.subscriptionStatus(userInfo?.id ?? '');
+      })
     ),
     shareReplay(1) // Cache the latest result for all subscribers
   );

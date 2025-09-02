@@ -42,7 +42,10 @@ export class RentPropertyListingFormComponent implements OnInit {
   public readonly propertyAmenitiesValues: PropertyListingForm[] = ApiStaticData.amenitiesValues;
   private readonly userInfo: AuthApiResponse = JSON.parse(localStorage.getItem('UserInfo') ?? '{}')
   private isEditMode!: boolean;
-  private rentPropertyData!: PropertyListing
+  private rentPropertyData!: PropertyListing;
+  accuracy = 400;
+  accuracyLabel = 'Locate Me';
+  severity: ButtonSeverity = 'secondary';
 
   public readonly dialogConfig = inject(DynamicDialogConfig)
   public readonly dialogRef = inject(DynamicDialogRef)
@@ -289,10 +292,7 @@ export class RentPropertyListingFormComponent implements OnInit {
     });
   }
 
-  accuracy = 400;
-  accuracyLabel = 'Locate Me';
-  severity: ButtonSeverity = 'secondary';
-  public locateMe(counter: number = 0): void {
+  public locateMe(counter = 0): void {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         position => {

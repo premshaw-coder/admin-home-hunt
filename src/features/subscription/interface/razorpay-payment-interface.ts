@@ -13,6 +13,8 @@ export interface RazorPayOrderCreation {
     offer_id?: string | null;
     receipt?: string;
     status?: string;
+    billingCycle?: string;
+    subscriptionCategory?: string;
 }
 
 export interface RazorPayPaymentDetails {
