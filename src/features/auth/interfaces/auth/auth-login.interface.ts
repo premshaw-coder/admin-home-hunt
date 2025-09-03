@@ -6,10 +6,16 @@ export interface AuthApiResponse {
     readonly last_login: string;
     readonly is_registered?: boolean;
     readonly address: Address[]; // Address can be of various formats, keep it generic
-    readonly token: { accessToken: string, refreshToken: string };
+    readonly token: Token;
     readonly uuid?: string;
     readonly id?: string;
 }
+
+export interface Token {
+    accessToken: string,
+    refreshToken: string
+}
+
 export interface Address {
     readonly address?: string;
     readonly city?: string;

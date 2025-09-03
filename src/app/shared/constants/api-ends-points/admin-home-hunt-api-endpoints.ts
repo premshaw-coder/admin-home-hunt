@@ -7,6 +7,7 @@ export const ApiEndPoints = {
         login: 'login',
         signUp: 'signup',
         regenerateJwtToken: 're-generate-jwt-token/',
+        refreshAccessToken: 'refresh-token',
     },
 
     //rent property list endpoint
