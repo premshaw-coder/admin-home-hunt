@@ -30,6 +30,19 @@ export const MyHttpInterceptor: HttpInterceptorFn = (
     });
   }
   return next(cloned).pipe(
+    // retry({
+    //   delay: (error: HttpErrorResponse, retryAttempt: number) => {
+    //     if (retryAttempt <= 2 && [401, 403].includes(error.status)) {
+    //       // Implement exponential backoff for the delay
+    //       // e.g., 1st retry: 2^1 * 500 = 1000ms
+    //       //  2nd retry: 2^2 * 500 = 2000ms
+    //       const delayTime = Math.pow(2, retryAttempt) * 500;
+    //       return timer(delayTime);
+    //     } else {
+    //       return throwError(() => error);
+    //     }
+    //   },
+    // }),
     catchError((error: HttpErrorResponse) => {
       if ([401, 403].includes(error.status)) {
         if (error.status === 403 && error.error?.subscriptionExpired && error.error?.message === 'Subscription expired') {
