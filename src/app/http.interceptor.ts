@@ -1,5 +1,5 @@
 import { HttpRequest, HttpErrorResponse, HttpEvent, HttpInterceptorFn, HttpHandlerFn } from '@angular/common/http';
-import { catchError, Observable, switchMap, throwError } from 'rxjs';
+import { catchError, first, Observable, switchMap, throwError } from 'rxjs';
 import { AuthApiResponse } from '../features/auth/interfaces/auth/auth-login.interface';
 import { RoutesPaths } from './shared/constants/application-routes/app-routes';
 import { inject } from '@angular/core';
@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { SubscriptionService } from '../features/subscription/services/subscription.service';
 import { CommonService } from './shared/common-services/common.service';
 
-let count = 0;
+let failedApiRetryCount = 0;
 
 export const MyHttpInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
@@ -49,15 +49,15 @@ export const MyHttpInterceptor: HttpInterceptorFn = (
           const payload = {
             endDate: new Date(error.error.subscriptionEndDate).toISOString()
           }
-          subscriptionService.checkAndExpireSubscribedUser(userInfo.id ?? '', payload).subscribe()
+          subscriptionService.checkAndExpireSubscribedUser(userInfo.id ?? '', payload).pipe(first()).subscribe()
           router.navigate([RoutesPaths.BasePath + RoutesPaths.Subscription])
         }
         else {
-          count++;
-          if (count > 2) return throwError(() => error);
+          failedApiRetryCount++;
+          if (failedApiRetryCount > 2) return throwError(() => error);
           return commonService.updateToken().pipe(
             switchMap((accessToken) => {
-              count = 0;
+              failedApiRetryCount = 0;
               const clonedRequest = req.clone({
                 headers: req.headers.set('Authorization', `Bearer ${accessToken}`)
               });
