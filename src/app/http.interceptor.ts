@@ -56,11 +56,10 @@ export const MyHttpInterceptor: HttpInterceptorFn = (
           count++;
           if (count > 2) return throwError(() => error);
           return commonService.updateToken().pipe(
-            switchMap(() => {
+            switchMap((accessToken) => {
               count = 0;
-              let access_token = userInfo.token?.accessToken;
               const clonedRequest = req.clone({
-                headers: req.headers.set('Authorization', `Bearer ${access_token}`)
+                headers: req.headers.set('Authorization', `Bearer ${accessToken}`)
               });
               return next(clonedRequest);
             })
